@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faCog } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom"; // Импортируем useNavigate для навигации
+import { useNavigate } from "react-router-dom"; // Import useNavigate for routing
 
 const Dashboard = () => {
   const tests = [
@@ -19,7 +19,7 @@ const Dashboard = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
 
-  const navigate = useNavigate(); // Используем хук useNavigate для маршрутизации
+  const navigate = useNavigate(); // Use the useNavigate hook for routing
 
   useEffect(() => {
     const savedUsername = localStorage.getItem("username");
@@ -49,15 +49,15 @@ const Dashboard = () => {
     }
 
     setNotifications([
-      "Скоро закончится срок сдачи теста по математике.",
-      "У вас появился новый тест по истории.",
-      "Пришли результаты тестирования по биологии.",
+      { title: "Math Test Deadline", text: "Скоро закончится срок сдачи теста по математике.", link: "/math-test" },
+      { title: "New History Test", text: "У вас появился новый тест по истории.", link: "/history-test" },
+      { title: "Biology Test Results", text: "Пришли результаты тестирования по биологии.", link: "/biology-results" },
     ]);
   }, []);
 
-  // Функция для перенаправления на Forms
+  // Function to redirect to Forms
   const handleTestClick = () => {
-    navigate("/forms"); // Перенаправляем на компонент Forms
+    navigate("/forms"); // Redirect to Forms component
   };
 
   return (
@@ -90,12 +90,20 @@ const Dashboard = () => {
       {showNotifications && (
         <div className="position-relative">
           <div className="position-absolute end-0 me-3" style={{ zIndex: 1000 }}>
-            <div className="card shadow">
+            <div className="card shadow" style={{ maxWidth: "500px" }}>
               <div className="card-body">
                 <h5 className="card-title">Уведомления</h5>
                 {notifications.length > 0 ? (
                   notifications.map((notification, index) => (
-                    <p key={index} className="mb-1">{notification}</p>
+                    <div key={index} className="mb-3">
+                      <div className="notification-card card">
+                        <div className="card-body">
+                          <h6 className="card-title">{notification.title}</h6>
+                          <p className="card-text">{notification.text}</p>
+                          <a href={notification.link} className="btn btn-primary">Подробнее</a>
+                        </div>
+                      </div>
+                    </div>
                   ))
                 ) : (
                   <p className="mb-0">Нет новых уведомлений.</p>
@@ -110,7 +118,7 @@ const Dashboard = () => {
         <div className="row">
           {data.tests.map((test) => (
             <div key={test.id} className="col-md-4 mb-4">
-              <div className="card h-100" onClick={handleTestClick}> {/* Добавляем onClick для перехода */}
+              <div className="card h-100" onClick={handleTestClick}> {/* Adding onClick for navigation */}
                 <div className="card-body">
                   <h5 className="card-title">📚 {test.title}</h5>
                   <p className="card-text">{test.description}</p>

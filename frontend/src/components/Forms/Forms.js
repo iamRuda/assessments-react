@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './forms.css'; // Не забудьте создать и подключить файл стилей
 import "./slider.css";
+import { Link } from 'react-router-dom'; // Импортируем Link для маршрутизации
 
 const Forms = () => {
     const [formData, setFormData] = useState({
@@ -74,6 +75,7 @@ const Forms = () => {
 
     return (
         <div className="container mt-5">
+            <Link to="/dashboard" className="mb-3">{"<<"} Вернуться на главную</Link>
             <h2 className="mb-4">Анкета</h2>
             <form onSubmit={handleSubmit}>
                 {/* Вопрос 1 */}
@@ -142,7 +144,7 @@ const Forms = () => {
                                 <label htmlFor={`image${index}`} className="d-block position-relative img-form">
                                     <img
                                         src={`https://via.placeholder.com/100?text=${index + 1}`}
-                                        alt={`Опция ${index + 1}`}
+                                        alt={`Image ${index + 1}`}
                                         className="img-thumbnail"
                                         style={{ cursor: 'pointer', borderRadius: '10px' }}
                                     />
@@ -174,7 +176,7 @@ const Forms = () => {
                                 <label htmlFor={`checkboxImage${index}`} className="d-block position-relative img-form">
                                     <img
                                         src={`https://via.placeholder.com/100?text=${index + 1}`}
-                                        alt={`Опция ${index + 1}`}
+                                        alt={`Image ${index + 1}`}
                                         className="img-thumbnail"
                                         style={{ cursor: 'pointer', borderRadius: '10px' }}
                                     />
@@ -248,6 +250,40 @@ const Forms = () => {
                             ))}
                         </div>
                     </div>
+                    <p className="mt-2" style={{ color: '#6c757d' }}>
+                        Выберите несколько кнопок, которые вам нравятся!
+                    </p>
+                </div>
+                
+                {/* Вопрос 7 - Открытый ответ */}
+                <div className="card mb-4 p-3 shadow-sm" style={{ borderRadius: '10px' }}>
+                    <h5 className="mb-3">Пожалуйста, напишите ваш ответ на вопрос:</h5>
+                    <p>Как вы оцениваете своё текущее настроение?</p>
+                    <input
+                        className="form-control"
+                        type="text"
+                        name="openTextAnswer"
+                        value={formData.openTextAnswer}
+                        onChange={handleChange}
+                        placeholder="Введите ваш ответ здесь"
+                    />
+                    <p className="mt-2" style={{ color: '#6c757d' }}>
+                        Выберите несколько кнопок, которые вам нравятся!
+                    </p>
+                </div>
+
+                {/* Вопрос 8 - Развернутый ткрытый ответ */}
+                <div className="card mb-4 p-3 shadow-sm" style={{ borderRadius: '10px' }}>
+                    <h5 className="mb-3">Пожалуйста, напишите ваш ответ на вопрос:</h5>
+                    <p>Как вы оцениваете своё текущее настроение?</p>
+                    <textarea
+                        className="form-control"
+                        name="openTextAnswer"
+                        rows="3"
+                        value={formData.openTextAnswer}
+                        onChange={handleChange}
+                        placeholder="Введите ваш ответ здесь"
+                    ></textarea>
                     <p className="mt-2" style={{ color: '#6c757d' }}>
                         Выберите несколько кнопок, которые вам нравятся!
                     </p>
