@@ -16,7 +16,7 @@ const Login = () => {
     if (username === "test" && password === "test") {
       localStorage.setItem("username", username);
       navigate("/dashboard");
-      return;
+      return; // Обязательно выходи из функции после успешного тестового входа
     }
 
     try {
@@ -47,6 +47,13 @@ const Login = () => {
   const handleClosePopup = () => {
     setShowErrorPopup(false);
     setError(""); // Сбросить сообщение об ошибке
+  };
+
+  // Функция для входа как гость
+  const handleGuestLogin = () => {
+    localStorage.setItem("username", "test");
+    localStorage.setItem("token", "test_token"); // Токен для гостя
+    navigate("/dashboard");
   };
 
   return (
@@ -95,8 +102,16 @@ const Login = () => {
 
           <button className="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
 
-          <p className="mt-5 mb-3 text-muted text-center">&copy;SASDevs</p>
+          <p className="mt-5 mb-3 text-muted text-center">&copy; SASDevs</p>
         </form>
+
+        {/* Добавляем кнопку для входа как гость */}
+        <button
+          className="w-100 btn btn-lg btn-secondary mt-3"
+          onClick={handleGuestLogin}
+        >
+          Войти как гость
+        </button>
       </div>
     </div>
   );

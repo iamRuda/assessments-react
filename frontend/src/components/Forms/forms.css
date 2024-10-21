@@ -1,0 +1,25 @@
+.checkbox-overlay {
+    position: absolute; /* Position absolutely within the parent container */
+    top: 0.5rem; /* Adjust this value to position it vertically */
+    right: 0.8rem; /* Adjust this value to position it horizontally */
+    width: 1.5rem;
+    height: 1.5rem;
+    cursor: pointer;
+    z-index: 1; /* Ensure it appears above the image */
+}
+
+.img-form {
+    display: inline-block; /* Keeps the label as a block to maintain layout */
+    width: 7rem; /* Set this to match the image width */
+    height: 7rem; /* Set this to match the image height */
+    position: relative; /* To position the checkbox correctly within it */
+}
+
+.img-form img {
+    width: 100%; /* Make image responsive to the label size */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 10px; /* Keep rounded corners */
+}
+
+
+
