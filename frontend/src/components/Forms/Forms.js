@@ -238,7 +238,7 @@ const Forms = () => {
                             </div>
                         ) : (
                             <div>
-                                {question.questionText && <p className="text-muted">{question.questionText}</p>}
+                                <p className="text-dark">{question.questionText}</p>
                                 {question.options && question.questionType === 'multiple_choice_single' && (
                                     question.options.map((option, index) => (
                                         <div key={index} className="form-check">
@@ -283,6 +283,7 @@ const Forms = () => {
                                         onChange={(e) => handleChange(e, question.id, false)}
                                     />
                                 )}
+                                <p className="text-muted mt-2">{question.questionPostscript}</p>
                                 <button
                                     type="button"
                                     className="btn btn-secondary mt-2"

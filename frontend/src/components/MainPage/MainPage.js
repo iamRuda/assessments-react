@@ -31,7 +31,7 @@ const MainPage = () => {
             color="primary"
             fullWidth
             style={{ marginTop: '15px' }}
-            onClick={() => alert("Зарегистрироваться")}
+            onClick={() => navigate("/registration")}
           >
             Зарегистрироваться
           </Button>
