@@ -2,7 +2,7 @@ import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import './MainPage.css';
 import { useNavigate } from "react-router-dom";
-import { TextField, Button, Paper, Typography, Container } from "@mui/material";
+import { Button, Typography, Container, Card, CardContent } from "@mui/material";
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -11,59 +11,113 @@ const MainPage = () => {
     <div className="bg-light text-dark">
       {/* Image Header with Gradient Effect */}
       <div className="image-header">
-        <div className="text-center text-black" style={{ padding: '80px 0' }}>
+        <Container className="text-center text-black" style={{ padding: '80px 0' }}>
           <Typography variant="h2" component="h1">Добро пожаловать в систему тестирования!</Typography>
           <Typography variant="h5" component="p">Ваш надежный помощник в обучении и оценке знаний.</Typography>
-        </div>
+          
+          {/* Button and Registration Prompt */}
+          <div style={{ position: 'relative', zIndex: 1, marginTop: '20px' }}> {/* Reduced margin for closeness */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}> {/* Adjusted margin */}
+              <Button
+                variant="contained"
+                color="primary"
+                style={{
+                  width: '150px',
+                  borderRadius: '20px',
+                  padding: '10px',
+                  color: 'white'
+                }}
+                onClick={() => navigate("/login")}
+              >
+                Войти
+              </Button>
+            </div>
+
+            <Typography style={{ textAlign: 'center', marginTop: '10px' }}>
+              Еще нет аккаунта?  
+              <span 
+                style={{ color: '#007bff', cursor: 'pointer' }} 
+                onClick={() => navigate("/registration")}
+              >
+                Зарегистрироваться!
+              </span>
+            </Typography>
+          </div>
+        </Container>
       </div>
 
-      <Container maxWidth="sm" style={{ marginTop: '-70px', position: 'relative', zIndex: 2 }}>
-        {/* Registration Form Box */}
-        <Paper elevation={3} className="registration-form">
-          <Typography variant="h5" component="h2" align="center" gutterBottom>
-            Зарегистрироваться
-          </Typography>
-          <TextField fullWidth label="Имя" margin="normal" variant="outlined" />
-          <TextField fullWidth label="Email" margin="normal" variant="outlined" />
-          <TextField fullWidth label="Пароль" type="password" margin="normal" variant="outlined" />
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            style={{ marginTop: '15px' }}
-            onClick={() => navigate("/registration")}
-          >
-            Зарегистрироваться
-          </Button>
-          {/* Войти Button Inside the Form */}
-          <Button
-            variant="outlined"
-            color="secondary"
-            fullWidth
-            style={{ marginTop: '10px' }}
-            onClick={() => navigate("/login")}
-          >
-            Войти
-          </Button>
-        </Paper>
-      </Container>
+      {/* Added Cards Section with Images */}
+      <section className="container py-5">
+        <div className="row">
+          {/* First Card */}
+          <div className="col-md-4">
+            <Card>
+              <img
+                src={require('./first.jpg')}
+                alt="Test Environment"
+                className="card-img-top"
+              />
+              <CardContent>
+                <Typography variant="h5">Удобная платформа</Typography>
+                <Typography variant="body2">
+                  Наша система предоставляет интуитивно понятный интерфейс для тестирования в различных предметах.
+                </Typography>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Second Card */}
+          <div className="col-md-4">
+            <Card>
+              <img
+                src={require('./second.jpg')}
+                alt="Analytics"
+                className="card-img-top"
+              />
+              <CardContent>
+                <Typography variant="h5">Подробная аналитика</Typography>
+                <Typography variant="body2">
+                  Мы предлагаем детализированные отчеты и рекомендации для улучшения ваших знаний.
+                </Typography>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Third Card */}
+          <div className="col-md-4">
+            <Card>
+              <img
+                src={require('./third.jpg')}
+                alt="Security"
+                className="card-img-top"
+              />
+              <CardContent>
+                <Typography variant="h5">Безопасность данных</Typography>
+                <Typography variant="body2">
+                  Обеспечиваем защиту ваших данных с использованием современных технологий безопасности.
+                </Typography>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
 
       <div className="security-testing-info">
-        <p>
-          Системы тестирования безопасности на производстве играют критически важную роль в обеспечении 
-          защиты оборудования и производственных процессов. Эти системы направлены на выявление 
-          уязвимостей и проверку эффективности различных мер безопасности. Регулярные тестирования 
-          позволяют своевременно обнаруживать потенциальные угрозы и минимизировать риски для 
-          сотрудников и активов компании. Современные методы тестирования включают как статический, 
-          так и динамический анализ, что обеспечивает всестороннюю оценку состояния безопасности на 
-          всех этапах производства.
-        </p>
-      </div>
+  <h2 className="info-heading">Информация о системе тестирования</h2>
+  <p className="info-text">
+    Системы тестирования безопасности на производстве играют критически важную роль в обеспечении 
+    защиты оборудования и производственных процессов. Эти системы направлены на выявление 
+    уязвимостей и проверку эффективности различных мер безопасности. Регулярные тестирования 
+    позволяют своевременно обнаруживать потенциальные угрозы и минимизировать риски для 
+    сотрудников и активов компании.
+  </p>
+</div>
+
 
       {/* Section for Testing System Features */}
       <section className="container py-5">
         <h2 className="pb-3 text-center text-info" style={{ marginTop: '40px' }}>Почему выбирают нашу систему тестирования?</h2>
-        <div className="list-container" style={{ display: 'flex', margin: '10' }}>
+        <div className="list-container" style={{ display: 'flex' }}>
           {/* Left Box */}
           <div className="list-box list-box-left">
             <h3 className="list-heading">Вы сможете:</h3>
@@ -91,7 +145,7 @@ const MainPage = () => {
 
       <footer className="d-flex justify-content-between align-items-center py-3 my-4 border-top bg-white">
         <div className="container">
-          <p className="text-muted">© 2023 Система тестирования</p>
+          <p className="text-muted">© 2024 Система тестирования</p>
         </div>
       </footer>
     </div>
