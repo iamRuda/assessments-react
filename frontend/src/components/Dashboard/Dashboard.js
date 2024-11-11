@@ -60,6 +60,11 @@ const Dashboard = () => {
     navigate("/forms"); // Redirect to Forms component
   };
 
+  // Navigate to the settings page
+  const handleSettingsClick = () => {
+    navigate("/settings"); // Navigate to settings page
+  };
+
   return (
     <div className="container">
       <header className="d-flex align-items-center justify-content-between my-4">
@@ -81,7 +86,7 @@ const Dashboard = () => {
           <button className="btn btn-link" title="Notifications" onClick={() => setShowNotifications(!showNotifications)}>
             <FontAwesomeIcon icon={faBell} size="lg" />
           </button>
-          <button className="btn btn-link" title="Settings">
+          <button className="btn btn-link" title="Settings" onClick={handleSettingsClick}>
             <FontAwesomeIcon icon={faCog} size="lg" />
           </button>
         </div>

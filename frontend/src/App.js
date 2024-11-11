@@ -5,8 +5,8 @@ import Login from "./components/Login/Login";
 import Registration from "./components/Registration/Registration";
 import Dashboard from "./components/Dashboard/Dashboard";
 import Forms from "./components/Forms/Forms";
+import Settings from "./components/Settings/Settings"; // Import Settings component
 import PrivateRoute from "./routes/PrivateRoute";
-
 
 const App = () => {
   return (
@@ -17,6 +17,7 @@ const App = () => {
         <Route path="/registration" element={<Registration />} />
         <Route path="/dashboard" element={<PrivateRoute element={Dashboard} />} />
         <Route path="/forms" element={<PrivateRoute element={Forms} />} />
+        <Route path="/settings" element={<PrivateRoute element={Settings} />} /> {/* New route for settings */}
       </Routes>
     </Router>
   );

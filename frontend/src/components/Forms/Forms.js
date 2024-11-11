@@ -207,6 +207,21 @@ const Forms = () => {
         }));
     };
 
+    const handleDeleteQuestion = (questionId) => {
+        // Remove the question with the matching id from the jsonData state
+        setJsonData((prevData) => ({
+            ...prevData,
+            questions: prevData.questions.filter((q) => q.id !== questionId)
+        }));
+    
+        // Optionally, you can clear the corresponding data in formData state if needed
+        setFormData((prevData) => {
+            const newFormData = { ...prevData };
+            delete newFormData[questionId];
+            return newFormData;
+        });
+    };
+
     return (
         <div className="container mt-5">
             <div className="d-flex justify-content-between align-items-center">
