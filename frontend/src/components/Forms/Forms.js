@@ -38,13 +38,153 @@ const Forms = () => {
                 selectedAnswers: []
             },
             {
-                id: 'question8', // New question ID
+                id: 'question4', // New question ID
                 questionHeader: 'Опишите, как вы решаете проблемы в коде:',
                 questionText: 'Поделитесь вашим опытом и подходами.',
                 questionPostscript: 'Это многострочный ответ.',
                 questionType: 'open_ended',
                 responseType: 'multi_line', // This specifies that it's a multi-line response
                 selectedAnswers: [] // Store multi-line response
+            },
+            {
+                id: 'question5',
+                questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать только одну)',
+                questionText: 'Нажмите на любую кнопку, чтобы выбрать вашу любимую.',
+                questionType: 'single_button_select',
+                buttonOptions: {
+                    1: '1',
+                    2: '2',
+                    3: '3',
+                    4: '4',
+                    5: '5'
+                },
+                selectedAnswers: []
+            },
+            {
+                id: 'question6',
+                questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать несколько)',
+                questionText: 'Нажмите на любые кнопки, чтобы выбрать ваши любимые.',
+                questionType: 'multiple_button_select',
+                buttonOptions: {
+                    1: '1',
+                    2: '2',
+                    3: '3',
+                    4: '4',
+                    5: '5'
+                },
+                selectedAnswers: []
+            },
+            {
+                id: 'question7',
+                questionHeader: 'Вы когда-нибудь использовали Google Формы?',
+                questionText: 'Пожалуйста, выберите один из вариантов ниже.',
+                questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
+                questionType: 'image_selection_single',
+                options: {
+                    option1: {
+                        id: '1',
+                        label: 'Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    },
+                    option2: {
+                        id: '2',
+                        label: 'No Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    },
+                    option3: {
+                        id: '3',
+                        label: 'No Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    },
+                    option4: {
+                        id: '4',
+                        label: 'No Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    },
+                    option5: {
+                        id: '5',
+                        label: 'No Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    },
+                    option6: {
+                        id: '6',
+                        label: 'No Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    },
+                    option7: {
+                        id: '7',
+                        label: 'No Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    },
+                    option8: {
+                        id: '8',
+                        label: 'No Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    },
+                    option9: {
+                        id: '9',
+                        label: 'No Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    }
+                },
+                correctAnswers: [],
+                selectedAnswers: []
+            },
+            {
+                id: 'question8',
+                questionHeader: 'Вы когда-нибудь использовали Google Формы?',
+                questionText: 'Пожалуйста, выберите один из вариантов ниже.',
+                questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
+                questionType: 'image_selection_multiple',
+                options: {
+                    option1: {
+                        id: '1',
+                        label: 'Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    },
+                    option2: {
+                        id: '2',
+                        label: 'No Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    },
+                    option3: {
+                        id: '3',
+                        label: 'No Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    },
+                    option4: {
+                        id: '4',
+                        label: 'No Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    },
+                    option5: {
+                        id: '5',
+                        label: 'No Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    },
+                    option6: {
+                        id: '6',
+                        label: 'No Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    },
+                    option7: {
+                        id: '7',
+                        label: 'No Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    },
+                    option8: {
+                        id: '8',
+                        label: 'No Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    },
+                    option9: {
+                        id: '9',
+                        label: 'No Google Forms',
+                        imageUrl: 'https://via.placeholder.com/100'
+                    }
+                },
+                correctAnswers: [],
+                selectedAnswers: []
             }
         ]
     });
@@ -159,6 +299,72 @@ const Forms = () => {
         }
     };
 
+
+    const handleSingleButtonSelect = (buttonId, questionId) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            [questionId]: buttonId
+        }));
+    
+        setJsonData((prevData) => ({
+            ...prevData,
+            questions: prevData.questions.map((q) =>
+                q.id === questionId ? { ...q, selectedAnswers: [buttonId] } : q
+            )
+        }));
+    };
+
+    const handleMultipleButtonSelect = (buttonId, questionId) => {
+        setJsonData((prevData) => ({
+          ...prevData,
+          questions: prevData.questions.map((q) => {
+            if (q.id === questionId) {
+              const isSelected = q.selectedAnswers.includes(buttonId);
+              const newSelectedAnswers = isSelected
+                ? q.selectedAnswers.filter((id) => id !== buttonId)
+                : [...q.selectedAnswers, buttonId];
+      
+              return { ...q, selectedAnswers: newSelectedAnswers };
+            }
+            return q;
+          })
+        }));
+      };
+    
+    const handleSingleImageSelect = (e, questionId) => {
+        const selectedValue = e.target.value; // id выбранного изображения
+    
+        // Обновляем данные в состоянии
+        setJsonData((prevData) => ({
+            ...prevData,
+            questions: prevData.questions.map((question) => 
+                question.id === questionId
+                    ? { ...question, selectedAnswers: [selectedValue] } // Обновляем выбранный ответ для данного вопроса
+                    : question
+            )
+        }));
+    };
+
+    const handleMultipleImageSelect = (e, questionId) => {
+        const selectedValue = e.target.value; // id выбранного изображения
+        const isChecked = e.target.checked; // флаг, отмечен ли чекбокс
+    
+        // Обновляем данные в состоянии
+        setJsonData((prevData) => ({
+            ...prevData,
+            questions: prevData.questions.map((question) => 
+                question.id === questionId
+                    ? {
+                        ...question,
+                        selectedAnswers: isChecked
+                            ? [...question.selectedAnswers, selectedValue] // Если выбрали, добавляем
+                            : question.selectedAnswers.filter((answer) => answer !== selectedValue) // Если сняли, убираем
+                    }
+                    : question
+            )
+        }));
+    };
+
     const handleAddQuestion = () => {
         const newQuestionId = `question_${Date.now()}_${Math.floor(Math.random() * 1000)}`; // Generate a unique ID using timestamp and random number
         const existingIds = jsonData.questions.map(q => q.id);
@@ -190,7 +396,7 @@ const Forms = () => {
             [newQuestionId]: false
         }));
     };    
-
+    
     const handleEditQuestionId = (newId, questionId) => {
         const existingIds = jsonData.questions.map(q => q.id);
         // Проверка на уникальность нового ID
@@ -298,6 +504,98 @@ const Forms = () => {
                                         onChange={(e) => handleChange(e, question.id, false)}
                                     />
                                 )}
+                                {question.questionType === 'single_button_select' && (
+                                    <div className="slider-container">
+                                        <div className="slider-track">
+                                            {Object.entries(question.buttonOptions).map(([id, label]) => (
+                                                <div key={id} className="slide">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleSingleButtonSelect(id, question.id)}
+                                                        className="d-block"
+                                                        style={{
+                                                            backgroundColor: question.selectedAnswers.includes(id) ? '#ff9900' : '#007bff'
+                                                        }}
+                                                    >
+                                                        {label}
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                {question.questionType === 'multiple_button_select' && (
+                                <div className="slider-container">
+                                    <div className="slider-track">
+                                    {Object.entries(question.buttonOptions).map(([id, label]) => (
+                                        <div key={id} className="slide">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleMultipleButtonSelect(id, question.id)}
+                                            className="d-block"
+                                            style={{
+                                            backgroundColor: question.selectedAnswers.includes(id) ? '#ff9900' : '#007bff'
+                                            }}
+                                        >
+                                            {label}
+                                        </button>
+                                        </div>
+                                    ))}
+                                    </div>
+                                </div>
+                                )}
+                                {question.questionType === 'image_selection_single' && (
+                                    <div className="row">
+                                        {Object.values(question.options).map((option, index) => (
+                                            <div key={option.id} className="col-4 text-center mb-3">
+                                                <label htmlFor={`image_${question.id}_${option.id}`} className="d-block position-relative img-form">
+                                                    <img
+                                                        src={option.imageUrl}
+                                                        alt={option.label}
+                                                        className="img-thumbnail"
+                                                        style={{ cursor: 'pointer', borderRadius: '10px' }}
+                                                    />
+                                                    <input
+                                                        className="form-check-input checkbox-overlay"
+                                                        type="radio"
+                                                        id={`image_${question.id}_${option.id}`} // Составной id
+                                                        name={`selectedImage_${question.id}`}
+                                                        value={option.id}
+                                                        checked={question.selectedAnswers[0] === option.id}
+                                                        onChange={(e) => handleSingleImageSelect(e, question.id)}
+                                                    />
+                                                </label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {question.questionType === 'image_selection_multiple' && ( // Проверка для множественного выбора
+                                    <div className="row">
+                                        {Object.values(question.options).map((option, index) => (
+                                            <div key={option.id} className="col-4 text-center mb-3">
+                                                <label htmlFor={`image_${question.id}_${option.id}`} className="d-block position-relative img-form">
+                                                    <img
+                                                        src={option.imageUrl}
+                                                        alt={option.label}
+                                                        className="img-thumbnail"
+                                                        style={{ cursor: 'pointer', borderRadius: '10px' }}
+                                                    />
+                                                    <input
+                                                        className="form-check-input checkbox-overlay"
+                                                        type="checkbox" // Используем чекбокс для множественного выбора
+                                                        id={`image_${question.id}_${option.id}`} // Составной id
+                                                        value={option.id}
+                                                        checked={question.selectedAnswers.includes(option.id)} // Проверка, выбрано ли изображение
+                                                        onChange={(e) => handleMultipleImageSelect(e, question.id)} // Обработчик выбора
+                                                    />
+                                                </label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                
                                 <p className="text-muted mt-2">{question.questionPostscript}</p>
                                 <button
                                     type="button"
