@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './forms.css';
 import './slider.css';
@@ -237,69 +237,6 @@ const Forms = () => {
         });
     };
     
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log(formData);
-    };
-
-    const handleJsonChange = (e, questionId) => {
-        const updatedJson = e.target.value;
-        setJsonData((prevData) => ({
-            ...prevData,
-            questions: prevData.questions.map((q) =>
-                q.id === questionId ? { ...q, json: updatedJson } : q
-            )
-        }));
-    };
-
-    const handleEditJson = (questionId) => {
-        const question = jsonData.questions.find((q) => q.id === questionId);
-        if (question) {
-            const questionJson = JSON.stringify(question, null, 2);
-            setJsonData((prevData) => ({
-                ...prevData,
-                questions: prevData.questions.map((q) =>
-                    q.id === questionId ? { ...q, json: questionJson } : q
-                )
-            }));
-
-            setIsEditingJson((prevState) => ({
-                ...prevState,
-                [questionId]: true
-            }));
-        }
-    };
-
-    const handleJsonToQuestion = (questionId) => {
-        try {
-            const questionJson = jsonData.questions.find((q) => q.id === questionId).json;
-            const parsedJson = JSON.parse(questionJson);
-
-            // Check for unique ID before updating
-            const existingIds = jsonData.questions.map(q => q.id);
-            if (existingIds.includes(parsedJson.id) && parsedJson.id !== questionId) {
-                alert('ID вопроса должен быть уникальным!');
-                return;
-            }
-
-            setJsonData((prevData) => ({
-                ...prevData,
-                questions: prevData.questions.map((q) =>
-                    q.id === questionId ? parsedJson : q
-                )
-            }));
-
-            setIsEditingJson((prevState) => ({
-                ...prevState,
-                [questionId]: false
-            }));
-        } catch (error) {
-            alert('Неправильный формат JSON');
-        }
-    };
-
-
     const handleSingleButtonSelect = (buttonId, questionId) => {
         setFormData((prevData) => ({
             ...prevData,
@@ -365,38 +302,222 @@ const Forms = () => {
         }));
     };
 
-    const handleAddQuestion = () => {
-        const newQuestionId = `question_${Date.now()}_${Math.floor(Math.random() * 1000)}`; // Generate a unique ID using timestamp and random number
-        const existingIds = jsonData.questions.map(q => q.id);
-    
-        // Проверяем на уникальность ID
-        if (existingIds.includes(newQuestionId)) {
-            alert('ID вопроса должен быть уникальным!');
-            return;
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        console.log(formData);
+    };
+
+    const handleJsonChange = (e, questionId) => {
+        const updatedJson = e.target.value;
+        setJsonData((prevData) => ({
+            ...prevData,
+            questions: prevData.questions.map((q) =>
+                q.id === questionId ? { ...q, json: updatedJson } : q
+            )
+        }));
+    };
+
+    const handleEditJson = (questionId) => {
+        const question = jsonData.questions.find((q) => q.id === questionId);
+        if (question) {
+            const questionJson = JSON.stringify(question, null, 2);
+            setJsonData((prevData) => ({
+                ...prevData,
+                questions: prevData.questions.map((q) =>
+                    q.id === questionId ? { ...q, json: questionJson } : q
+                )
+            }));
+
+            setIsEditingJson((prevState) => ({
+                ...prevState,
+                [questionId]: true
+            }));
         }
+    };
+
+    const handleJsonToQuestion = (questionId) => {
+        try {
+            const questionJson = jsonData.questions.find((q) => q.id === questionId).json;
+            const parsedJson = JSON.parse(questionJson);
+
+            // Check for unique ID before updating
+            const existingIds = jsonData.questions.map(q => q.id);
+            if (existingIds.includes(parsedJson.id) && parsedJson.id !== questionId) {
+                alert('ID вопроса должен быть уникальным!');
+                return;
+            }
+
+            setJsonData((prevData) => ({
+                ...prevData,
+                questions: prevData.questions.map((q) =>
+                    q.id === questionId ? parsedJson : q
+                )
+            }));
+
+            setIsEditingJson((prevState) => ({
+                ...prevState,
+                [questionId]: false
+            }));
+        } catch (error) {
+            alert('Неправильный формат JSON');
+        }
+    };  
+
+    const QuestionTemplateModal = ({ onClose, onSelectTemplate }) => {
+        return (
+          <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <h2>Выберите шаблон вопроса</h2>
+              <div className="template-buttons d-flex flex-wrap justify-content-center">
+                {/* Кнопки с иконками */}
+                {[
+                  { type: 'multiple_choice_single', label: 'Один ответ', imageUrl: '/icons/ui-radios.svg' },
+                  { type: 'multiple_choice_multiple', label: 'Несколько ответов', imageUrl: '/icons/ui-checks.svg' },
+                  { type: 'open_ended_single', label: 'Однострочный ответ', imageUrl: '/icons/input.svg' },
+                  { type: 'open_ended_multi', label: 'Многострочный ответ', imageUrl: '/icons/layout-text-sidebar-reverse.svg' },
+                  { type: 'image_selection_single', label: 'Изображение (один)', imageUrl: '/icons/image.svg' },
+                  { type: 'image_selection_multiple', label: 'Изображения (несколько)', imageUrl: '/icons/images.svg' },
+                  { type: 'slider_single', label: 'Слайдер (один)', imageUrl: '/icons/segmented-nav.svg' },
+                  { type: 'slider_multiple', label: 'Слайдер (несколько)', imageUrl: '/icons/segmented-nav.svg' },
+                ].map((button, idx) => (
+                  <button
+                    key={idx}
+                    className="template-btn m-2"
+                    onClick={() => onSelectTemplate(button.type)}
+                  >
+                    <div className="icon-container">
+                      {/* Иконка внутри квадрата */}
+                      <img
+                        src={button.imageUrl}
+                        alt={button.label}
+                        className="icon"
+                      />
+                    </div>
+                    <span>{button.label}</span>
+                  </button>
+                ))}
+              </div>
+              <button className="close-modal btn btn-secondary" onClick={onClose}>Закрыть</button>
+            </div>
+          </div>
+        );
+      };
     
-        const newQuestion = {
-            id: newQuestionId,
-            questionHeader: `Новый вопрос ${jsonData.questions.length + 1}`,
-            questionText: 'Введите текст вопроса.',
-            questionPostscript: '',
-            questionType: 'multiple_choice_single',
-            options: ['Да', 'Нет'], 
-            correctAnswers: [],
-            selectedAnswers: []
-        };
-    
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleAddQuestion = () => {
+        setIsModalOpen(true);  // Показываем модальное окно
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);  // Закрываем модальное окно
+    };
+
+    const handleSelectTemplate = (templateType) => {
+        const newQuestionId = `question_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+        const newQuestion = getTemplateQuestion(templateType, newQuestionId);
+
+        // Добавляем новый вопрос в jsonData
         setJsonData((prevData) => ({
             ...prevData,
             questions: [...prevData.questions, newQuestion]
         }));
-    
-        setIsEditingJson((prevState) => ({
-            ...prevState,
-            [newQuestionId]: false
-        }));
-    };    
-    
+        
+         // Прокручиваем страницу до последнего добавленного вопроса
+        setTimeout(scrollToLastQuestion, 0); // Вызываем прокрутку после обновления состояния
+
+        setIsModalOpen(false);  // Закрываем модальное окно после добавления
+    };
+
+    const getTemplateQuestion = (templateType, newQuestionId) => {
+    switch (templateType) {
+        case 'multiple_choice_single':
+        return {
+            id: newQuestionId,
+            questionHeader: 'Выберите один вариант ответа',
+            questionText: 'Пожалуйста, выберите один из вариантов.',
+            questionType: 'multiple_choice_single',
+            options: ['Option 1', 'Option 2'],
+            correctAnswers: [],
+            selectedAnswers: []
+        };
+        case 'multiple_choice_multiple':
+        return {
+            id: newQuestionId,
+            questionHeader: 'Выберите несколько вариантов ответа',
+            questionText: 'Пожалуйста, выберите все подходящие варианты.',
+            questionType: 'multiple_choice_multiple',
+            options: ['Option 1', 'Option 2', 'Option 3'],
+            correctAnswers: [],
+            selectedAnswers: []
+        };
+        case 'open_ended_single':
+        return {
+            id: newQuestionId,
+            questionHeader: 'Опишите ваш опыт',
+            questionText: 'Пожалуйста, напишите однострочный ответ.',
+            questionType: 'open_ended',
+            responseType: 'single_line',
+            selectedAnswers: []
+        };
+        case 'open_ended_multi':
+        return {
+            id: newQuestionId,
+            questionHeader: 'Опишите ваш опыт подробно',
+            questionText: 'Пожалуйста, напишите многострочный ответ.',
+            questionType: 'open_ended',
+            responseType: 'multi_line',
+            selectedAnswers: []
+        };
+        case 'image_selection_single':
+        return {
+            id: newQuestionId,
+            questionHeader: 'Выберите изображение',
+            questionText: 'Пожалуйста, выберите один из вариантов ниже.',
+            questionType: 'image_selection_single',
+            options: {
+            option1: { id: '1', label: 'Option 1', imageUrl: 'https://via.placeholder.com/100' },
+            option2: { id: '2', label: 'Option 2', imageUrl: 'https://via.placeholder.com/100' }
+            },
+            correctAnswers: [],
+            selectedAnswers: []
+        };
+        case 'image_selection_multiple':
+        return {
+            id: newQuestionId,
+            questionHeader: 'Выберите несколько изображений',
+            questionText: 'Пожалуйста, выберите все подходящие варианты.',
+            questionType: 'image_selection_multiple',
+            options: {
+            option1: { id: '1', label: 'Option 1', imageUrl: 'https://via.placeholder.com/100' },
+            option2: { id: '2', label: 'Option 2', imageUrl: 'https://via.placeholder.com/100' }
+            },
+            correctAnswers: [],
+            selectedAnswers: []
+        };
+        case 'slider_single':
+        return {
+            id: newQuestionId,
+            questionHeader: 'Выберите вашу любимую кнопку',
+            questionText: 'Нажмите на любую кнопку, чтобы выбрать.',
+            questionType: 'single_button_select',
+            buttonOptions: { 1: '1', 2: '2', 3: '3', 4: '4', 5: '5' },
+            selectedAnswers: []
+        };
+        case 'slider_multiple':
+        return {
+            id: newQuestionId,
+            questionHeader: 'Выберите несколько кнопок',
+            questionText: 'Нажмите на несколько кнопок, чтобы выбрать.',
+            questionType: 'multiple_button_select',
+            buttonOptions: { 1: '1', 2: '2', 3: '3', 4: '4', 5: '5' },
+            selectedAnswers: []
+        };
+        default:
+        return {};
+    }
+    };
+
     const handleEditQuestionId = (newId, questionId) => {
         const existingIds = jsonData.questions.map(q => q.id);
         // Проверка на уникальность нового ID
@@ -428,11 +549,33 @@ const Forms = () => {
         });
     };
 
+    // Функция для прокрутки страницы до последнего добавленного вопроса
+    const scrollToLastQuestion = () => {
+        // Прокручиваем страницу до самого низа
+        setTimeout(() => {
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
+        }, 0);
+    };
+
     return (
         <div className="container mt-5">
             <div className="d-flex justify-content-between align-items-center">
                 <h2 className="mb-4">Анкета</h2>
-                <button type="button" className="btn btn-success" onClick={handleAddQuestion}>Добавить вопрос</button>
+                <div>
+                    <button className="btn btn-primary" onClick={handleAddQuestion}>
+                        Добавить вопрос
+                    </button>
+
+                    {isModalOpen && (
+                        <QuestionTemplateModal
+                        onClose={handleCloseModal}
+                        onSelectTemplate={handleSelectTemplate}
+                        />
+                    )}
+                </div>
             </div>
             <Link to="/dashboard" className="mb-3">{"<<"} Вернуться на главную</Link>
 
