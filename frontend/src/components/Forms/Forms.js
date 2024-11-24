@@ -14,7 +14,10 @@ const Forms = () => {
                 questionText: 'Пожалуйста, выберите один из вариантов ниже.',
                 questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
                 questionType: 'multiple_choice_single',
-                options: ['Да', 'Нет'],
+                options: [
+                    { id: "1", text: "Да", url: null, typeUrl: null },
+                    { id: "2", text: "Нет", url: null, typeUrl: null }
+                ],
                 correctAnswers: [],
                 selectedAnswers: []
             },
@@ -24,7 +27,12 @@ const Forms = () => {
                 questionText: 'Вы можете выбрать несколько вариантов.',
                 questionPostscript: 'Убедитесь, что вы выбрали все подходящие.',
                 questionType: 'multiple_choice_multiple',
-                options: ['JavaScript', 'Python', 'Java', 'C++'],
+                options: [
+                    { id: "1", text: "JavaScript", url: null, typeUrl: null },
+                    { id: "2", text: "Python", url: null, typeUrl: null },
+                    { id: "3", text: "Java", url: null, typeUrl: null },
+                    { id: "4", text: "C++", url: null, typeUrl: null }
+                ],
                 correctAnswers: ['1', '2'],
                 selectedAnswers: []
             },
@@ -35,29 +43,32 @@ const Forms = () => {
                 questionPostscript: 'Это однострочный ответ.',
                 questionType: 'open_ended',
                 responseType: 'single_line',
+                correctAnswers: [],
                 selectedAnswers: []
             },
             {
-                id: 'question4', // New question ID
+                id: 'question4', 
                 questionHeader: 'Опишите, как вы решаете проблемы в коде:',
                 questionText: 'Поделитесь вашим опытом и подходами.',
                 questionPostscript: 'Это многострочный ответ.',
                 questionType: 'open_ended',
-                responseType: 'multi_line', // This specifies that it's a multi-line response
-                selectedAnswers: [] // Store multi-line response
+                responseType: 'multi_line', 
+                correctAnswers: [],
+                selectedAnswers: []
             },
             {
                 id: 'question5',
                 questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать только одну)',
                 questionText: 'Нажмите на любую кнопку, чтобы выбрать вашу любимую.',
                 questionType: 'single_button_select',
-                buttonOptions: {
-                    1: '1',
-                    2: '2',
-                    3: '3',
-                    4: '4',
-                    5: '5'
-                },
+                options: [
+                    { id: "1", text: "1", url: null, typeUrl: null },
+                    { id: "2", text: "2", url: null, typeUrl: null },
+                    { id: "3", text: "3", url: null, typeUrl: null },
+                    { id: "4", text: "4", url: null, typeUrl: null },
+                    { id: "5", text: "5", url: null, typeUrl: null }
+                ],
+                correctAnswers: [],
                 selectedAnswers: []
             },
             {
@@ -65,13 +76,14 @@ const Forms = () => {
                 questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать несколько)',
                 questionText: 'Нажмите на любые кнопки, чтобы выбрать ваши любимые.',
                 questionType: 'multiple_button_select',
-                buttonOptions: {
-                    1: '1',
-                    2: '2',
-                    3: '3',
-                    4: '4',
-                    5: '5'
-                },
+                options: [
+                    { id: "1", text: "1", url: null, typeUrl: null },
+                    { id: "2", text: "2", url: null, typeUrl: null },
+                    { id: "3", text: "3", url: null, typeUrl: null },
+                    { id: "4", text: "4", url: null, typeUrl: null },
+                    { id: "5", text: "5", url: null, typeUrl: null }
+                ],
+                correctAnswers: [],
                 selectedAnswers: []
             },
             {
@@ -80,53 +92,62 @@ const Forms = () => {
                 questionText: 'Пожалуйста, выберите один из вариантов ниже.',
                 questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
                 questionType: 'image_selection_single',
-                options: {
-                    option1: {
-                        id: '1',
-                        label: 'Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                options: [
+                    { 
+                        id: '1', 
+                        text: 'Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     },
-                    option2: {
-                        id: '2',
-                        label: 'No Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                    { 
+                        id: '2', 
+                        text: 'No Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     },
-                    option3: {
-                        id: '3',
-                        label: 'No Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                    { 
+                        id: '3', 
+                        text: 'No Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     },
-                    option4: {
-                        id: '4',
-                        label: 'No Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                    { 
+                        id: '4', 
+                        text: 'No Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     },
-                    option5: {
-                        id: '5',
-                        label: 'No Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                    { 
+                        id: '5', 
+                        text: 'No Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     },
-                    option6: {
-                        id: '6',
-                        label: 'No Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                    { 
+                        id: '6', 
+                        text: 'No Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     },
-                    option7: {
-                        id: '7',
-                        label: 'No Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                    { 
+                        id: '7', 
+                        text: 'No Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     },
-                    option8: {
-                        id: '8',
-                        label: 'No Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                    { 
+                        id: '8', 
+                        text: 'No Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     },
-                    option9: {
-                        id: '9',
-                        label: 'No Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                    { 
+                        id: '9', 
+                        text: 'No Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     }
-                },
+                ],
                 correctAnswers: [],
                 selectedAnswers: []
             },
@@ -136,53 +157,62 @@ const Forms = () => {
                 questionText: 'Пожалуйста, выберите один из вариантов ниже.',
                 questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
                 questionType: 'image_selection_multiple',
-                options: {
-                    option1: {
-                        id: '1',
-                        label: 'Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                options: [
+                    { 
+                        id: '1', 
+                        text: 'Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     },
-                    option2: {
-                        id: '2',
-                        label: 'No Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                    { 
+                        id: '2', 
+                        text: 'No Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     },
-                    option3: {
-                        id: '3',
-                        label: 'No Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                    { 
+                        id: '3', 
+                        text: 'No Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     },
-                    option4: {
-                        id: '4',
-                        label: 'No Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                    { 
+                        id: '4', 
+                        text: 'No Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     },
-                    option5: {
-                        id: '5',
-                        label: 'No Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                    { 
+                        id: '5', 
+                        text: 'No Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     },
-                    option6: {
-                        id: '6',
-                        label: 'No Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                    { 
+                        id: '6', 
+                        text: 'No Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     },
-                    option7: {
-                        id: '7',
-                        label: 'No Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                    { 
+                        id: '7', 
+                        text: 'No Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     },
-                    option8: {
-                        id: '8',
-                        label: 'No Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                    { 
+                        id: '8', 
+                        text: 'No Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     },
-                    option9: {
-                        id: '9',
-                        label: 'No Google Forms',
-                        imageUrl: 'https://via.placeholder.com/100'
+                    { 
+                        id: '9', 
+                        text: 'No Google Forms', 
+                        url: 'https://via.placeholder.com/100', 
+                        typeUrl: 'image' 
                     }
-                },
+                ],
                 correctAnswers: [],
                 selectedAnswers: []
             }
@@ -191,22 +221,17 @@ const Forms = () => {
 
     const [isEditingJson, setIsEditingJson] = useState({});
 
-    const handleChange = (e, questionId, isMultiple) => {
-        const { value, checked } = e.target;
-    
+    const handleChange = (id, questionId, isMultiple) => {
         setFormData((prevData) => {
+            // Обновляем данные для выбора нескольких вариантов (если isMultiple == true)
             if (isMultiple) {
                 const updatedValues = prevData[questionId] ? [...prevData[questionId]] : [];
-                if (checked) {
-                    updatedValues.push(value);
+                if (updatedValues.includes(id)) {
+                    updatedValues.splice(updatedValues.indexOf(id), 1); // Удаляем элемент, если он уже выбран
                 } else {
-                    const index = updatedValues.indexOf(value);
-                    if (index > -1) {
-                        updatedValues.splice(index, 1);
-                    }
+                    updatedValues.push(id); // Добавляем элемент, если он ещё не выбран
                 }
     
-                // Update selectedAnswers in jsonData
                 setJsonData((prevData) => ({
                     ...prevData,
                     questions: prevData.questions.map((q) =>
@@ -219,74 +244,42 @@ const Forms = () => {
                     [questionId]: updatedValues
                 };
             } else {
-                const newValue = value; // Capture the input response
-                
-                // Update selectedAnswers in jsonData
+                // Обновляем данные для одиночного выбора
                 setJsonData((prevData) => ({
                     ...prevData,
                     questions: prevData.questions.map((q) =>
-                        q.id === questionId ? { ...q, selectedAnswers: [newValue] } : q // Update selectedAnswers
+                        q.id === questionId ? { ...q, selectedAnswers: [id] } : q
                     )
                 }));
     
                 return {
                     ...prevData,
-                    [questionId]: newValue // Save answer
+                    [questionId]: [id]
                 };
             }
         });
     };
-    
-    const handleSingleButtonSelect = (buttonId, questionId) => {
-        setFormData((prevData) => ({
-            ...prevData,
-            [questionId]: buttonId
-        }));
-    
-        setJsonData((prevData) => ({
-            ...prevData,
-            questions: prevData.questions.map((q) =>
-                q.id === questionId ? { ...q, selectedAnswers: [buttonId] } : q
-            )
-        }));
-    };
 
-    const handleMultipleButtonSelect = (buttonId, questionId) => {
-        setJsonData((prevData) => ({
-          ...prevData,
-          questions: prevData.questions.map((q) => {
-            if (q.id === questionId) {
-              const isSelected = q.selectedAnswers.includes(buttonId);
-              const newSelectedAnswers = isSelected
-                ? q.selectedAnswers.filter((id) => id !== buttonId)
-                : [...q.selectedAnswers, buttonId];
-      
-              return { ...q, selectedAnswers: newSelectedAnswers };
-            }
-            return q;
-          })
-        }));
-      };
     
     const handleSingleImageSelect = (e, questionId) => {
-        const selectedValue = e.target.value; // id выбранного изображения
+        const selectedValue = e.target.value; // id of the selected image
     
-        // Обновляем данные в состоянии
+        // Update the state data with the selected answer for single image selection
         setJsonData((prevData) => ({
             ...prevData,
             questions: prevData.questions.map((question) => 
                 question.id === questionId
-                    ? { ...question, selectedAnswers: [selectedValue] } // Обновляем выбранный ответ для данного вопроса
+                    ? { ...question, selectedAnswers: [selectedValue] } // Update selected answer with single selection
                     : question
             )
         }));
     };
-
-    const handleMultipleImageSelect = (e, questionId) => {
-        const selectedValue = e.target.value; // id выбранного изображения
-        const isChecked = e.target.checked; // флаг, отмечен ли чекбокс
     
-        // Обновляем данные в состоянии
+    const handleMultipleImageSelect = (e, questionId) => {
+        const selectedValue = e.target.value; // id of the selected image
+        const isChecked = e.target.checked; // Whether the checkbox is checked
+    
+        // Update the state data for multiple image selection (add or remove from selectedAnswers)
         setJsonData((prevData) => ({
             ...prevData,
             questions: prevData.questions.map((question) => 
@@ -294,8 +287,8 @@ const Forms = () => {
                     ? {
                         ...question,
                         selectedAnswers: isChecked
-                            ? [...question.selectedAnswers, selectedValue] // Если выбрали, добавляем
-                            : question.selectedAnswers.filter((answer) => answer !== selectedValue) // Если сняли, убираем
+                            ? [...question.selectedAnswers, selectedValue] // Add selected answer
+                            : question.selectedAnswers.filter((answer) => answer !== selectedValue) // Remove selected answer
                     }
                     : question
             )
@@ -603,34 +596,39 @@ const Forms = () => {
                         ) : (
                             <div>
                                 <p className="text-dark">{question.questionText}</p>
+                                {/* Рендеринг для single choice (radio) */}
                                 {question.options && question.questionType === 'multiple_choice_single' && (
-                                    question.options.map((option, index) => (
-                                        <div key={index} className="form-check">
+                                    question.options.map((option) => (
+                                        <div key={option.id} className="form-check">
                                             <input
                                                 type="radio"
                                                 className="form-check-input"
-                                                value={option}
-                                                checked={question.selectedAnswers.includes(option)}
+                                                value={option.id} // Используем id для value
+                                                checked={question.selectedAnswers.includes(option.id)} // Проверка по id
                                                 onChange={(e) => handleChange(e, question.id, false)}
                                             />
-                                            <label className="form-check-label">{option}</label>
+                                            <label className="form-check-label">{option.text}</label> {/* Показываем текст */}
                                         </div>
                                     ))
                                 )}
+
+                                {/* Рендеринг для multiple choice (checkbox) */}
                                 {question.options && question.questionType === 'multiple_choice_multiple' && (
-                                    question.options.map((option, index) => (
-                                        <div key={index} className="form-check">
+                                    question.options.map((option) => (
+                                        <div key={option.id} className="form-check">
                                             <input
                                                 type="checkbox"
                                                 className="form-check-input"
-                                                value={option}
-                                                checked={question.selectedAnswers.includes(option)}
+                                                value={option.id} // Используем id для value
+                                                checked={question.selectedAnswers.includes(option.id)} // Проверка по id
                                                 onChange={(e) => handleChange(e, question.id, true)}
                                             />
-                                            <label className="form-check-label">{option}</label>
+                                            <label className="form-check-label">{option.text}</label> {/* Показываем текст */}
                                         </div>
                                     ))
                                 )}
+
+                                {/* Рендеринг для open-ended single-line ответа */}
                                 {question.questionType === 'open_ended' && question.responseType === 'single_line' && (
                                     <input
                                         type="text"
@@ -639,6 +637,8 @@ const Forms = () => {
                                         onChange={(e) => handleChange(e, question.id, false)}
                                     />
                                 )}
+
+                                {/* Рендеринг для open-ended multi-line ответа */}
                                 {question.questionType === 'open_ended' && question.responseType === 'multi_line' && (
                                     <textarea
                                         className="form-control"
@@ -647,20 +647,21 @@ const Forms = () => {
                                         onChange={(e) => handleChange(e, question.id, false)}
                                     />
                                 )}
+
                                 {question.questionType === 'single_button_select' && (
                                     <div className="slider-container">
                                         <div className="slider-track">
-                                            {Object.entries(question.buttonOptions).map(([id, label]) => (
-                                                <div key={id} className="slide">
+                                            {question.options.map((option) => (
+                                                <div key={option.id} className="slide">
                                                     <button
                                                         type="button"
-                                                        onClick={() => handleSingleButtonSelect(id, question.id)}
+                                                        onClick={() => handleChange(option.id, question.id, false)} // Для одиночного выбора передаем false
                                                         className="d-block"
                                                         style={{
-                                                            backgroundColor: question.selectedAnswers.includes(id) ? '#ff9900' : '#007bff'
+                                                            backgroundColor: question.selectedAnswers.includes(option.id) ? '#ff9900' : '#007bff'
                                                         }}
                                                     >
-                                                        {label}
+                                                        {option.text}
                                                     </button>
                                                 </div>
                                             ))}
@@ -668,40 +669,41 @@ const Forms = () => {
                                     </div>
                                 )}
                                 {question.questionType === 'multiple_button_select' && (
-                                <div className="slider-container">
-                                    <div className="slider-track">
-                                    {Object.entries(question.buttonOptions).map(([id, label]) => (
-                                        <div key={id} className="slide">
-                                        <button
-                                            type="button"
-                                            onClick={() => handleMultipleButtonSelect(id, question.id)}
-                                            className="d-block"
-                                            style={{
-                                            backgroundColor: question.selectedAnswers.includes(id) ? '#ff9900' : '#007bff'
-                                            }}
-                                        >
-                                            {label}
-                                        </button>
+                                    <div className="slider-container">
+                                        <div className="slider-track">
+                                            {question.options.map((option) => (
+                                                <div key={option.id} className="slide">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleChange(option.id, question.id, true)} // Для множественного выбора передаем true
+                                                        className="d-block"
+                                                        style={{
+                                                            backgroundColor: question.selectedAnswers.includes(option.id) ? '#ff9900' : '#007bff'
+                                                        }}
+                                                    >
+                                                        {option.text}
+                                                    </button>
+                                                </div>
+                                            ))}
                                         </div>
-                                    ))}
                                     </div>
-                                </div>
                                 )}
+
                                 {question.questionType === 'image_selection_single' && (
                                     <div className="row">
-                                        {Object.values(question.options).map((option, index) => (
+                                        {question.options.map((option) => (
                                             <div key={option.id} className="col-4 text-center mb-3">
                                                 <label htmlFor={`image_${question.id}_${option.id}`} className="d-block position-relative img-form">
                                                     <img
-                                                        src={option.imageUrl}
-                                                        alt={option.label}
+                                                        src={option.url} // Ensure you are using 'url' here for the image source
+                                                        alt={option.text} // Option text can be used for alt text
                                                         className="img-thumbnail"
                                                         style={{ cursor: 'pointer', borderRadius: '10px' }}
                                                     />
                                                     <input
                                                         className="form-check-input checkbox-overlay"
                                                         type="radio"
-                                                        id={`image_${question.id}_${option.id}`} // Составной id
+                                                        id={`image_${question.id}_${option.id}`} // Composite ID for uniqueness
                                                         name={`selectedImage_${question.id}`}
                                                         value={option.id}
                                                         checked={question.selectedAnswers[0] === option.id}
@@ -713,24 +715,24 @@ const Forms = () => {
                                     </div>
                                 )}
 
-                                {question.questionType === 'image_selection_multiple' && ( // Проверка для множественного выбора
+                                {question.questionType === 'image_selection_multiple' && (
                                     <div className="row">
-                                        {Object.values(question.options).map((option, index) => (
+                                        {question.options.map((option) => (
                                             <div key={option.id} className="col-4 text-center mb-3">
                                                 <label htmlFor={`image_${question.id}_${option.id}`} className="d-block position-relative img-form">
                                                     <img
-                                                        src={option.imageUrl}
-                                                        alt={option.label}
+                                                        src={option.url} // Ensure you are using 'url' here as well
+                                                        alt={option.text} // Option text can be used for alt text
                                                         className="img-thumbnail"
                                                         style={{ cursor: 'pointer', borderRadius: '10px' }}
                                                     />
                                                     <input
                                                         className="form-check-input checkbox-overlay"
-                                                        type="checkbox" // Используем чекбокс для множественного выбора
-                                                        id={`image_${question.id}_${option.id}`} // Составной id
+                                                        type="checkbox"
+                                                        id={`image_${question.id}_${option.id}`} // Composite ID for uniqueness
                                                         value={option.id}
-                                                        checked={question.selectedAnswers.includes(option.id)} // Проверка, выбрано ли изображение
-                                                        onChange={(e) => handleMultipleImageSelect(e, question.id)} // Обработчик выбора
+                                                        checked={question.selectedAnswers.includes(option.id)} // Check if image is selected
+                                                        onChange={(e) => handleMultipleImageSelect(e, question.id)} // Handler for selection
                                                     />
                                                 </label>
                                             </div>
