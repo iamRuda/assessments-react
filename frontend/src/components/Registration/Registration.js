@@ -1,52 +1,47 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css"; // Подключение стилей Bootstrap
+import "bootstrap/dist/css/bootstrap.min.css"; // Bootstrap styles
 
 const Registration = () => {
-  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [error, setError] = useState("");
-  const [showErrorPopup, setShowErrorPopup] = useState(false); // Для управления показом всплывающего сообщения
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
-
-    // Basic validation
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      setShowErrorPopup(true);
-      return;
-    }
-
     try {
-      const response = await fetch("http://localhost:8080/api/auth/register", {
+      const response = await fetch("http://localhost:8080/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ email, password, firstName, lastName }),
+        credentials: "include", // To include cookies in the request
       });
-
+      console.log("Response status:", response.status); // Логируем статус
       if (response.ok) {
         navigate("/login"); // Redirect to login after successful registration
       } else {
         const { message } = await response.json();
+        console.log("Error message from API:", message); // Логируем сообщение об ошибке
         setError(message || "Registration failed");
-        setShowErrorPopup(true); // Показать всплывающее сообщение
+        setShowErrorPopup(true);
       }
     } catch (error) {
+      console.error("API error:", error); // Логируем ошибку при запросе
       setError("Could not connect to the API. Please try again later.");
-      setShowErrorPopup(true); // Показать всплывающее сообщение
+      setShowErrorPopup(true);
     }
   };
+  
 
-  // Функция для скрытия всплывающего сообщения
   const handleClosePopup = () => {
     setShowErrorPopup(false);
-    setError(""); // Сбросить сообщение об ошибке
+    setError(""); // Clear the error message
   };
 
   return (
@@ -60,20 +55,7 @@ const Registration = () => {
         )}
 
         <form onSubmit={handleRegister}>
-          <img className="mb-4 mx-auto d-block" src="https://getbootstrap.com/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57" />
           <h1 className="h3 mb-3 fw-normal text-center">Register</h1>
-
-          <div className="form-floating mb-3">
-            <input
-              type="text"
-              className="form-control"
-              id="floatingUsername"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-            <label htmlFor="floatingUsername">Username</label>
-          </div>
 
           <div className="form-floating mb-3">
             <input
@@ -101,19 +83,31 @@ const Registration = () => {
 
           <div className="form-floating mb-3">
             <input
-              type="password"
+              type="text"
               className="form-control"
-              id="floatingConfirmPassword"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              id="floatingFirstName"
+              placeholder="First Name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
             />
-            <label htmlFor="floatingConfirmPassword">Confirm Password</label>
+            <label htmlFor="floatingFirstName">First Name</label>
           </div>
 
-          <button className="w-100 btn btn-lg btn-primary" type="submit">Register</button>
+          <div className="form-floating mb-3">
+            <input
+              type="text"
+              className="form-control"
+              id="floatingLastName"
+              placeholder="Last Name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+            <label htmlFor="floatingLastName">Last Name</label>
+          </div>
 
-          <p className="mt-5 mb-3 text-muted text-center">&copy; SASDevs</p>
+          <button className="w-100 btn btn-lg btn-primary" type="submit">
+            Register
+          </button>
         </form>
       </div>
     </div>

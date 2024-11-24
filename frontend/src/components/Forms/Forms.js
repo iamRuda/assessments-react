@@ -1,10 +1,32 @@
-import React, { useState } from 'react'; 
+import React, { useState, useEffect } from 'react'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './forms.css';
 import './slider.css';
 import { Link } from 'react-router-dom';
 
 const Forms = () => {
+
+    useEffect(() => {
+        const fetchProtectedData = async () => {
+          const token = localStorage.getItem("token");
+    
+            try {
+              const response = await fetch("http://localhost:8080/api/test/user", {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              });
+              const result = await response.json();
+              setData(result);
+            } catch (error) {
+              console.error("Error fetching protected data", error);
+            }
+          };
+    
+        fetchProtectedData();
+      }); // сыпет ошибку
+
     const [formData, setFormData] = useState({});
     const [jsonData, setJsonData] = useState({
         questions: [
@@ -93,60 +115,15 @@ const Forms = () => {
                 questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
                 questionType: 'image_selection_single',
                 options: [
-                    { 
-                        id: '1', 
-                        text: 'Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    },
-                    { 
-                        id: '2', 
-                        text: 'No Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    },
-                    { 
-                        id: '3', 
-                        text: 'No Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    },
-                    { 
-                        id: '4', 
-                        text: 'No Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    },
-                    { 
-                        id: '5', 
-                        text: 'No Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    },
-                    { 
-                        id: '6', 
-                        text: 'No Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    },
-                    { 
-                        id: '7', 
-                        text: 'No Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    },
-                    { 
-                        id: '8', 
-                        text: 'No Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    },
-                    { 
-                        id: '9', 
-                        text: 'No Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    }
+                    { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '3', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '4', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '5', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '6', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '7', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '8', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '9', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' }
                 ],
                 correctAnswers: [],
                 selectedAnswers: []
@@ -158,60 +135,15 @@ const Forms = () => {
                 questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
                 questionType: 'image_selection_multiple',
                 options: [
-                    { 
-                        id: '1', 
-                        text: 'Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    },
-                    { 
-                        id: '2', 
-                        text: 'No Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    },
-                    { 
-                        id: '3', 
-                        text: 'No Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    },
-                    { 
-                        id: '4', 
-                        text: 'No Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    },
-                    { 
-                        id: '5', 
-                        text: 'No Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    },
-                    { 
-                        id: '6', 
-                        text: 'No Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    },
-                    { 
-                        id: '7', 
-                        text: 'No Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    },
-                    { 
-                        id: '8', 
-                        text: 'No Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    },
-                    { 
-                        id: '9', 
-                        text: 'No Google Forms', 
-                        url: 'https://via.placeholder.com/100', 
-                        typeUrl: 'image' 
-                    }
+                    { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '3', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '4', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '5', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '6', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '7', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '8', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '9', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' }
                 ],
                 correctAnswers: [],
                 selectedAnswers: []
@@ -427,83 +359,127 @@ const Forms = () => {
         case 'multiple_choice_single':
         return {
             id: newQuestionId,
-            questionHeader: 'Выберите один вариант ответа',
-            questionText: 'Пожалуйста, выберите один из вариантов.',
+            questionHeader: 'Вы когда-нибудь использовали Google Формы?',
+            questionText: 'Пожалуйста, выберите один из вариантов ниже.',
+            questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
             questionType: 'multiple_choice_single',
-            options: ['Option 1', 'Option 2'],
+            options: [
+                { id: "1", text: "Да", url: null, typeUrl: null },
+                { id: "2", text: "Нет", url: null, typeUrl: null }
+            ],
             correctAnswers: [],
             selectedAnswers: []
         };
         case 'multiple_choice_multiple':
         return {
             id: newQuestionId,
-            questionHeader: 'Выберите несколько вариантов ответа',
-            questionText: 'Пожалуйста, выберите все подходящие варианты.',
+            questionHeader: 'Выберите языки программирования, которые вы знаете:',
+            questionText: 'Вы можете выбрать несколько вариантов.',
+            questionPostscript: 'Убедитесь, что вы выбрали все подходящие.',
             questionType: 'multiple_choice_multiple',
-            options: ['Option 1', 'Option 2', 'Option 3'],
-            correctAnswers: [],
+            options: [
+                { id: "1", text: "JavaScript", url: null, typeUrl: null },
+                { id: "2", text: "Python", url: null, typeUrl: null },
+                { id: "3", text: "Java", url: null, typeUrl: null },
+                { id: "4", text: "C++", url: null, typeUrl: null }
+            ],
+            correctAnswers: ['1', '2'],
             selectedAnswers: []
         };
         case 'open_ended_single':
         return {
             id: newQuestionId,
-            questionHeader: 'Опишите ваш опыт',
-            questionText: 'Пожалуйста, напишите однострочный ответ.',
+            questionHeader: 'Опишите ваш опыт в программировании:',
+            questionText: 'Пожалуйста, дайте краткий ответ.',
+            questionPostscript: 'Это однострочный ответ.',
             questionType: 'open_ended',
             responseType: 'single_line',
+            correctAnswers: [],
             selectedAnswers: []
         };
         case 'open_ended_multi':
         return {
             id: newQuestionId,
-            questionHeader: 'Опишите ваш опыт подробно',
-            questionText: 'Пожалуйста, напишите многострочный ответ.',
+            questionHeader: 'Опишите, как вы решаете проблемы в коде:',
+            questionText: 'Поделитесь вашим опытом и подходами.',
+            questionPostscript: 'Это многострочный ответ.',
             questionType: 'open_ended',
-            responseType: 'multi_line',
+            responseType: 'multi_line', 
+            correctAnswers: [],
             selectedAnswers: []
         };
         case 'image_selection_single':
         return {
             id: newQuestionId,
-            questionHeader: 'Выберите изображение',
+            questionHeader: 'Вы когда-нибудь использовали Google Формы?',
             questionText: 'Пожалуйста, выберите один из вариантов ниже.',
+            questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
             questionType: 'image_selection_single',
-            options: {
-            option1: { id: '1', label: 'Option 1', imageUrl: 'https://via.placeholder.com/100' },
-            option2: { id: '2', label: 'Option 2', imageUrl: 'https://via.placeholder.com/100' }
-            },
+            options: [
+                { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                { id: '3', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                { id: '4', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                { id: '5', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                { id: '6', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                { id: '7', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                { id: '8', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                { id: '9', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' }
+            ],
             correctAnswers: [],
             selectedAnswers: []
         };
         case 'image_selection_multiple':
         return {
             id: newQuestionId,
-            questionHeader: 'Выберите несколько изображений',
-            questionText: 'Пожалуйста, выберите все подходящие варианты.',
+            questionHeader: 'Вы когда-нибудь использовали Google Формы?',
+            questionText: 'Пожалуйста, выберите один из вариантов ниже.',
+            questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
             questionType: 'image_selection_multiple',
-            options: {
-            option1: { id: '1', label: 'Option 1', imageUrl: 'https://via.placeholder.com/100' },
-            option2: { id: '2', label: 'Option 2', imageUrl: 'https://via.placeholder.com/100' }
-            },
+            options: [
+                { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                { id: '3', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                { id: '4', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                { id: '5', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                { id: '6', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                { id: '7', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                { id: '8', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                { id: '9', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' }
+            ],
             correctAnswers: [],
             selectedAnswers: []
         };
         case 'slider_single':
         return {
             id: newQuestionId,
-            questionHeader: 'Выберите вашу любимую кнопку',
-            questionText: 'Нажмите на любую кнопку, чтобы выбрать.',
+            questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать только одну)',
+            questionText: 'Нажмите на любую кнопку, чтобы выбрать вашу любимую.',
             questionType: 'single_button_select',
-            buttonOptions: { 1: '1', 2: '2', 3: '3', 4: '4', 5: '5' },
+            options: [
+                { id: "1", text: "1", url: null, typeUrl: null },
+                { id: "2", text: "2", url: null, typeUrl: null },
+                { id: "3", text: "3", url: null, typeUrl: null },
+                { id: "4", text: "4", url: null, typeUrl: null },
+                { id: "5", text: "5", url: null, typeUrl: null }
+            ],
+            correctAnswers: [],
             selectedAnswers: []
         };
         case 'slider_multiple':
         return {
             id: newQuestionId,
-            questionHeader: 'Выберите несколько кнопок',
-            questionText: 'Нажмите на несколько кнопок, чтобы выбрать.',
+            questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать несколько)',
+            questionText: 'Нажмите на любые кнопки, чтобы выбрать ваши любимые.',
             questionType: 'multiple_button_select',
-            buttonOptions: { 1: '1', 2: '2', 3: '3', 4: '4', 5: '5' },
+            options: [
+                { id: "1", text: "1", url: null, typeUrl: null },
+                { id: "2", text: "2", url: null, typeUrl: null },
+                { id: "3", text: "3", url: null, typeUrl: null },
+                { id: "4", text: "4", url: null, typeUrl: null },
+                { id: "5", text: "5", url: null, typeUrl: null }
+            ],
+            correctAnswers: [],
             selectedAnswers: []
         };
         default:

@@ -25,14 +25,11 @@ const Dashboard = () => {
     const savedUsername = localStorage.getItem("username");
     setUsername(savedUsername);
 
-    if (savedUsername === "test") {
-      setData({ tests });
-    } else {
-      const fetchProtectedData = async () => {
-        const token = localStorage.getItem("token");
+    const fetchProtectedData = async () => {
+      const token = localStorage.getItem("token");
 
         try {
-          const response = await fetch("http://localhost:8080/api/protected", {
+          const response = await fetch("http://localhost:8080/api/test/user", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,
@@ -45,8 +42,8 @@ const Dashboard = () => {
         }
       };
 
-      fetchProtectedData();
-    }
+    fetchProtectedData();
+
 
     setNotifications([
       { title: "Math Test Deadline", text: "Скоро закончится срок сдачи теста по математике.", link: "/math-test" },
