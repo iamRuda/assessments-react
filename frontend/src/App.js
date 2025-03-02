@@ -7,6 +7,7 @@ import Dashboard from "./components/Dashboard/Dashboard";
 import Forms from "./components/Forms/Forms";
 import Settings from "./components/Settings/Settings"; // Import Settings component
 import PrivateRoute from "./routes/PrivateRoute";
+import "./App.css"; 
 
 const App = () => {
   return (

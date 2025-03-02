@@ -18,6 +18,7 @@ const Dashboard = () => {
   const [username, setUsername] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [userProfile, setUserProfile] = useState(null); // State for user profile
 
   const navigate = useNavigate(); // Use the useNavigate hook for routing
 
@@ -28,22 +29,39 @@ const Dashboard = () => {
     const fetchProtectedData = async () => {
       const token = localStorage.getItem("token");
 
-        try {
-          const response = await fetch("http://localhost:8080/api/test/user", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          const result = await response.json();
-          setData(result);
-        } catch (error) {
-          console.error("Error fetching protected data", error);
-        }
-      };
+      try {
+        const response = await fetch("http://localhost:8080/api/test/user", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const result = await response.json();
+        setData(result);
+      } catch (error) {
+        console.error("Error fetching protected data", error);
+      }
+    };
+
+    const fetchUserProfile = async () => {
+      const token = localStorage.getItem("token");
+
+      try {
+        const response = await fetch("http://localhost:8080/api/user/profile", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const userProfile = await response.json();
+        setUserProfile(userProfile);
+      } catch (error) {
+        console.error("Error fetching user profile", error);
+      }
+    };
 
     fetchProtectedData();
-
+    fetchUserProfile();
 
     setNotifications([
       { title: "Math Test Deadline", text: "Скоро закончится срок сдачи теста по математике.", link: "/math-test" },
@@ -67,15 +85,15 @@ const Dashboard = () => {
       <header className="d-flex align-items-center justify-content-between my-4">
         <div className="d-flex align-items-center">
           <img
-            src="https://via.placeholder.com/100"
+            src={userProfile?.imageUrl || "https://via.placeholder.com/100"}
             alt="Profile"
             className="rounded-circle me-3"
             width="100"
             height="100"
           />
           <div>
-            <h2>{username ? username : "Guest"}</h2>
-            <p>Student | Grade 10</p>
+            <h2>{userProfile ? `${userProfile.firstName} ${userProfile.lastName}` : "Guest"}</h2>
+            <p>{userProfile ? userProfile.email : "Student | Grade 10"}</p>
           </div>
         </div>
 

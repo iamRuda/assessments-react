@@ -18,7 +18,7 @@ const Forms = () => {
                 },
               });
               const result = await response.json();
-              setData(result);
+              // setData(result);
             } catch (error) {
               console.error("Error fetching protected data", error);
             }
