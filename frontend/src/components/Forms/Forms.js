@@ -159,7 +159,10 @@ const Forms = () => {
         ]
     });
 
+    // Состояния для редактирования JSON (уже реализовано) и для редактирования через удобные поля
     const [isEditingJson, setIsEditingJson] = useState({});
+    const [isEditingFields, setIsEditingFields] = useState({});
+    const [editingData, setEditingData] = useState({});
 
     const handleChange = (id, questionId, isMultiple) => {
         setFormData((prevData) => {
@@ -295,6 +298,144 @@ const Forms = () => {
             alert('Неправильный формат JSON');
         }
     };  
+
+    // Новый метод редактирования через удобные поля
+    const handleStartFieldEditing = (questionId) => {
+        const question = jsonData.questions.find(q => q.id === questionId);
+        if (question) {
+            setEditingData(prev => ({
+                ...prev,
+                [questionId]: {
+                    questionHeader: question.questionHeader,
+                    questionText: question.questionText,
+                    questionPostscript: question.questionPostscript,
+                    url: question.url,
+                    // Если есть options – клонируем их, иначе для open_ended оставляем undefined
+                    options: question.options ? question.options.map(option => ({ ...option })) : undefined,
+                    // Для open_ended корректные ответы и тип ответа
+                    correctAnswers: question.questionType === 'open_ended'
+                        ? (question.correctAnswers ? [...question.correctAnswers] : [])
+                        : (question.correctAnswers ? [...question.correctAnswers] : []),
+                    responseType: question.questionType === 'open_ended' ? (question.responseType || 'single_line') : undefined
+                }
+            }));
+            setIsEditingFields(prev => ({ ...prev, [questionId]: true }));
+        }
+    };
+
+    const handleFieldChange = (questionId, field, value) => {
+        setEditingData(prev => ({
+            ...prev,
+            [questionId]: { ...prev[questionId], [field]: value }
+        }));
+    };
+
+    const handleOptionTextChange = (questionId, optionId, newText) => {
+        setEditingData(prev => {
+            const updatedOptions = prev[questionId].options.map(option =>
+                option.id === optionId ? { ...option, text: newText } : option
+            );
+            return { 
+                ...prev,
+                [questionId]: { ...prev[questionId], options: updatedOptions }
+            };
+        });
+    };
+
+    const handleOptionUrlChange = (questionId, optionId, newUrl) => {
+        setEditingData(prev => {
+            const updatedOptions = prev[questionId].options.map(option =>
+                option.id === optionId ? { ...option, url: newUrl } : option
+            );
+            return { 
+                ...prev,
+                [questionId]: { ...prev[questionId], options: updatedOptions }
+            };
+        });
+    };
+
+    const handleDeleteOption = (questionId, optionId) => {
+        setEditingData(prev => {
+            const updatedOptions = prev[questionId].options.filter(option => option.id !== optionId);
+            const updatedCorrectAnswers = prev[questionId].correctAnswers.filter(id => id !== optionId);
+            return {
+                ...prev,
+                [questionId]: { 
+                    ...prev[questionId],
+                    options: updatedOptions,
+                    correctAnswers: updatedCorrectAnswers
+                }
+            };
+        });
+    };
+
+    // Для вопросов open_ended – обработчики работы с correctAnswers
+    const handleAddCorrectAnswer = (questionId) => {
+        setEditingData(prev => {
+            const currentAnswers = prev[questionId].correctAnswers || [];
+            return {
+                ...prev,
+                [questionId]: { ...prev[questionId], correctAnswers: [...currentAnswers, ''] }
+            };
+        });
+    };
+
+    const handleCorrectAnswerChange = (questionId, index, value) => {
+        setEditingData(prev => {
+            const updatedAnswers = [...prev[questionId].correctAnswers];
+            updatedAnswers[index] = value;
+            return {
+                ...prev,
+                [questionId]: { ...prev[questionId], correctAnswers: updatedAnswers }
+            };
+        });
+    };
+
+    const handleDeleteCorrectAnswer = (questionId, index) => {
+        setEditingData(prev => {
+            const updatedAnswers = prev[questionId].correctAnswers.filter((_, i) => i !== index);
+            return {
+                ...prev,
+                [questionId]: { ...prev[questionId], correctAnswers: updatedAnswers }
+            };
+        });
+    };
+
+    const handleSaveFieldEdits = (questionId) => {
+        const edited = editingData[questionId];
+        if (edited) {
+            setJsonData(prev => ({
+                ...prev,
+                questions: prev.questions.map(q => 
+                    q.id === questionId ? { 
+                        ...q, 
+                        questionHeader: edited.questionHeader,
+                        questionText: edited.questionText,
+                        questionPostscript: edited.questionPostscript,
+                        url: edited.url,
+                        options: edited.options,
+                        correctAnswers: edited.correctAnswers,
+                        responseType: edited.responseType
+                    } : q
+                )
+            }));
+            setIsEditingFields(prev => ({ ...prev, [questionId]: false }));
+            setEditingData(prev => {
+                const newEditingData = { ...prev };
+                delete newEditingData[questionId];
+                return newEditingData;
+            });
+        }
+    };
+
+    const handleCancelFieldEdits = (questionId) => {
+        setIsEditingFields(prev => ({ ...prev, [questionId]: false }));
+        setEditingData(prev => {
+            const newEditingData = { ...prev };
+            delete newEditingData[questionId];
+            return newEditingData;
+        });
+    };
 
     const QuestionTemplateModal = ({ onClose, onSelectTemplate }) => {
         return (
@@ -553,29 +694,150 @@ const Forms = () => {
                     <button className="btn btn-primary" onClick={handleAddQuestion}>
                         Добавить вопрос
                     </button>
-
                     {isModalOpen && (
                         <QuestionTemplateModal
-                        onClose={handleCloseModal}
-                        onSelectTemplate={handleSelectTemplate}
+                            onClose={handleCloseModal}
+                            onSelectTemplate={handleSelectTemplate}
                         />
                     )}
                 </div>
             </div>
             <Link to="/dashboard" className="mb-3">{"<<"} Вернуться на главную</Link>
-
             <form onSubmit={handleSubmit}>
                 {jsonData.questions.map((question) => (
                     <div key={question.id} className="card mb-4 p-3 shadow-sm position-relative" style={{ borderRadius: '10px' }}>
                         <h5 className="mb-3">{question.questionHeader}</h5>
-                        
                         {question.url && (
                             <div className="mb-3">
                                 <img src={question.url} alt="Question related" className="img-fluid" style={{ maxHeight: '50vh', objectFit: 'cover' }} />
                             </div>
                         )}
-                        
-                        {isEditingJson[question.id] ? (
+                        {isEditingFields[question.id] ? (
+                            <div>
+                                <div className="mb-3">
+                                    <label>Заголовок вопроса</label>
+                                    <input 
+                                        type="text" 
+                                        className="form-control"
+                                        value={editingData[question.id]?.questionHeader || ''}
+                                        onChange={(e) => handleFieldChange(question.id, 'questionHeader', e.target.value)}
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label>Текст вопроса</label>
+                                    <textarea 
+                                        className="form-control"
+                                        value={editingData[question.id]?.questionText || ''}
+                                        onChange={(e) => handleFieldChange(question.id, 'questionText', e.target.value)}
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label>Постскрипт</label>
+                                    <input 
+                                        type="text" 
+                                        className="form-control"
+                                        value={editingData[question.id]?.questionPostscript || ''}
+                                        onChange={(e) => handleFieldChange(question.id, 'questionPostscript', e.target.value)}
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label>URL изображения вопроса</label>
+                                    <input 
+                                        type="text" 
+                                        className="form-control"
+                                        value={editingData[question.id]?.url || ''}
+                                        onChange={(e) => handleFieldChange(question.id, 'url', e.target.value)}
+                                    />
+                                </div>
+                                {question.questionType === 'open_ended' ? (
+                                    <>
+                                        <div className="mb-3">
+                                            <label>Тип ответа</label>
+                                            <select
+                                               className="form-select"
+                                               value={editingData[question.id]?.responseType || 'single_line'}
+                                               onChange={(e) => handleFieldChange(question.id, 'responseType', e.target.value)}
+                                            >
+                                               <option value="single_line">Однострочный</option>
+                                               <option value="multi_line">Многострочный</option>
+                                            </select>
+                                        </div>
+                                        <div className="mb-3">
+                                            <label>Правильные ответы</label>
+                                            {editingData[question.id]?.correctAnswers && editingData[question.id].correctAnswers.map((answer, index) => (
+                                                <div key={index} className="input-group mb-2">
+                                                    <input 
+                                                        type="text" 
+                                                        className="form-control"
+                                                        value={answer}
+                                                        onChange={(e) => handleCorrectAnswerChange(question.id, index, e.target.value)}
+                                                    />
+                                                    <button 
+                                                        type="button" 
+                                                        className="btn btn-outline-danger" 
+                                                        onClick={() => handleDeleteCorrectAnswer(question.id, index)}
+                                                    >
+                                                        Удалить
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            <button 
+                                                type="button" 
+                                                className="btn btn-outline-primary" 
+                                                onClick={() => handleAddCorrectAnswer(question.id)}
+                                            >
+                                                Добавить правильный ответ
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        {editingData[question.id]?.options && (
+                                            <div className="mb-3">
+                                                <label>Варианты ответа</label>
+                                                {editingData[question.id].options.map((option) => (
+                                                    <div key={option.id} className="input-group mb-2">
+                                                        <span className="input-group-text">{option.id}</span>
+                                                        <input 
+                                                            type="text" 
+                                                            className="form-control"
+                                                            value={option.text}
+                                                            onChange={(e) => handleOptionTextChange(question.id, option.id, e.target.value)}
+                                                        />
+                                                        {(question.questionType === 'image_selection_single' ||
+                                                          question.questionType === 'image_selection_multiple') && (
+                                                            <input 
+                                                                type="text"
+                                                                className="form-control"
+                                                                placeholder="URL изображения"
+                                                                value={option.url || ''}
+                                                                onChange={(e) => handleOptionUrlChange(question.id, option.id, e.target.value)}
+                                                            />
+                                                        )}
+                                                        <button 
+                                                            type="button" 
+                                                            className="btn btn-outline-danger" 
+                                                            onClick={() => handleDeleteOption(question.id, option.id)}
+                                                        >
+                                                            Удалить
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                                <button 
+                                                    type="button" 
+                                                    className="btn btn-outline-primary" 
+                                                    onClick={() => handleAddOption(question.id)}
+                                                >
+                                                    Добавить вариант
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                                <button type="button" className="btn btn-success me-2" onClick={() => handleSaveFieldEdits(question.id)}>Сохранить изменения</button>
+                                <button type="button" className="btn btn-secondary" onClick={() => handleCancelFieldEdits(question.id)}>Отменить</button>
+                            </div>
+                        ) : isEditingJson[question.id] ? (
                             <div>
                                 <textarea
                                     className="form-control"
@@ -594,58 +856,40 @@ const Forms = () => {
                         ) : (
                             <div>
                                 <p className="text-dark">{question.questionText}</p>
-                                {/* Рендеринг для single choice (radio) */}
-                                {question.options && question.questionType === 'multiple_choice_single' && (
+                                {/* Рендеринг вариантов ответа для разных типов */}
+                                {question.options && (question.questionType === 'multiple_choice_single' || question.questionType === 'multiple_choice_multiple') && (
                                     question.options.map((option) => (
                                         <div key={option.id} className="form-check">
-                                        <input
-                                            type="radio"
-                                            className="form-check-input"
-                                            value={option.id}
-                                            checked={question.selectedAnswers.includes(option.id)}
-                                            onChange={() => handleChange(option.id, question.id, false)}
-                                        />
-                                        <label className="form-check-label">{option.text}</label>
+                                            <input
+                                                type={question.questionType === 'multiple_choice_single' ? 'radio' : 'checkbox'}
+                                                className="form-check-input"
+                                                value={option.id}
+                                                checked={question.selectedAnswers.includes(option.id)}
+                                                onChange={(e) => handleChange(e.target.value, question.id, question.questionType === 'multiple_choice_multiple')}
+                                            />
+                                            <label className="form-check-label">{option.text}</label>
                                         </div>
                                     ))
                                 )}
-
-                                {/* Рендеринг для multiple choice (checkbox) */}
-                                {question.options && question.questionType === 'multiple_choice_multiple' && (
-                                    question.options.map((option) => (
-                                        <div key={option.id} className="form-check">
-                                        <input
-                                            type="checkbox"
-                                            className="form-check-input"
-                                            value={option.id}
-                                            checked={question.selectedAnswers.includes(option.id)}
-                                            onChange={() => handleChange(option.id, question.id, true)}
-                                        />
-                                        <label className="form-check-label">{option.text}</label>
-                                        </div>
-                                    ))
+                                {question.questionType === 'open_ended' && (
+                                    <>
+                                        {question.responseType === 'single_line' ? (
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                value={question.selectedAnswers[0] || ''}
+                                                onChange={(e) => handleChange(e.target.value, question.id, false)}
+                                            />
+                                        ) : (
+                                            <textarea
+                                                className="form-control"
+                                                rows="3"
+                                                value={question.selectedAnswers[0] || ''}
+                                                onChange={(e) => handleChange(e.target.value, question.id, false)}
+                                            />
+                                        )}
+                                    </>
                                 )}
-
-                                {/* Рендеринг для open-ended single-line ответа */}
-                                {question.questionType === 'open_ended' && question.responseType === 'single_line' && (
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        value={question.selectedAnswers[0] || ''}
-                                        onChange={(e) => handleChange(e, question.id, false)}
-                                    />
-                                )}
-
-                                {/* Рендеринг для open-ended multi-line ответа */}
-                                {question.questionType === 'open_ended' && question.responseType === 'multi_line' && (
-                                    <textarea
-                                        className="form-control"
-                                        rows="3"
-                                        value={question.selectedAnswers[0] || ''}
-                                        onChange={(e) => handleChange(e, question.id, false)}
-                                    />
-                                )}
-
                                 {question.questionType === 'single_button_select' && (
                                     <div className="slider-container">
                                         <div className="slider-track">
@@ -653,7 +897,7 @@ const Forms = () => {
                                                 <div key={option.id} className="slide">
                                                     <button
                                                         type="button"
-                                                        onClick={() => handleChange(option.id, question.id, false)} // Для одиночного выбора передаем false
+                                                        onClick={() => handleChange(option.id, question.id, false)}
                                                         className="d-block"
                                                         style={{
                                                             backgroundColor: question.selectedAnswers.includes(option.id) ? '#ff9900' : '#007bff'
@@ -673,7 +917,7 @@ const Forms = () => {
                                                 <div key={option.id} className="slide">
                                                     <button
                                                         type="button"
-                                                        onClick={() => handleChange(option.id, question.id, true)} // Для множественного выбора передаем true
+                                                        onClick={() => handleChange(option.id, question.id, true)}
                                                         className="d-block"
                                                         style={{
                                                             backgroundColor: question.selectedAnswers.includes(option.id) ? '#ff9900' : '#007bff'
@@ -686,22 +930,21 @@ const Forms = () => {
                                         </div>
                                     </div>
                                 )}
-
                                 {question.questionType === 'image_selection_single' && (
                                     <div className="row">
                                         {question.options.map((option) => (
                                             <div key={option.id} className="col-4 text-center mb-3">
                                                 <label htmlFor={`image_${question.id}_${option.id}`} className="d-block position-relative img-form">
                                                     <img
-                                                        src={option.url} // Ensure you are using 'url' here for the image source
-                                                        alt={option.text} // Option text can be used for alt text
+                                                        src={option.url}
+                                                        alt={option.text}
                                                         className="img-thumbnail"
                                                         style={{ cursor: 'pointer', borderRadius: '10px' }}
                                                     />
                                                     <input
                                                         className="form-check-input checkbox-overlay"
                                                         type="radio"
-                                                        id={`image_${question.id}_${option.id}`} // Composite ID for uniqueness
+                                                        id={`image_${question.id}_${option.id}`}
                                                         name={`selectedImage_${question.id}`}
                                                         value={option.id}
                                                         checked={question.selectedAnswers[0] === option.id}
@@ -712,44 +955,48 @@ const Forms = () => {
                                         ))}
                                     </div>
                                 )}
-
                                 {question.questionType === 'image_selection_multiple' && (
                                     <div className="row">
                                         {question.options.map((option) => (
                                             <div key={option.id} className="col-4 text-center mb-3">
                                                 <label htmlFor={`image_${question.id}_${option.id}`} className="d-block position-relative img-form">
                                                     <img
-                                                        src={option.url} // Ensure you are using 'url' here as well
-                                                        alt={option.text} // Option text can be used for alt text
+                                                        src={option.url}
+                                                        alt={option.text}
                                                         className="img-thumbnail"
                                                         style={{ cursor: 'pointer', borderRadius: '10px' }}
                                                     />
                                                     <input
                                                         className="form-check-input checkbox-overlay"
                                                         type="checkbox"
-                                                        id={`image_${question.id}_${option.id}`} // Composite ID for uniqueness
+                                                        id={`image_${question.id}_${option.id}`}
                                                         value={option.id}
-                                                        checked={question.selectedAnswers.includes(option.id)} // Check if image is selected
-                                                        onChange={(e) => handleMultipleImageSelect(e, question.id)} // Handler for selection
+                                                        checked={question.selectedAnswers.includes(option.id)}
+                                                        onChange={(e) => handleMultipleImageSelect(e, question.id)}
                                                     />
                                                 </label>
                                             </div>
                                         ))}
                                     </div>
                                 )}
-
-                                
                                 <p className="text-muted mt-2">{question.questionPostscript}</p>
                                 <button
                                     type="button"
-                                    className="btn btn-secondary mt-2"
+                                    className="btn btn-secondary mt-2 me-2"
                                     onClick={() => handleEditJson(question.id)}
                                 >
                                     Редактировать JSON
                                 </button>
                                 <button
                                     type="button"
-                                    className="btn btn-danger mt-2"
+                                    className="btn btn-info mt-2"
+                                    onClick={() => handleStartFieldEditing(question.id)}
+                                >
+                                    Редактировать вопрос
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-danger mt-2 ms-2"
                                     onClick={() => handleDeleteQuestion(question.id)}
                                 >
                                     Удалить вопрос
