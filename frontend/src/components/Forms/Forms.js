@@ -36,6 +36,7 @@ const Forms = () => {
                 questionText: 'Пожалуйста, выберите один из вариантов ниже.',
                 questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
                 questionType: 'multiple_choice_single',
+                url: 'https://multi-admin.ru/mediabank_blog/11/121267/713d35c65bef4f7457062252f398f04fistock-462392661.jpg',
                 options: [
                     { id: "1", text: "Да", url: null, typeUrl: null },
                     { id: "2", text: "Нет", url: null, typeUrl: null }
@@ -49,6 +50,7 @@ const Forms = () => {
                 questionText: 'Вы можете выбрать несколько вариантов.',
                 questionPostscript: 'Убедитесь, что вы выбрали все подходящие.',
                 questionType: 'multiple_choice_multiple',
+                url: null,
                 options: [
                     { id: "1", text: "JavaScript", url: null, typeUrl: null },
                     { id: "2", text: "Python", url: null, typeUrl: null },
@@ -65,6 +67,7 @@ const Forms = () => {
                 questionPostscript: 'Это однострочный ответ.',
                 questionType: 'open_ended',
                 responseType: 'single_line',
+                url: null,
                 correctAnswers: [],
                 selectedAnswers: []
             },
@@ -75,6 +78,7 @@ const Forms = () => {
                 questionPostscript: 'Это многострочный ответ.',
                 questionType: 'open_ended',
                 responseType: 'multi_line', 
+                url: null,
                 correctAnswers: [],
                 selectedAnswers: []
             },
@@ -83,6 +87,7 @@ const Forms = () => {
                 questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать только одну)',
                 questionText: 'Нажмите на любую кнопку, чтобы выбрать вашу любимую.',
                 questionType: 'single_button_select',
+                url: null,
                 options: [
                     { id: "1", text: "1", url: null, typeUrl: null },
                     { id: "2", text: "2", url: null, typeUrl: null },
@@ -98,6 +103,7 @@ const Forms = () => {
                 questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать несколько)',
                 questionText: 'Нажмите на любые кнопки, чтобы выбрать ваши любимые.',
                 questionType: 'multiple_button_select',
+                url: null,
                 options: [
                     { id: "1", text: "1", url: null, typeUrl: null },
                     { id: "2", text: "2", url: null, typeUrl: null },
@@ -114,6 +120,7 @@ const Forms = () => {
                 questionText: 'Пожалуйста, выберите один из вариантов ниже.',
                 questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
                 questionType: 'image_selection_single',
+                url: null,
                 options: [
                     { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
                     { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
@@ -134,6 +141,7 @@ const Forms = () => {
                 questionText: 'Пожалуйста, выберите один из вариантов ниже.',
                 questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
                 questionType: 'image_selection_multiple',
+                url: null,
                 options: [
                     { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
                     { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
@@ -363,6 +371,7 @@ const Forms = () => {
             questionText: 'Пожалуйста, выберите один из вариантов ниже.',
             questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
             questionType: 'multiple_choice_single',
+            url: null,
             options: [
                 { id: "1", text: "Да", url: null, typeUrl: null },
                 { id: "2", text: "Нет", url: null, typeUrl: null }
@@ -377,6 +386,7 @@ const Forms = () => {
             questionText: 'Вы можете выбрать несколько вариантов.',
             questionPostscript: 'Убедитесь, что вы выбрали все подходящие.',
             questionType: 'multiple_choice_multiple',
+            url: null,
             options: [
                 { id: "1", text: "JavaScript", url: null, typeUrl: null },
                 { id: "2", text: "Python", url: null, typeUrl: null },
@@ -394,6 +404,7 @@ const Forms = () => {
             questionPostscript: 'Это однострочный ответ.',
             questionType: 'open_ended',
             responseType: 'single_line',
+            url: null,
             correctAnswers: [],
             selectedAnswers: []
         };
@@ -404,7 +415,8 @@ const Forms = () => {
             questionText: 'Поделитесь вашим опытом и подходами.',
             questionPostscript: 'Это многострочный ответ.',
             questionType: 'open_ended',
-            responseType: 'multi_line', 
+            responseType: 'multi_line',
+            url: null, 
             correctAnswers: [],
             selectedAnswers: []
         };
@@ -415,6 +427,7 @@ const Forms = () => {
             questionText: 'Пожалуйста, выберите один из вариантов ниже.',
             questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
             questionType: 'image_selection_single',
+            url: null,
             options: [
                 { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
                 { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
@@ -436,6 +449,7 @@ const Forms = () => {
             questionText: 'Пожалуйста, выберите один из вариантов ниже.',
             questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
             questionType: 'image_selection_multiple',
+            url: null,
             options: [
                 { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
                 { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
@@ -456,6 +470,7 @@ const Forms = () => {
             questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать только одну)',
             questionText: 'Нажмите на любую кнопку, чтобы выбрать вашу любимую.',
             questionType: 'single_button_select',
+            url: null,
             options: [
                 { id: "1", text: "1", url: null, typeUrl: null },
                 { id: "2", text: "2", url: null, typeUrl: null },
@@ -472,6 +487,7 @@ const Forms = () => {
             questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать несколько)',
             questionText: 'Нажмите на любые кнопки, чтобы выбрать ваши любимые.',
             questionType: 'multiple_button_select',
+            url: null,
             options: [
                 { id: "1", text: "1", url: null, typeUrl: null },
                 { id: "2", text: "2", url: null, typeUrl: null },
@@ -553,6 +569,12 @@ const Forms = () => {
                     <div key={question.id} className="card mb-4 p-3 shadow-sm position-relative" style={{ borderRadius: '10px' }}>
                         <h5 className="mb-3">{question.questionHeader}</h5>
                         
+                        {question.url && (
+                            <div className="mb-3">
+                                <img src={question.url} alt="Question related" className="img-fluid" style={{ maxHeight: '50vh', objectFit: 'cover' }} />
+                            </div>
+                        )}
+                        
                         {isEditingJson[question.id] ? (
                             <div>
                                 <textarea
@@ -576,14 +598,14 @@ const Forms = () => {
                                 {question.options && question.questionType === 'multiple_choice_single' && (
                                     question.options.map((option) => (
                                         <div key={option.id} className="form-check">
-                                            <input
-                                                type="radio"
-                                                className="form-check-input"
-                                                value={option.id} // Используем id для value
-                                                checked={question.selectedAnswers.includes(option.id)} // Проверка по id
-                                                onChange={(e) => handleChange(e, question.id, false)}
-                                            />
-                                            <label className="form-check-label">{option.text}</label> {/* Показываем текст */}
+                                        <input
+                                            type="radio"
+                                            className="form-check-input"
+                                            value={option.id}
+                                            checked={question.selectedAnswers.includes(option.id)}
+                                            onChange={() => handleChange(option.id, question.id, false)}
+                                        />
+                                        <label className="form-check-label">{option.text}</label>
                                         </div>
                                     ))
                                 )}
@@ -592,14 +614,14 @@ const Forms = () => {
                                 {question.options && question.questionType === 'multiple_choice_multiple' && (
                                     question.options.map((option) => (
                                         <div key={option.id} className="form-check">
-                                            <input
-                                                type="checkbox"
-                                                className="form-check-input"
-                                                value={option.id} // Используем id для value
-                                                checked={question.selectedAnswers.includes(option.id)} // Проверка по id
-                                                onChange={(e) => handleChange(e, question.id, true)}
-                                            />
-                                            <label className="form-check-label">{option.text}</label> {/* Показываем текст */}
+                                        <input
+                                            type="checkbox"
+                                            className="form-check-input"
+                                            value={option.id}
+                                            checked={question.selectedAnswers.includes(option.id)}
+                                            onChange={() => handleChange(option.id, question.id, true)}
+                                        />
+                                        <label className="form-check-label">{option.text}</label>
                                         </div>
                                     ))
                                 )}
