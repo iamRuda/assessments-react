@@ -25,7 +25,7 @@ const Forms = () => {
           };
     
         fetchProtectedData();
-      }); // сыпет ошибку
+      });
 
     const [formData, setFormData] = useState({});
     const [jsonData, setJsonData] = useState({
@@ -350,6 +350,25 @@ const Forms = () => {
             return { 
                 ...prev,
                 [questionId]: { ...prev[questionId], options: updatedOptions }
+            };
+        });
+    };
+
+    const handleAddOption = (questionId) => {
+        setEditingData(prev => {
+            const currentOptions = prev[questionId]?.options || [];
+            const newOption = {
+                id: `${Date.now()}_${Math.floor(Math.random() * 1000)}`, // генерируем уникальный id
+                text: 'Новый вариант',
+                url: null,
+                typeUrl: null
+            };
+            return {
+                ...prev,
+                [questionId]: {
+                    ...prev[questionId],
+                    options: [...currentOptions, newOption]
+                }
             };
         });
     };
