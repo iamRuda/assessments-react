@@ -93,7 +93,7 @@ const Dashboard = () => {
         <header className="d-flex align-items-center justify-content-between my-4">
           <div className="d-flex align-items-center">
             <img
-                src={userProfile?.imageUrl || "https://via.placeholder.com/100"}
+                src={userProfile?.imageUrl || "https://placehold.co/100"}
                 alt="Profile"
                 className="rounded-circle me-3"
                 width="100"
