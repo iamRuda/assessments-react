@@ -27,7 +27,8 @@ const Dashboard = () => {
     setUsername(savedUsername);
 
     const fetchProtectedData = async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("authToken");
+      console.log("Token:" + token);
 
       try {
         const response = await fetch("http://localhost:8080/api/test/user", {
@@ -36,6 +37,7 @@ const Dashboard = () => {
             Authorization: `Bearer ${token}`,
           },
         });
+        console.log(response);
         const result = await response.json();
         setData(result);
       } catch (error) {
@@ -44,15 +46,21 @@ const Dashboard = () => {
     };
 
     const fetchUserProfile = async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("authToken"); // Исправлено, чтобы использовать правильный ключ токена
 
       try {
         const response = await fetch("http://localhost:8080/api/user/profile", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
+            Accept: "application/json",
           },
         });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch user profile");
+        }
+
         const userProfile = await response.json();
         setUserProfile(userProfile);
       } catch (error) {
@@ -81,79 +89,87 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="container">
-      <header className="d-flex align-items-center justify-content-between my-4">
-        <div className="d-flex align-items-center">
-          <img
-            src={userProfile?.imageUrl || "https://via.placeholder.com/100"}
-            alt="Profile"
-            className="rounded-circle me-3"
-            width="100"
-            height="100"
-          />
-          <div>
-            <h2>{userProfile ? `${userProfile.firstName} ${userProfile.lastName}` : "Guest"}</h2>
-            <p>{userProfile ? userProfile.email : "Student | Grade 10"}</p>
-          </div>
-        </div>
+      <div className="container">
+        <header className="d-flex align-items-center justify-content-between my-4">
+          <div className="d-flex align-items-center">
+            <img
+                src={userProfile?.imageUrl || "https://via.placeholder.com/100"}
+                alt="Profile"
+                className="rounded-circle me-3"
+                width="100"
+                height="100"
+            />
+            <div>
+              <h2>
+                {userProfile?.firstName && userProfile?.lastName
+                    ? `${userProfile.firstName} ${userProfile.lastName}`
+                    : "Guest"}
+              </h2>
+              <p>
+                {userProfile?.email
+                    ? `${userProfile.email} / ${userProfile.roles?.[0]?.role || "User"}`
+                    : "Student | User"}
+              </p>
 
-        <div className="d-flex align-items-center">
-          <button className="btn btn-link" title="Notifications" onClick={() => setShowNotifications(!showNotifications)}>
-            <FontAwesomeIcon icon={faBell} size="lg" />
-          </button>
-          <button className="btn btn-link" title="Settings" onClick={handleSettingsClick}>
-            <FontAwesomeIcon icon={faCog} size="lg" />
-          </button>
-        </div>
-      </header>
-
-      {showNotifications && (
-        <div className="position-relative">
-          <div className="position-absolute end-0 me-3" style={{ zIndex: 1000 }}>
-            <div className="card shadow" style={{ maxWidth: "500px" }}>
-              <div className="card-body">
-                <h5 className="card-title">Уведомления</h5>
-                {notifications.length > 0 ? (
-                  notifications.map((notification, index) => (
-                    <div key={index} className="mb-3">
-                      <div className="notification-card card">
-                        <div className="card-body">
-                          <h6 className="card-title">{notification.title}</h6>
-                          <p className="card-text">{notification.text}</p>
-                          <a href={notification.link} className="btn btn-primary">Подробнее</a>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="mb-0">Нет новых уведомлений.</p>
-                )}
-              </div>
             </div>
           </div>
-        </div>
-      )}
 
-      {data ? (
-        <div className="row">
-          {data.tests.map((test) => (
-            <div key={test.id} className="col-md-4 mb-4">
-              <div className="card h-100" onClick={handleTestClick}> {/* Adding onClick for navigation */}
-                <div className="card-body">
-                  <h5 className="card-title">📚 {test.title}</h5>
-                  <p className="card-text">{test.description}</p>
-                  <a href="#" className="btn btn-primary">
-                    Start Test
-                  </a>
+          <div className="d-flex align-items-center">
+            <button className="btn btn-link" title="Notifications"
+                    onClick={() => setShowNotifications(!showNotifications)}>
+              <FontAwesomeIcon icon={faBell} size="lg"/>
+            </button>
+            <button className="btn btn-link" title="Settings" onClick={handleSettingsClick}>
+              <FontAwesomeIcon icon={faCog} size="lg" />
+            </button>
+          </div>
+        </header>
+
+        {showNotifications && (
+            <div className="position-relative">
+              <div className="position-absolute end-0 me-3" style={{ zIndex: 1000 }}>
+                <div className="card shadow" style={{ maxWidth: "500px" }}>
+                  <div className="card-body">
+                    <h5 className="card-title">Уведомления</h5>
+                    {notifications.length > 0 ? (
+                        notifications.map((notification, index) => (
+                            <div key={index} className="mb-3">
+                              <div className="notification-card card">
+                                <div className="card-body">
+                                  <h6 className="card-title">{notification.title}</h6>
+                                  <p className="card-text">{notification.text}</p>
+                                  <a href={notification.link} className="btn btn-primary">Подробнее</a>
+                                </div>
+                              </div>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="mb-0">Нет новых уведомлений.</p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      ) : (
-        <p>Loading...</p>
-      )}
-    </div>
+        )}
+
+        {data ? (
+            <div className="row">
+              {data.tests.map((test) => (
+                  <div key={test.id} className="col-md-4 mb-4">
+                    <div className="card h-100" onClick={handleTestClick}>
+                      <div className="card-body">
+                        <h5 className="card-title">📚 {test.title}</h5>
+                        <p className="card-text">{test.description}</p>
+                        <a href="#" className="btn btn-primary">Start Test</a>
+                      </div>
+                    </div>
+                  </div>
+              ))}
+            </div>
+        ) : (
+            <p>Loading...</p>
+        )}
+      </div>
   );
 };
 

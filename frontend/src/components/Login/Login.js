@@ -30,6 +30,7 @@ const Login = () => {
   
         // Сохраняем токен в localStorage
         localStorage.setItem("authToken", data.token);  // Сохраняем токен в localStorage
+        console.log("LS Token:" + localStorage.getItem("authToken"))
   
         navigate("/dashboard"); // Перенаправляем на dashboard
       } else {
