@@ -2,52 +2,39 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faCog } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for routing
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
-  const tests = [
-    { id: 1, title: "Math Test", description: "Algebra and Geometry" },
-    { id: 2, title: "Science Test", description: "Physics and Chemistry" },
-    { id: 3, title: "History Test", description: "World War II" },
-    { id: 4, title: "English Test", description: "Grammar and Vocabulary" },
-    { id: 5, title: "Geography Test", description: "Maps and Climates" },
-    { id: 6, title: "Biology Test", description: "Cell Biology" },
-  ];
-
-  const [data, setData] = useState(null);
-  const [username, setUsername] = useState("");
+  const [tests, setTests] = useState([]);
+  const [userProfile, setUserProfile] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
-  const [userProfile, setUserProfile] = useState(null); // State for user profile
-
-  const navigate = useNavigate(); // Use the useNavigate hook for routing
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const savedUsername = localStorage.getItem("username");
-    setUsername(savedUsername);
+    const token = localStorage.getItem("authToken");
 
-    const fetchProtectedData = async () => {
-      const token = localStorage.getItem("authToken");
-      console.log("Token:" + token);
-
+    const fetchTests = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/test/user", {
+        // TODO: Пофиксить заглушку, чтобы было получение тестов для данного пользователя, а не всех тестов
+        const response = await fetch("http://localhost:8080/api/test/findAll", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
+            Accept: "application/json",
           },
         });
-        console.log(response);
-        const result = await response.json();
-        setData(result);
+
+        if (!response.ok) throw new Error("Failed to fetch tests");
+
+        const testData = await response.json();
+        setTests(testData);
       } catch (error) {
-        console.error("Error fetching protected data", error);
+        console.error("Error fetching tests:", error);
       }
     };
 
     const fetchUserProfile = async () => {
-      const token = localStorage.getItem("authToken"); // Исправлено, чтобы использовать правильный ключ токена
-
       try {
         const response = await fetch("http://localhost:8080/api/user/profile", {
           method: "GET",
@@ -57,18 +44,16 @@ const Dashboard = () => {
           },
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch user profile");
-        }
+        if (!response.ok) throw new Error("Failed to fetch user profile");
 
-        const userProfile = await response.json();
-        setUserProfile(userProfile);
+        const userProfileData = await response.json();
+        setUserProfile(userProfileData);
       } catch (error) {
-        console.error("Error fetching user profile", error);
+        console.error("Error fetching user profile:", error);
       }
     };
 
-    fetchProtectedData();
+    fetchTests();
     fetchUserProfile();
 
     setNotifications([
@@ -77,16 +62,6 @@ const Dashboard = () => {
       { title: "Biology Test Results", text: "Пришли результаты тестирования по биологии.", link: "/biology-results" },
     ]);
   }, []);
-
-  // Function to redirect to Forms
-  const handleTestClick = () => {
-    navigate("/forms"); // Redirect to Forms component
-  };
-
-  // Navigate to the settings page
-  const handleSettingsClick = () => {
-    navigate("/settings"); // Navigate to settings page
-  };
 
   return (
       <div className="container">
@@ -100,26 +75,16 @@ const Dashboard = () => {
                 height="100"
             />
             <div>
-              <h2>
-                {userProfile?.firstName && userProfile?.lastName
-                    ? `${userProfile.firstName} ${userProfile.lastName}`
-                    : "Guest"}
-              </h2>
-              <p>
-                {userProfile?.email
-                    ? `${userProfile.email} / ${userProfile.roles?.[0]?.role || "User"}`
-                    : "Student | User"}
-              </p>
-
+              <h2>{userProfile?.firstName && userProfile?.lastName ? `${userProfile.firstName} ${userProfile.lastName}` : "Guest"}</h2>
+              <p>{userProfile?.email ? `${userProfile.email} / ${userProfile.roles?.[0]?.role || "User"}` : "Student | User"}</p>
             </div>
           </div>
 
           <div className="d-flex align-items-center">
-            <button className="btn btn-link" title="Notifications"
-                    onClick={() => setShowNotifications(!showNotifications)}>
-              <FontAwesomeIcon icon={faBell} size="lg"/>
+            <button className="btn btn-link" title="Notifications" onClick={() => setShowNotifications(!showNotifications)}>
+              <FontAwesomeIcon icon={faBell} size="lg" />
             </button>
-            <button className="btn btn-link" title="Settings" onClick={handleSettingsClick}>
+            <button className="btn btn-link" title="Settings" onClick={() => navigate("/settings")}>
               <FontAwesomeIcon icon={faCog} size="lg" />
             </button>
           </div>
@@ -152,22 +117,23 @@ const Dashboard = () => {
             </div>
         )}
 
-        {data ? (
+        <h3>Available Tests</h3>
+        {tests.length > 0 ? (
             <div className="row">
-              {data.tests.map((test) => (
+              {tests.map((test) => (
                   <div key={test.id} className="col-md-4 mb-4">
-                    <div className="card h-100" onClick={handleTestClick}>
+                    <div className="card h-100">
                       <div className="card-body">
                         <h5 className="card-title">📚 {test.title}</h5>
-                        <p className="card-text">{test.description}</p>
-                        <a href="#" className="btn btn-primary">Start Test</a>
+                        <p className="card-text">Passing Score: {test.passingScore}</p>
+                        <button className="btn btn-primary">Start Test</button>
                       </div>
                     </div>
                   </div>
               ))}
             </div>
         ) : (
-            <p>Loading...</p>
+            <p>Loading tests...</p>
         )}
       </div>
   );

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const Settings = () => {
+  // TODO: Выход из учетки не работает
   const [activeSection, setActiveSection] = useState("general");
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const navigate = useNavigate();
@@ -69,7 +70,7 @@ const Settings = () => {
                 : "Выход из учётки"}
             </h4>
             <button className="btn btn-secondary" onClick={handleBackToDashboard}>
-              Вернуться на Dashboard
+              Назад
             </button>
           </div>
 
