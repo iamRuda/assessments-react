@@ -27,6 +27,8 @@ const Forms = () => {
         fetchProtectedData();
       });
 
+
+    // TODO: разбейте по файлам, не читаемо
     const [formData, setFormData] = useState({});
     const [jsonData, setJsonData] = useState({
         questions: [
@@ -122,15 +124,15 @@ const Forms = () => {
                 questionType: 'image_selection_single',
                 url: null,
                 options: [
-                    { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '3', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '4', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '5', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '6', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '7', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '8', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '9', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' }
+                    { id: '1', text: 'Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                    { id: '2', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                    { id: '3', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                    { id: '4', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                    { id: '5', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                    { id: '6', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                    { id: '7', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                    { id: '8', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                    { id: '9', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' }
                 ],
                 correctAnswers: [],
                 selectedAnswers: []
@@ -143,15 +145,15 @@ const Forms = () => {
                 questionType: 'image_selection_multiple',
                 url: null,
                 options: [
-                    { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '3', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '4', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '5', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '6', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '7', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '8', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '9', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' }
+                    { id: '1', text: 'Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                    { id: '2', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                    { id: '3', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                    { id: '4', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                    { id: '5', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                    { id: '6', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                    { id: '7', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                    { id: '8', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                    { id: '9', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' }
                 ],
                 correctAnswers: [],
                 selectedAnswers: []
@@ -589,15 +591,15 @@ const Forms = () => {
             questionType: 'image_selection_single',
             url: null,
             options: [
-                { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '3', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '4', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '5', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '6', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '7', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '8', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '9', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' }
+                { id: '1', text: 'Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                { id: '2', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                { id: '3', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                { id: '4', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                { id: '5', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                { id: '6', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                { id: '7', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                { id: '8', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                { id: '9', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' }
             ],
             correctAnswers: [],
             selectedAnswers: []
@@ -611,15 +613,15 @@ const Forms = () => {
             questionType: 'image_selection_multiple',
             url: null,
             options: [
-                { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '3', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '4', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '5', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '6', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '7', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '8', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '9', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' }
+                { id: '1', text: 'Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                { id: '2', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                { id: '3', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                { id: '4', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                { id: '5', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                { id: '6', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                { id: '7', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                { id: '8', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' },
+                { id: '9', text: 'No Google Forms', url: 'https://placehold.co/100', typeUrl: 'image' }
             ],
             correctAnswers: [],
             selectedAnswers: []
