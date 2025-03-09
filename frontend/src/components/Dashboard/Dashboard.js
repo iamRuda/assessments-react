@@ -14,10 +14,31 @@ const Dashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem("authToken");
 
-    const fetchTests = async () => {
+    const fetchUserProfile = async () => {
       try {
-        // TODO: Пофиксить заглушку, чтобы было получение тестов для данного пользователя, а не всех тестов
-        const response = await fetch("http://localhost:8080/api/test/findAll", {
+        const response = await fetch("http://localhost:8080/api/user/profile", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+
+        if (!response.ok) throw new Error("Failed to fetch user profile");
+
+        const userProfileData = await response.json();
+        setUserProfile(userProfileData);
+
+        // После загрузки профиля загружаем тесты по userId
+        fetchTests(userProfileData.id);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+
+    const fetchTests = async (userId) => {
+      try {
+        const response = await fetch(`http://localhost:8080/api/test/findAllByUser/${userId}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -34,26 +55,6 @@ const Dashboard = () => {
       }
     };
 
-    const fetchUserProfile = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/api/user/profile", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        });
-
-        if (!response.ok) throw new Error("Failed to fetch user profile");
-
-        const userProfileData = await response.json();
-        setUserProfile(userProfileData);
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-      }
-    };
-
-    fetchTests();
     fetchUserProfile();
 
     setNotifications([
