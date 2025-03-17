@@ -6,26 +6,26 @@ import { Link } from 'react-router-dom';
 
 const Forms = () => {
 
-    useEffect(() => {
-        const fetchProtectedData = async () => {
-          const token = localStorage.getItem("token");
-    
-            try {
-              const response = await fetch("http://localhost:8080/api/test/user", {
-                method: "GET",
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              });
-              const result = await response.json();
-              setData(result);
-            } catch (error) {
-              console.error("Error fetching protected data", error);
-            }
-          };
-    
-        fetchProtectedData();
-      });
+    // useEffect(() => {
+    //     const fetchProtectedData = async () => {
+    //         const token = localStorage.getItem("token");
+    //
+    //         try {
+    //             const response = await fetch("http://localhost:8080/api/test/user", {
+    //                 method: "GET",
+    //                 headers: {
+    //                     Authorization: `Bearer ${token}`,
+    //                 },
+    //             });
+    //             const result = await response.json();
+    //             setData(result);
+    //         } catch (error) {
+    //             console.error("Error fetching protected data", error);
+    //         }
+    //     };
+    //
+    //     fetchProtectedData();
+    //   });
 
     const [formData, setFormData] = useState({});
     const [jsonData, setJsonData] = useState({
@@ -41,7 +41,7 @@ const Forms = () => {
                     { id: "1", text: "Да", url: null, typeUrl: null },
                     { id: "2", text: "Нет", url: null, typeUrl: null }
                 ],
-                correctAnswers: [],
+                correctAnswers: ["1","2"],
                 selectedAnswers: []
             },
             {
@@ -66,7 +66,6 @@ const Forms = () => {
                 questionText: 'Пожалуйста, дайте краткий ответ.',
                 questionPostscript: 'Это однострочный ответ.',
                 questionType: 'open_ended',
-                responseType: 'single_line',
                 url: null,
                 correctAnswers: [],
                 selectedAnswers: []
@@ -77,7 +76,6 @@ const Forms = () => {
                 questionText: 'Поделитесь вашим опытом и подходами.',
                 questionPostscript: 'Это многострочный ответ.',
                 questionType: 'open_ended',
-                responseType: 'multi_line', 
                 url: null,
                 correctAnswers: [],
                 selectedAnswers: []

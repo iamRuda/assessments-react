@@ -29,8 +29,7 @@ const Login = () => {
         console.log(data);  // Логирование ответа
   
         // Сохраняем токен в localStorage
-        localStorage.setItem("authToken", data.token);  // Сохраняем токен в localStorage
-  
+        localStorage.setItem("authToken", data.token);
         navigate("/dashboard"); // Перенаправляем на dashboard
       } else {
         const { message } = await response.json();

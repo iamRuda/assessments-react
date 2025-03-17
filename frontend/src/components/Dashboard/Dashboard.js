@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faCog } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for routing
+import { useNavigate } from "react-router-dom";
+import {logout} from "../../auth/auth";
+import {wait} from "@testing-library/user-event/dist/utils"; // Import useNavigate for routing
 
 const Dashboard = () => {
   const tests = [
@@ -15,35 +17,38 @@ const Dashboard = () => {
   ];
 
   const [data, setData] = useState(null);
-  const [username, setUsername] = useState("");
+  const [assignedTests, setTests] = useState(null);
+  const [profileData, setProfileData] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
 
   const navigate = useNavigate(); // Use the useNavigate hook for routing
 
+  const handleLogoutButtonClick = () => {
+    logout();
+  };
+
+
+
   useEffect(() => {
-    const savedUsername = localStorage.getItem("username");
-    setUsername(savedUsername);
+    const token = localStorage.getItem("authToken");
 
-    const fetchProtectedData = async () => {
-      const token = localStorage.getItem("token");
+    const initProfileData = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/user/profile", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const result = await response.json();
+        setProfileData(result);
+        localStorage.setItem("profile", JSON.stringify(result));
+        console.log("Profile data:", result);
+      } catch (error) {
+        console.error("Error fetching profile data", error);
+      }
+    };
 
-        try {
-          const response = await fetch("http://localhost:8080/api/test/user", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          const result = await response.json();
-          setData(result);
-        } catch (error) {
-          console.error("Error fetching protected data", error);
-        }
-      };
-
-    fetchProtectedData();
-
+    initProfileData();
 
     setNotifications([
       { title: "Math Test Deadline", text: "Скоро закончится срок сдачи теста по математике.", link: "/math-test" },
@@ -51,6 +56,32 @@ const Dashboard = () => {
       { title: "Biology Test Results", text: "Пришли результаты тестирования по биологии.", link: "/biology-results" },
     ]);
   }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    const getAssignedTests = async () => {
+      if (!profileData || !profileData.group || !profileData.group.name) {
+        return;
+      }
+      try {
+        console.log("getAssignedTests using profile:", profileData);
+        const response = await fetch(
+            `http://localhost:8080/api/testAssignment/findByGroupName/${profileData.group.name}`,
+            {
+              method: "GET",
+              headers: { Authorization: `Bearer ${token}` },
+            }
+        );
+        const tests = await response.json();
+        setTests(tests);
+        console.log("Tests:", tests);
+      } catch (error) {
+        console.error("Error fetching test assignments", error);
+      }
+    };
+
+    getAssignedTests();
+  }, [profileData]);
 
   // Function to redirect to Forms
   const handleTestClick = () => {
@@ -67,31 +98,54 @@ const Dashboard = () => {
       <header className="d-flex align-items-center justify-content-between my-4">
         <div className="d-flex align-items-center">
           <img
-            src="https://via.placeholder.com/100"
-            alt="Profile"
-            className="rounded-circle me-3"
-            width="100"
-            height="100"
+              src="https://via.placeholder.com/100"
+              alt="Profile"
+              className="rounded-circle me-3"
+              width="100"
+              height="100"
           />
-          <div>
-            <h2>{username ? username : "Guest"}</h2>
-            <p>Student | Grade 10</p>
+          <div className="profile-container">
+            <h2>{profileData ? profileData.firstName + " " + profileData.lastName : "Guest"}</h2>
+            <p className="role">Role: {profileData && profileData.roles ? profileData.roles[0].role : "Not assigned"}</p>
+            <p className="email">Email: {profileData ? profileData.email : "No email"}</p>
+            <p className="id">User ID: {profileData ? profileData.id : "No ID"}</p>
           </div>
+          <style>{`.profile-container {
+                    font-family: 'Arial', sans-serif;
+                    background-color: #f9f9f9;
+                    padding: 20px;
+                    border-radius: 8px;
+                    width: 100%;
+                    max-width: 400px;
+                    margin: 0 auto;
+                    text-align: center;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                  }
+                  .profile-container h2 {
+                    font-size: 24px;
+                    color: #333;
+                    margin-bottom: 10px;}`}
+          </style>
         </div>
 
+        <button className="action-button" onClick={handleLogoutButtonClick}>
+          Logout 🧕
+        </button>
+
         <div className="d-flex align-items-center">
-          <button className="btn btn-link" title="Notifications" onClick={() => setShowNotifications(!showNotifications)}>
-            <FontAwesomeIcon icon={faBell} size="lg" />
+          <button className="btn btn-link" title="Notifications"
+                  onClick={() => setShowNotifications(!showNotifications)}>
+            <FontAwesomeIcon icon={faBell} size="lg"/>
           </button>
           <button className="btn btn-link" title="Settings" onClick={handleSettingsClick}>
-            <FontAwesomeIcon icon={faCog} size="lg" />
+            <FontAwesomeIcon icon={faCog} size="lg"/>
           </button>
         </div>
       </header>
 
       {showNotifications && (
-        <div className="position-relative">
-          <div className="position-absolute end-0 me-3" style={{ zIndex: 1000 }}>
+          <div className="position-relative">
+            <div className="position-absolute end-0 me-3" style={{ zIndex: 1000 }}>
             <div className="card shadow" style={{ maxWidth: "500px" }}>
               <div className="card-body">
                 <h5 className="card-title">Уведомления</h5>
@@ -116,14 +170,14 @@ const Dashboard = () => {
         </div>
       )}
 
-      {data ? (
+      {assignedTests ? (
         <div className="row">
-          {data.tests.map((test) => (
-            <div key={test.id} className="col-md-4 mb-4">
-              <div className="card h-100" onClick={handleTestClick}> {/* Adding onClick for navigation */}
+          {assignedTests.map((assignedTest) => (
+            <div key={assignedTest.id} className="col-md-4 mb-4">
+              <div className="card h-100" onClick={handleTestClick}>
                 <div className="card-body">
-                  <h5 className="card-title">📚 {test.title}</h5>
-                  <p className="card-text">{test.description}</p>
+                  <h5 className="card-title">📚 {assignedTest.test.title}</h5>
+                  <p className="card-text">тут должно быть описание</p>
                   <a href="#" className="btn btn-primary">
                     Start Test
                   </a>
