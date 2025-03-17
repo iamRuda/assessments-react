@@ -1,20 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const Settings = () => {
+  // TODO: Выход из учетки не работает
   const [activeSection, setActiveSection] = useState("general");
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
   const navigate = useNavigate();
 
-  // Function to handle navigation back to the dashboard
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      setIsDarkTheme(savedTheme === "dark");
+      document.body.classList.toggle("dark-theme", savedTheme === "dark");
+    }
+  }, []);
+
   const handleBackToDashboard = () => {
     navigate("/dashboard");
   };
 
+  const toggleTheme = () => {
+    const newTheme = !isDarkTheme ? "dark" : "light";
+    setIsDarkTheme(!isDarkTheme);
+    document.body.classList.toggle("dark-theme", !isDarkTheme);
+    localStorage.setItem("theme", newTheme);
+  };
+
   return (
-    <div className="container-fluid">
+    <div className={`container-fluid ${isDarkTheme ? "dark-theme" : ""}`}>
       <div className="row">
-        {/* Sidebar */}
         <div
           className="col-md-3 bg-light p-4"
           style={{ position: "absolute", top: 0, bottom: 0, left: 0 }}
@@ -45,7 +60,6 @@ const Settings = () => {
           </ul>
         </div>
 
-        {/* Content Area */}
         <div className="col-md-9 offset-md-3 p-4" style={{ marginLeft: "25%" }}>
           <div className="d-flex justify-content-between mb-4">
             <h4>
@@ -56,32 +70,33 @@ const Settings = () => {
                 : "Выход из учётки"}
             </h4>
             <button className="btn btn-secondary" onClick={handleBackToDashboard}>
-              Вернуться на Dashboard
+              Назад
             </button>
           </div>
 
           {activeSection === "general" && (
             <div>
-              <h5>Общие настройки</h5>
-              <p>Настройки для общих параметров вашего профиля.</p>
-              <div>
+              <h5 className="mb-3">Общие настройки</h5>
+              <p className="mb-4">Настройки для общих параметров вашего профиля.</p>
+              <div className="mb-3">
                 <label htmlFor="themeToggle" className="form-label">
                   Тёмная тема
                 </label>
                 <input
                   type="checkbox"
-                  className="form-check-input"
+                  className="form-check-input mx-3"
                   id="themeToggle"
-                  onChange={(e) => console.log("Dark theme toggled:", e.target.checked)}
+                  checked={isDarkTheme}
+                  onChange={toggleTheme}
                 />
               </div>
-              <div>
+              <div className="mb-3">
                 <label htmlFor="emailNotifications" className="form-label">
                   Уведомления по электронной почте
                 </label>
                 <input
                   type="checkbox"
-                  className="form-check-input"
+                  className="form-check-input mx-3"
                   id="emailNotifications"
                   onChange={(e) => console.log("Email notifications toggled:", e.target.checked)}
                 />
@@ -91,25 +106,25 @@ const Settings = () => {
 
           {activeSection === "account" && (
             <div>
-              <h5>Учётная запись</h5>
-              <p>Настройки для изменения данных учётной записи.</p>
-              <div>
+              <h5 className="mb-3">Учётная запись</h5>
+              <p className="mb-4">Настройки для изменения данных учётной записи.</p>
+              <div className="mb-3">
                 <label htmlFor="changePassword" className="form-label">
                   Сменить пароль
                 </label>
-                <button className="btn btn-warning" id="changePassword">
+                <button className="btn btn-warning mx-3" id="changePassword">
                   Изменить
                 </button>
               </div>
-              <div>
+              <div className="mb-3">
                 <label htmlFor="deleteAccount" className="form-label">
                   Удалить учётную запись
                 </label>
-                <button className="btn btn-danger" id="deleteAccount">
+                <button className="btn btn-danger mx-3" id="deleteAccount">
                   Удалить
                 </button>
               </div>
-              <div>
+              <div className="mb-3">
                 <label htmlFor="language" className="form-label">
                   Язык интерфейса
                 </label>
@@ -123,8 +138,8 @@ const Settings = () => {
 
           {activeSection === "logout" && (
             <div>
-              <h5>Выход из учётной записи</h5>
-              <p>Настройки для выхода из учётной записи.</p>
+              <h5 className="mb-3">Выход из учётной записи</h5>
+              <p className="mb-4">Настройки для выхода из учётной записи.</p>
               <button className="btn btn-danger" onClick={() => console.log("Logging out")}>
                 Выйти
               </button>
