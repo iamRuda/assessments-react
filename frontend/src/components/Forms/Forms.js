@@ -27,6 +27,19 @@ const Forms = () => {
     //     fetchProtectedData();
     //   });
 
+    // Имитация проверки роли при инициализации
+    useEffect(() => {
+        checkUserRole();
+    }, []);
+
+    const checkUserRole = () => {
+        // Реальная логика определения роли должна быть здесь
+        // Например, из контекста, localStorage или API
+        const role = 'Student'; // Пример значения
+        setUserRole(role);
+    };
+
+    const [userRole, setUserRole] = useState('Student');
     const [formData, setFormData] = useState({});
     const [jsonData, setJsonData] = useState({
         questions: [
@@ -238,7 +251,13 @@ const Forms = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(formData);
+        if (userRole === 'Student') {
+            // Логика отправки ответов студента
+            console.log('Отправка ответов:', jsonData);
+        } else {
+            // Логика сохранения теста для учителя/админа
+            console.log('Сохранение теста:', jsonData);
+        }
     };
 
     const handleJsonChange = (e, questionId) => {
@@ -707,17 +726,19 @@ const Forms = () => {
         <div className="container mt-5">
             <div className="d-flex justify-content-between align-items-center">
                 <h2 className="mb-4">Анкета</h2>
-                <div>
-                    <button className="btn btn-primary" onClick={handleAddQuestion}>
-                        Добавить вопрос
-                    </button>
-                    {isModalOpen && (
-                        <QuestionTemplateModal
-                            onClose={handleCloseModal}
-                            onSelectTemplate={handleSelectTemplate}
-                        />
-                    )}
-                </div>
+                {userRole !== 'Student' && (
+                    <div>
+                        <button className="btn btn-primary" onClick={handleAddQuestion}>
+                            Добавить вопрос
+                        </button>
+                        {isModalOpen && (
+                            <QuestionTemplateModal
+                                onClose={handleCloseModal}
+                                onSelectTemplate={handleSelectTemplate}
+                            />
+                        )}
+                    </div>
+                )}
             </div>
             <Link to="/dashboard" className="mb-3">{"<<"} Вернуться на главную</Link>
             <form onSubmit={handleSubmit}>
@@ -997,32 +1018,38 @@ const Forms = () => {
                                     </div>
                                 )}
                                 <p className="text-muted mt-2">{question.questionPostscript}</p>
-                                <button
-                                    type="button"
-                                    className="btn btn-secondary mt-2 me-2"
-                                    onClick={() => handleEditJson(question.id)}
-                                >
-                                    Редактировать JSON
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-info mt-2"
-                                    onClick={() => handleStartFieldEditing(question.id)}
-                                >
-                                    Редактировать вопрос
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-danger mt-2 ms-2"
-                                    onClick={() => handleDeleteQuestion(question.id)}
-                                >
-                                    Удалить вопрос
-                                </button>
+                                
+                                {userRole !== 'Student' && (
+                                <div className="mt-3">
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary me-2"
+                                        onClick={() => handleEditJson(question.id)}
+                                    >
+                                        Редактировать JSON
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-info me-2"
+                                        onClick={() => handleStartFieldEditing(question.id)}
+                                    >
+                                        Редактировать вопрос
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-danger"
+                                        onClick={() => handleDeleteQuestion(question.id)}
+                                    >
+                                        Удалить вопрос
+                                    </button>
+                                </div>)}
                             </div>
                         )}
                     </div>
                 ))}
-                <button type="submit" className="btn btn-primary mt-4">Отправить</button>
+                <button type="submit" className="btn btn-primary mt-4">
+                    {userRole === 'Student' ? 'Отправить ответы' : 'Сохранить тест'}
+                </button>
             </form>
         </div>
     );
