@@ -43,7 +43,7 @@ const Dashboard = () => {
     };
 
     initProfileData();
-    
+
     setNotifications([
       { title: "Math Test Deadline", text: "Скоро закончится срок сдачи теста по математике.", link: "/math-test" },
       { title: "New History Test", text: "У вас появился новый тест по истории.", link: "/history-test" },
@@ -101,8 +101,8 @@ const Dashboard = () => {
         <div>
         <h2 className="mb-1">{profileData ? `${profileData.lastName} ${profileData.firstName}` : "Guest"}</h2>
         <p className="text-muted mb-0">
-          Role: {profileData && profileData.roles ? profileData.roles[0].role : "Not assigned"} / 
-          Email: {profileData ? profileData.email : "No email"} / 
+          Role: {profileData && profileData.roles ? profileData.roles[0].role : "Not assigned"} /
+          Email: {profileData ? profileData.email : "No email"} /
           ID: {profileData ? profileData.id : "No ID"}
         </p>
         </div>
@@ -164,19 +164,34 @@ const Dashboard = () => {
             </div>
           ))}
 
-          {(profileData?.roles?.[0]?.role === 'ADMIN' || profileData?.roles?.[0]?.role === 'USER') && (
+          {(profileData?.roles?.[0]?.role === 'ADMIN' || profileData?.roles?.[0]?.role === 'TEACHER') && (
             <div className="col-md-4 mb-4 d-flex align-items-stretch">
-              <div 
-                className="card h-100 w-100 d-flex align-items-center justify-content-center" 
+              <div
+                className="card h-100 w-100 d-flex align-items-center justify-content-center"
                 style={{ cursor: 'pointer', minHeight: '200px' }}
                 onClick={() => navigate('/create-test')}
               >
                 <div className="card-body text-center d-flex flex-column justify-content-center">
-                  <h5 className="card-title">➕ Создать новое тестетирование</h5>
-                  <p className="card-text text-muted">Нажмите чтобы создать новый тест</p>
+                  <h5 className="card-title">➕ Создать новое тестирование</h5>
+                  <p className="card-text text-muted">Нажмите, чтобы создать новый тест.</p>
                 </div>
               </div>
             </div>
+          )}
+          {(profileData?.roles?.[0]?.role === 'ADMIN' || profileData?.roles?.[0]?.role === 'TEACHER') && (
+              <div className="col-md-4 mb-4 d-flex align-items-stretch">
+                <div
+                    className="card h-100 w-100 d-flex align-items-center justify-content-center"
+                    style={{ cursor: 'pointer', minHeight: '200px' }}
+                    onClick={() => navigate('/create-test')}
+                >
+                  <div className="card-body text-center d-flex flex-column justify-content-center">
+                    <h5 className="card-title">➕ Создать нового пользователя</h5>
+                    <p className="card-text text-muted">Нажмите, чтобы создать нового ученика или преподавателя.</p>
+                  </div>
+                </div>
+              </div>
+
           )}
         </div>
       ) : (
