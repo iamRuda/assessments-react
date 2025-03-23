@@ -3,16 +3,25 @@ import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const Settings = () => {
-  // TODO: Выход из учетки не работает
   const [activeSection, setActiveSection] = useState("general");
+  // isDarkTheme = true, если установлена тёмная тема, иначе false (светлая)
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const navigate = useNavigate();
 
+  // Инициализация темы (однократно при загрузке)
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme) {
-      setIsDarkTheme(savedTheme === "dark");
-      document.body.classList.toggle("dark-theme", savedTheme === "dark");
+      const dark = savedTheme === "dark";
+      setIsDarkTheme(dark);
+      // Обновляем класс body в зависимости от сохранённой темы
+      document.body.classList.remove("dark-theme", "light-theme");
+      document.body.classList.add(dark ? "dark-theme" : "light-theme");
+    } else {
+      // Если тема не сохранена, по умолчанию светлая тема
+      setIsDarkTheme(false);
+      document.body.classList.remove("dark-theme", "light-theme");
+      document.body.classList.add("light-theme");
     }
   }, []);
 
@@ -23,12 +32,23 @@ const Settings = () => {
   const toggleTheme = () => {
     const newTheme = !isDarkTheme ? "dark" : "light";
     setIsDarkTheme(!isDarkTheme);
-    document.body.classList.toggle("dark-theme", !isDarkTheme);
+    // Явное управление классами на body:
+    document.body.classList.remove("dark-theme", "light-theme");
+    document.body.classList.add(newTheme === "dark" ? "dark-theme" : "light-theme");
     localStorage.setItem("theme", newTheme);
   };
 
+
+  const handleLogout = () => {
+    // Удаляем authToken из localStorage и выполняем логику logout
+    localStorage.removeItem("authToken");
+    console.log("Выполнен выход из учётной записи");
+    // Можно добавить очистку других данных и редирект на страницу логина
+    navigate("/login");
+  };
+
   return (
-    <div className={`container-fluid ${isDarkTheme ? "dark-theme" : ""}`}>
+    <div className={`container-fluid ${isDarkTheme ? "dark-theme" : "light-theme"}`}>
       <div className="row">
         <div
           className="col-md-3 bg-light p-4"
@@ -98,7 +118,9 @@ const Settings = () => {
                   type="checkbox"
                   className="form-check-input mx-3"
                   id="emailNotifications"
-                  onChange={(e) => console.log("Email notifications toggled:", e.target.checked)}
+                  onChange={(e) =>
+                    console.log("Email notifications toggled:", e.target.checked)
+                  }
                 />
               </div>
             </div>
@@ -140,7 +162,7 @@ const Settings = () => {
             <div>
               <h5 className="mb-3">Выход из учётной записи</h5>
               <p className="mb-4">Настройки для выхода из учётной записи.</p>
-              <button className="btn btn-danger" onClick={() => console.log("Logging out")}>
+              <button className="btn btn-danger" onClick={handleLogout}>
                 Выйти
               </button>
             </div>

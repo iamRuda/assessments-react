@@ -1,0 +1,108 @@
+/* Светлая тема (значения по умолчанию) */
+:root,
+.light-theme {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --bg-light: #f8f9fa;
+  --list-group-item-bg: #ffffff;
+  --list-group-item-text: #000000;
+  --list-group-item-active-bg: #007bff;
+  --list-group-item-active-text: #ffffff;
+  --form-element-color: #000000;
+  --text-muted: #6c757d;
+
+  /* Bootstrap дополнительные переменные */
+  --primary: #007bff;
+  --secondary: #6c757d;
+  --success: #28a745;
+  --danger: #dc3545;
+  --warning: #ffc107;
+  --info: #17a2b8;
+  --light: #f8f9fa;
+  --dark: #343a40;
+  
+  --btn-bg: var(--primary);
+  --btn-color: #ffffff;
+  --btn-border-color: var(--primary);
+  
+  --card-bg: #ffffff;
+  --card-text-color: #000000;
+  --card-border-color: rgba(0, 0, 0, 0.125);
+  
+  --navbar-bg: #e3f2fd;
+  --navbar-text-color: rgba(0, 0, 0, 0.9);
+  
+  --link-color: #007bff;
+  --link-hover-color: #0056b3;
+  
+  --border-color: #dee2e6;
+  --input-bg: #ffffff;
+  --input-text-color: #495057;
+  --input-border-color: #ced4da;
+}
+
+/* Тёмная тема */
+.dark-theme {
+  --bg-color: #121212;
+  --text-color: #e0e0e0;
+  --bg-light: #1f1f1f;
+  --list-group-item-bg: #1f1f1f;
+  --list-group-item-text: #e0e0e0;
+  --list-group-item-active-bg: #333;
+  --list-group-item-active-text: #fff;
+  --form-element-color: #e0e0e0;
+  --text-muted: #888888;
+
+  /* Bootstrap дополнительные переменные */
+  --primary: #375a7f;
+  --secondary: #444444;
+  --success: #00bc8c;
+  --danger: #e74c3c;
+  --warning: #f39c12;
+  --info: #3498db;
+  --light: #343a40;
+  --dark: #000000;
+  
+  --btn-bg: var(--primary);
+  --btn-color: #ffffff;
+  --btn-border-color: var(--primary);
+  
+  --card-bg: #1e1e1e;
+  --card-text-color: #e0e0e0;
+  --card-border-color: rgba(255, 255, 255, 0.125);
+  
+  --navbar-bg: #222222;
+  --navbar-text-color: #e0e0e0;
+  
+  --link-color: #66b0ff;
+  --link-hover-color: #3388ff;
+  
+  --border-color: #444444;
+  --input-bg: #1e1e1e;
+  --input-text-color: #e0e0e0;
+  --input-border-color: #555555;
+}
+
+/* Применение переменных */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.bg-light {
+  background-color: var(--bg-light) !important;
+}
+
+.list-group-item {
+  background-color: var(--list-group-item-bg);
+  color: var(--list-group-item-text);
+}
+
+.list-group-item.active {
+  background-color: var(--list-group-item-active-bg) !important;
+  color: var(--list-group-item-active-text) !important;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+}

@@ -5,42 +5,40 @@ import './slider.css';
 import { Link } from 'react-router-dom';
 
 const Forms = () => {
-
-    // useEffect(() => {
-    //     const fetchProtectedData = async () => {
-    //         const token = localStorage.getItem("token");
-    //
-    //         try {
-    //             const response = await fetch("http://localhost:8080/api/test/user", {
-    //                 method: "GET",
-    //                 headers: {
-    //                     Authorization: `Bearer ${token}`,
-    //                 },
-    //             });
-    //             const result = await response.json();
-    //             setData(result);
-    //         } catch (error) {
-    //             console.error("Error fetching protected data", error);
-    //         }
-    //     };
-    //
-    //     fetchProtectedData();
-    //   });
-
-    // Имитация проверки роли при инициализации
-    useEffect(() => {
-        checkUserRole();
-    }, []);
-
-    const checkUserRole = () => {
-        // Реальная логика определения роли должна быть здесь
-        // Например, из контекста, localStorage или API
-        const role = 'Student'; // Пример значения
-        setUserRole(role);
-    };
-
-    const [userRole, setUserRole] = useState('Student');
+    const [profileData, setProfileData] = useState(null);
+    const [userRole, setUserRole] = useState(null);
     const [formData, setFormData] = useState({});
+
+    useEffect(() => {
+        const token = localStorage.getItem("authToken");
+
+        const initProfileData = async () => {
+          try {
+            const response = await fetch("http://localhost:8080/api/user/profile", {
+              method: "GET",
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            const result = await response.json();
+            setProfileData(result);
+            localStorage.setItem("profile", JSON.stringify(result));
+            console.log("Profile data:", result);
+          } catch (error) {
+            console.error("Error fetching profile data", error);
+          }
+        };
+
+        // Получаем данные профиля один раз
+        initProfileData();
+    }, []); // Пустой массив зависимостей означает, что запрос выполнится только один раз при монтировании
+
+    useEffect(() => {
+        // Проверяем и устанавливаем роль только после загрузки данных профиля
+        if (profileData && profileData.roles && profileData.roles.length > 0) {
+            setUserRole(profileData.roles[0].role);
+            console.log('User role:', profileData.roles[0].role);
+        }
+    }, [profileData]); // Срабатывает, только когда изменяются данные профиля
+
     const [jsonData, setJsonData] = useState({
         questions: [
             {
@@ -251,12 +249,14 @@ const Forms = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (userRole === 'Student') {
+        if (userRole === 'USER' || userRole === 'ADMIN') {
+            // Логика сохранения теста для учителя/админа
+            console.log('Сохранение теста:', jsonData);
+        } else if (userRole === 'TESTTAKER') {
             // Логика отправки ответов студента
             console.log('Отправка ответов:', jsonData);
         } else {
-            // Логика сохранения теста для учителя/админа
-            console.log('Сохранение теста:', jsonData);
+            console.log('Error roles');
         }
     };
 
@@ -726,7 +726,7 @@ const Forms = () => {
         <div className="container mt-5">
             <div className="d-flex justify-content-between align-items-center">
                 <h2 className="mb-4">Анкета</h2>
-                {userRole !== 'Student' && (
+                {(userRole === 'USER' || userRole === 'ADMIN') && (
                     <div>
                         <button className="btn btn-primary" onClick={handleAddQuestion}>
                             Добавить вопрос
@@ -1019,7 +1019,7 @@ const Forms = () => {
                                 )}
                                 <p className="text-muted mt-2">{question.questionPostscript}</p>
                                 
-                                {userRole !== 'Student' && (
+                                {(userRole === 'USER' || userRole === 'ADMIN') && (
                                 <div className="mt-3">
                                     <button
                                         type="button"
@@ -1048,7 +1048,7 @@ const Forms = () => {
                     </div>
                 ))}
                 <button type="submit" className="btn btn-primary mt-4">
-                    {userRole === 'Student' ? 'Отправить ответы' : 'Сохранить тест'}
+                    {(userRole === 'USER' || userRole === 'ADMIN') ? 'Сохранить тест' : 'Отправить ответы'}
                 </button>
             </form>
         </div>

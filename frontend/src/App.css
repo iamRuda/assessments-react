@@ -1,28 +1,2 @@
 @import "~slick-carousel/slick/slick.css";
 @import "~slick-carousel/slick/slick-theme.css";
-
-body.dark-theme {
-  background-color: #121212;
-  color: #e0e0e0;
-}
-
-.dark-theme .bg-light {
-  background-color: #1f1f1f !important;
-}
-
-.dark-theme .list-group-item {
-  background-color: #1f1f1f;
-  color: #e0e0e0;
-}
-
-.dark-theme .list-group-item.active {
-  background-color: #333 !important;
-  color: #fff !important;
-}
-
-.dark-theme .form-label,
-.dark-theme .btn,
-.dark-theme .form-check-input,
-.dark-theme .form-select {
-  color: #e0e0e0;
-}
