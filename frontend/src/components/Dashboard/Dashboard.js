@@ -150,12 +150,12 @@ const Dashboard = () => {
         <div className="row">
           {assignedTests.map((assignedTest) => (
             <div key={assignedTest.id} className="col-md-4 mb-4">
-              <div className="card h-100" onClick={() => handleTestClick(assignedTest.test.id)}>
+              <div className="card h-100" >
                 <div className="card-body d-flex flex-column">
                   <h5 className="card-title">📚 {assignedTest.test.title}</h5>
                   <p className="card-text flex-grow-1">тут должно быть описание</p>
                   <div className="d-flex justify-content-end mt-auto">
-                    <a href="#" className="btn btn-primary">
+                    <a href="" className="btn btn-primary" onClick={() => handleTestClick(assignedTest.test.id)}>
                       Начать тестирование
                     </a>
                   </div>
