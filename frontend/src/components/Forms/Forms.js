@@ -51,6 +51,7 @@ const Forms = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const result = await response.json();
+                console.log('Test data:', result);
                 setJsonData(result);
             } catch (error) {
                 console.error("Error fetching test data", error);
@@ -581,24 +582,28 @@ const Forms = () => {
     };
 
     return (
-        <div className="container mt-5">
-            <div className="d-flex justify-content-between align-items-center">
-                <h2 className="mb-4">Анкета</h2>
+        <div className="container mt-4">
+            <div className="mb-3">
+                <Link to="/dashboard" className="">{"<<"} Вернуться на главную</Link>
+            </div>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h2 className="mb-0">
+                    {jsonData.test?.title || "Неизвестное тестирование"} {/* Показываем название теста из данных */}
+                </h2>
                 {(userRole === 'TEACHER' || userRole === 'ADMIN') && (
-                    <div>
-                        <button className="btn btn-primary" onClick={handleAddQuestion}>
-                            Добавить вопрос
-                        </button>
-                        {isModalOpen && (
-                            <QuestionTemplateModal
-                                onClose={handleCloseModal}
-                                onSelectTemplate={handleSelectTemplate}
-                            />
-                        )}
-                    </div>
+                <div>
+                    <button className="btn btn-primary" onClick={handleAddQuestion}>
+                    Добавить вопрос
+                    </button>
+                    {isModalOpen && (
+                    <QuestionTemplateModal
+                        onClose={handleCloseModal}
+                        onSelectTemplate={handleSelectTemplate}
+                    />
+                    )}
+                </div>
                 )}
             </div>
-            <Link to="/dashboard" className="mb-3">{"<<"} Вернуться на главную</Link>
             <form onSubmit={handleSubmit}>
                 {jsonData.questions.map((question) => (
                     <div key={question.id} className="card mb-4 p-3 shadow-sm position-relative" style={{ borderRadius: '10px' }}>
@@ -900,7 +905,7 @@ const Forms = () => {
                         )}
                     </div>
                 ))}
-                <button type="submit" className="btn btn-primary mt-4">
+                <button type="submit" className="btn btn-primary mb-4">
                     {(userRole === 'TEACHER' || userRole === 'ADMIN') ? 'Сохранить тест' : 'Отправить ответы'}
                 </button>
             </form>

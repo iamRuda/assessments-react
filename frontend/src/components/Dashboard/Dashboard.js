@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 const Dashboard = () => {
   const [assignedTests, setTests] = useState(null);
   const [profileData, setProfileData] = useState(null);
+  const [userRole, setUserRole] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
@@ -36,6 +37,12 @@ const Dashboard = () => {
       { title: "Biology Test Results", text: "Пришли результаты тестирования по биологии.", link: "/biology-results" },
     ]);
   }, []);
+
+  useEffect(() => {
+    if (profileData && profileData.roles && profileData.roles.length > 0) {
+        setUserRole(profileData.roles[0].role);
+    }
+  }, [profileData]);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -90,7 +97,7 @@ const Dashboard = () => {
           />
           <div>
             <h2 className="mb-1">
-              {profileData ? `${profileData.lastName} ${profileData.firstName}` : "Guest"}
+              {profileData ? `${profileData.lastName} ${profileData.firstName}` : "Unknown User"}
             </h2>
             <p className="text-muted mb-0">
               Role: {profileData?.roles?.[0]?.role || "Not assigned"} / 
@@ -162,7 +169,7 @@ const Dashboard = () => {
                       className="btn btn-primary"
                       onClick={() => handleTestClick(assignedTest.test.id)}
                     >
-                      Начать тестирование
+                      {(userRole === 'TEACHER' || userRole === 'ADMIN') ? 'Редактировать тест' : 'Начать тест'}
                     </button>
                   </div>
                 </div>
