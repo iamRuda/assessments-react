@@ -71,21 +71,18 @@ const Forms = () => {
         const windowHeight = window.innerHeight;
         const documentHeight = document.documentElement.scrollHeight;
         
-        // Всегда показывать кнопку если контент выходит за пределы экрана
         const shouldShow = documentHeight > windowHeight;
         setIsScrollButtonVisible(shouldShow);
     
-        // Определяем направление по позиции скролла относительно видимой области
         const scrollBottom = documentHeight - (scrollY + windowHeight);
-        const isNearBottom = scrollBottom < 100; // 100px от нижнего края
-        const isNearTop = scrollY < 100; // 100px от верхнего края
+        const isNearBottom = scrollBottom < 100;
+        const isNearTop = scrollY < 100;
     
         if (isNearBottom) {
             setScrollDirection('up');
         } else if (isNearTop) {
             setScrollDirection('down');
         } else {
-            // Сохраняем предыдущее направление если не у границ
             setScrollDirection(prev => prev || 'down');
         }
     };
@@ -97,15 +94,13 @@ const Forms = () => {
     
         window.addEventListener('resize', handleResizeAndScroll);
         window.addEventListener('scroll', handleResizeAndScroll);
-        
-        // Вызываем проверку при изменении данных вопросов
         checkScroll();
         
         return () => {
             window.removeEventListener('resize', handleResizeAndScroll);
             window.removeEventListener('scroll', handleResizeAndScroll);
         };
-    }, [jsonData.questions]); // Добавляем зависимость от questions
+    }, [jsonData.questions]);
 
     const handleScrollClick = () => {
         if (scrollDirection === 'up') {
@@ -327,7 +322,7 @@ const Forms = () => {
                 id: `${Date.now()}_${Math.floor(Math.random() * 1000)}`,
                 text: 'Новый вариант',
                 url: null,
-                typeUrl: null
+                type: null
             };
             return {
                 ...prev,
@@ -427,15 +422,15 @@ const Forms = () => {
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <h2>Выберите шаблон вопроса</h2>
               <div className="template-buttons d-flex flex-wrap justify-content-center">
-                {[
-                  { type: 'multiple_choice_single', label: 'Один ответ', imageUrl: '/icons/ui-radios.svg' },
-                  { type: 'multiple_choice_multiple', label: 'Несколько ответов', imageUrl: '/icons/ui-checks.svg' },
-                  { type: 'open_ended_single', label: 'Однострочный ответ', imageUrl: '/icons/input.svg' },
-                  { type: 'open_ended_multi', label: 'Многострочный ответ', imageUrl: '/icons/layout-text-sidebar-reverse.svg' },
-                  { type: 'image_selection_single', label: 'Изображение (один)', imageUrl: '/icons/image.svg' },
-                  { type: 'image_selection_multiple', label: 'Изображения (несколько)', imageUrl: '/icons/images.svg' },
-                  { type: 'slider_single', label: 'Слайдер (один)', imageUrl: '/icons/segmented-nav.svg' },
-                  { type: 'slider_multiple', label: 'Слайдер (несколько)', imageUrl: '/icons/segmented-nav.svg' },
+                {[ // ⚠️ Изменены типы вопросов на верхний регистр
+                  { type: 'MULTIPLE_CHOICE_SINGLE', label: 'Один ответ', imageUrl: '/icons/ui-radios.svg' },
+                  { type: 'MULTIPLE_CHOICE_MULTIPLE', label: 'Несколько ответов', imageUrl: '/icons/ui-checks.svg' },
+                  { type: 'OPEN_ENDED_SINGLE', label: 'Однострочный ответ', imageUrl: '/icons/input.svg' },
+                  { type: 'OPEN_ENDED_MULTI', label: 'Многострочный ответ', imageUrl: '/icons/layout-text-sidebar-reverse.svg' },
+                  { type: 'IMAGE_SELECTION_SINGLE', label: 'Изображение (один)', imageUrl: '/icons/image.svg' },
+                  { type: 'IMAGE_SELECTION_MULTIPLE', label: 'Изображения (несколько)', imageUrl: '/icons/images.svg' },
+                  { type: 'SINGLE_BUTTON_SELECT', label: 'Слайдер (один)', imageUrl: '/icons/segmented-nav.svg' },
+                  { type: 'MULTIPLE_BUTTON_SELECT', label: 'Слайдер (несколько)', imageUrl: '/icons/segmented-nav.svg' },
                 ].map((button, idx) => (
                   <button
                     key={idx}
@@ -457,7 +452,7 @@ const Forms = () => {
             </div>
           </div>
         );
-      };
+    };
     
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -489,115 +484,133 @@ const Forms = () => {
     };
 
     const getTemplateQuestion = (templateType, newQuestionId) => {
-        switch (templateType) {
-            case 'multiple_choice_single':
+        switch (templateType) { // ⚠️ Все case изменены на верхний регистр
+            case 'MULTIPLE_CHOICE_SINGLE':
             return {
                 id: newQuestionId,
                 questionHeader: 'Вы когда-нибудь использовали Google Формы?',
                 questionText: 'Пожалуйста, выберите один из вариантов ниже.',
                 questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
-                questionType: 'multiple_choice_single',
+                questionType: 'MULTIPLE_CHOICE_SINGLE',
                 url: null,
+                isVisible: false,
+                maxScore: 5,
                 options: [
-                    { id: "1", text: "Да", url: null, typeUrl: null },
-                    { id: "2", text: "Нет", url: null, typeUrl: null }
+                    { id: "1", text: "Да", url: null, type: null },
+                    { id: "2", text: "Нет", url: null, type: null }
                 ],
                 correctAnswers: [],
                 selectedAnswers: []
             };
-            case 'multiple_choice_multiple':
+            case 'MULTIPLE_CHOICE_MULTIPLE':
             return {
                 id: newQuestionId,
                 questionHeader: 'Выберите языки программирования, которые вы знаете:',
                 questionText: 'Вы можете выбрать несколько вариантов.',
                 questionPostscript: 'Убедитесь, что вы выбрали все подходящие.',
-                questionType: 'multiple_choice_multiple',
+                questionType: 'MULTIPLE_CHOICE_MULTIPLE',
                 url: null,
+                isVisible: false,
+                maxScore: 5,
                 options: [
-                    { id: "1", text: "JavaScript", url: null, typeUrl: null },
-                    { id: "2", text: "Python", url: null, typeUrl: null },
-                    { id: "3", text: "Java", url: null, typeUrl: null },
-                    { id: "4", text: "C++", url: null, typeUrl: null }
+                    { id: "1", text: "JavaScript", url: null, type: null },
+                    { id: "2", text: "Python", url: null, type: null },
+                    { id: "3", text: "Java", url: null, type: null },
+                    { id: "4", text: "C++", url: null, type: null }
                 ],
                 correctAnswers: ['1', '2'],
                 selectedAnswers: []
             };
-            case 'open_ended_single':
+            case 'OPEN_ENDED_SINGLE':
             return {
                 id: newQuestionId,
                 questionHeader: 'Опишите ваш опыт в программировании:',
                 questionText: 'Пожалуйста, дайте краткий ответ.',
                 questionPostscript: 'Это однострочный ответ.',
-                questionType: 'open_ended_single',
+                questionType: 'OPEN_ENDED_SINGLE',
                 url: null,
+                isVisible: false,
+                maxScore: 5,
                 correctAnswers: [],
-                selectedAnswers: []
+                selectedAnswers: [],
+                options: []
             };
-            case 'open_ended_multi':
+            case 'OPEN_ENDED_MULTI':
             return {
                 id: newQuestionId,
                 questionHeader: 'Опишите, как вы решаете проблемы в коде:',
                 questionText: 'Поделитесь вашим опытом и подходами.',
                 questionPostscript: 'Это многострочный ответ.',
-                questionType: 'open_ended_multi',
-                url: null, 
+                questionType: 'OPEN_ENDED_MULTI',
+                url: null,
+                isVisible: false,
+                maxScore: 5, 
                 correctAnswers: [],
-                selectedAnswers: []
+                selectedAnswers: [],
+                options: []
             };
-            case 'image_selection_single':
+            case 'IMAGE_SELECTION_SINGLE':
             return {
                 id: newQuestionId,
                 questionHeader: 'Вы когда-нибудь использовали Google Формы?',
                 questionText: 'Пожалуйста, выберите один из вариантов ниже.',
                 questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
-                questionType: 'image_selection_single',
+                questionType: 'IMAGE_SELECTION_SINGLE',
                 url: null,
+                isVisible: false,
+                maxScore: 5,
                 options: [
-                    { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' }
+                    { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', type: 'image' },
+                    { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', type: 'image' }
                 ],
                 correctAnswers: [],
                 selectedAnswers: []
             };
-            case 'image_selection_multiple':
+            case 'IMAGE_SELECTION_MULTIPLE':
             return {
                 id: newQuestionId,
                 questionHeader: 'Вы когда-нибудь использовали Google Формы?',
                 questionText: 'Пожалуйста, выберите один из вариантов ниже.',
                 questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
-                questionType: 'image_selection_multiple',
+                questionType: 'IMAGE_SELECTION_MULTIPLE',
+                isVisible: false,
+                maxScore: 5,
                 url: null,
                 options: [
-                    { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                    { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' }
+                    { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', type: 'image' },
+                    { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', type: 'image' }
                 ],
                 correctAnswers: [],
                 selectedAnswers: []
             };
-            case 'slider_single':
+            case 'SINGLE_BUTTON_SELECT':
             return {
                 id: newQuestionId,
                 questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать только одну)',
                 questionText: 'Нажмите на любую кнопку, чтобы выбрать вашу любимую.',
-                questionType: 'single_button_select',
+                questionType: 'SINGLE_BUTTON_SELECT',
                 url: null,
+                isVisible: false,
+                maxScore: 5,
                 options: [
-                    { id: "1", text: "1", url: null, typeUrl: null },
-                    { id: "2", text: "2", url: null, typeUrl: null }
+                    { id: "1", text: "1", url: null, type: null },
+                    { id: "2", text: "2", url: null, type: null }
                 ],
                 correctAnswers: [],
                 selectedAnswers: []
             };
-            case 'slider_multiple':
+            case 'MULTIPLE_BUTTON_SELECT':
             return {
                 id: newQuestionId,
                 questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать несколько)',
                 questionText: 'Нажмите на любые кнопки, чтобы выбрать ваши любимые.',
-                questionType: 'multiple_button_select',
+                questionType: 'MULTIPLE_BUTTON_SELECT',
                 url: null,
+                isVisible: false,
+                maxScore: 5,
                 options: [
-                    { id: "1", text: "1", url: null, typeUrl: null },
-                    { id: "2", text: "2", url: null, typeUrl: null }
+                    { id: "1", text: "1", url: null, type: null },
+                    { id: "2", text: "2", url: null, type: null }
                 ],
                 correctAnswers: [],
                 selectedAnswers: []
@@ -656,19 +669,19 @@ const Forms = () => {
                             <div>
                                 <div className="mb-3">
                                     <label>Тип вопроса</label>
-                                    <select
+                                    <select // ⚠️ Обновлены значения option
                                         className="form-select"
-                                        value={editingData[question.id]?.questionType || 'multiple_choice_single'}
+                                        value={editingData[question.id]?.questionType || 'MULTIPLE_CHOICE_SINGLE'}
                                         onChange={(e) => handleFieldChange(question.id, 'questionType', e.target.value)}
                                     >
-                                        <option value="multiple_choice_single">Один вариант</option>
-                                        <option value="multiple_choice_multiple">Несколько вариантов</option>
-                                        <option value="open_ended_single">Открытый вопрос (однострочный)</option>
-                                        <option value="open_ended_multi">Открытый вопрос (многострочный)</option>
-                                        <option value="image_selection_single">Выбор изображения (один)</option>
-                                        <option value="image_selection_multiple">Выбор изображения (несколько)</option>
-                                        <option value="single_button_select">Слайдер (один)</option>
-                                        <option value="multiple_button_select">Слайдер (несколько)</option>
+                                        <option value="MULTIPLE_CHOICE_SINGLE">Один вариант</option>
+                                        <option value="MULTIPLE_CHOICE_MULTIPLE">Несколько вариантов</option>
+                                        <option value="OPEN_ENDED_SINGLE">Открытый вопрос (однострочный)</option>
+                                        <option value="OPEN_ENDED_MULTI">Открытый вопрос (многострочный)</option>
+                                        <option value="IMAGE_SELECTION_SINGLE">Выбор изображения (один)</option>
+                                        <option value="IMAGE_SELECTION_MULTIPLE">Выбор изображения (несколько)</option>
+                                        <option value="SINGLE_BUTTON_SELECT">Слайдер (один)</option>
+                                        <option value="MULTIPLE_BUTTON_SELECT">Слайдер (несколько)</option>
                                     </select>
                                 </div>
                                 <div className="mb-3">
@@ -706,7 +719,7 @@ const Forms = () => {
                                         onChange={(e) => handleFieldChange(question.id, 'url', e.target.value)}
                                     />
                                 </div>
-                                {['open_ended_single', 'open_ended_multi'].includes(editingData[question.id]?.questionType) ? (
+                                {['OPEN_ENDED_SINGLE', 'OPEN_ENDED_MULTI'].includes(editingData[question.id]?.questionType) ? (
                                     <div className="mb-3">
                                         <label>Правильные ответы</label>
                                         {editingData[question.id]?.correctAnswers && editingData[question.id].correctAnswers.map((answer, index) => (
@@ -746,7 +759,7 @@ const Forms = () => {
                                                     value={option.text}
                                                     onChange={(e) => handleOptionTextChange(question.id, option.id, e.target.value)}
                                                 />
-                                                {['image_selection_single', 'image_selection_multiple'].includes(editingData[question.id]?.questionType) && (
+                                                {['IMAGE_SELECTION_SINGLE', 'IMAGE_SELECTION_MULTIPLE'].includes(editingData[question.id]?.questionType) && (
                                                     <input 
                                                         type="text"
                                                         className="form-control"
@@ -795,21 +808,21 @@ const Forms = () => {
                         ) : (
                             <div>
                                 <p className="text-dark">{question.questionText}</p>
-                                {question.options && (question.questionType.toLowerCase() === 'multiple_choice_single' || question.questionType.toLowerCase() === 'multiple_choice_multiple') && (
+                                {question.options && (question.questionType === 'MULTIPLE_CHOICE_SINGLE' || question.questionType === 'MULTIPLE_CHOICE_MULTIPLE') && (
                                     question.options.map((option) => (
                                         <div key={option.id} className="form-check">
                                             <input
-                                                type={question.questionType.toLowerCase() === 'multiple_choice_single' ? 'radio' : 'checkbox'}
+                                                type={question.questionType === 'MULTIPLE_CHOICE_SINGLE' ? 'radio' : 'checkbox'}
                                                 className="form-check-input"
                                                 value={option.id}
                                                 checked={question.selectedAnswers.includes(option.id)}
-                                                onChange={(e) => handleChange(e.target.value, question.id, question.questionType.toLowerCase() === 'multiple_choice_multiple')}
+                                                onChange={(e) => handleChange(e.target.value, question.id, question.questionType === 'MULTIPLE_CHOICE_MULTIPLE')}
                                             />
                                             <label className="form-check-label">{option.text}</label>
                                         </div>
                                     ))
                                 )}
-                                {question.questionType.toLowerCase() === 'open_ended_single' && (
+                                {question.questionType === 'OPEN_ENDED_SINGLE' && (
                                     <input
                                         type="text"
                                         className="form-control"
@@ -817,7 +830,7 @@ const Forms = () => {
                                         onChange={(e) => handleChange(e.target.value, question.id, false)}
                                     />
                                 )}
-                                {question.questionType.toLowerCase() === 'open_ended_multi' && (
+                                {question.questionType === 'OPEN_ENDED_MULTI' && (
                                     <textarea
                                         className="form-control"
                                         rows="3"
@@ -825,7 +838,7 @@ const Forms = () => {
                                         onChange={(e) => handleChange(e.target.value, question.id, false)}
                                     />
                                 )}
-                                {question.questionType.toLowerCase() === 'single_button_select' && (
+                                {question.questionType === 'SINGLE_BUTTON_SELECT' && (
                                     <div className="slider-container">
                                         <div className="slider-track">
                                             {question.options.map((option) => (
@@ -845,7 +858,7 @@ const Forms = () => {
                                         </div>
                                     </div>
                                 )}
-                                {question.questionType.toLowerCase() === 'multiple_button_select' && (
+                                {question.questionType === 'MULTIPLE_BUTTON_SELECT' && (
                                     <div className="slider-container">
                                         <div className="slider-track">
                                             {question.options.map((option) => (
@@ -865,7 +878,7 @@ const Forms = () => {
                                         </div>
                                     </div>
                                 )}
-                                {question.questionType.toLowerCase() === 'image_selection_single' && (
+                                {question.questionType === 'IMAGE_SELECTION_SINGLE' && (
                                     <div className="row">
                                         {question.options.map((option) => (
                                             <div key={option.id} className="col-4 text-center mb-3">
@@ -890,7 +903,7 @@ const Forms = () => {
                                         ))}
                                     </div>
                                 )}
-                                {question.questionType.toLowerCase() === 'image_selection_multiple' && (
+                                {question.questionType === 'IMAGE_SELECTION_MULTIPLE' && (
                                     <div className="row">
                                         {question.options.map((option) => (
                                             <div key={option.id} className="col-4 text-center mb-3">
