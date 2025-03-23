@@ -3,6 +3,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './forms.css';
 import './slider.css';
 import { Link, useParams } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 
 const Forms = () => {
     const { id } = useParams();
@@ -41,7 +43,7 @@ const Forms = () => {
             setUserRole(profileData.roles[0].role);
         }
     }, [profileData]);
-
+    
     useEffect(() => {
         const fetchTestData = async () => {
             try {
@@ -60,6 +62,61 @@ const Forms = () => {
 
         fetchTestData();
     }, [id]);
+
+    const [scrollDirection, setScrollDirection] = useState('down');
+    const [isScrollButtonVisible, setIsScrollButtonVisible] = useState(false);
+
+    const checkScroll = () => {
+        const scrollY = window.scrollY;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        
+        // Всегда показывать кнопку если контент выходит за пределы экрана
+        const shouldShow = documentHeight > windowHeight;
+        setIsScrollButtonVisible(shouldShow);
+    
+        // Определяем направление по позиции скролла относительно видимой области
+        const scrollBottom = documentHeight - (scrollY + windowHeight);
+        const isNearBottom = scrollBottom < 100; // 100px от нижнего края
+        const isNearTop = scrollY < 100; // 100px от верхнего края
+    
+        if (isNearBottom) {
+            setScrollDirection('up');
+        } else if (isNearTop) {
+            setScrollDirection('down');
+        } else {
+            // Сохраняем предыдущее направление если не у границ
+            setScrollDirection(prev => prev || 'down');
+        }
+    };
+
+    useEffect(() => {
+        const handleResizeAndScroll = () => {
+            checkScroll();
+        };
+    
+        window.addEventListener('resize', handleResizeAndScroll);
+        window.addEventListener('scroll', handleResizeAndScroll);
+        
+        // Вызываем проверку при изменении данных вопросов
+        checkScroll();
+        
+        return () => {
+            window.removeEventListener('resize', handleResizeAndScroll);
+            window.removeEventListener('scroll', handleResizeAndScroll);
+        };
+    }, [jsonData.questions]); // Добавляем зависимость от questions
+
+    const handleScrollClick = () => {
+        if (scrollDirection === 'up') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            window.scrollTo({ 
+                top: document.documentElement.scrollHeight,
+                behavior: 'smooth' 
+            });
+        }
+    };
 
     const [isEditingJson, setIsEditingJson] = useState({});
     const [isEditingFields, setIsEditingFields] = useState({});
@@ -421,142 +478,133 @@ const Forms = () => {
             questions: [...prevData.questions, newQuestion]
         }));
         
-        setTimeout(scrollToLastQuestion, 0);
+        setTimeout(() => {
+            checkScroll();
+            window.scrollTo({
+                top: document.documentElement.scrollHeight,
+                behavior: 'smooth'
+            });
+        }, 0);
         setIsModalOpen(false);
     };
 
     const getTemplateQuestion = (templateType, newQuestionId) => {
-    switch (templateType) {
-        case 'multiple_choice_single':
-        return {
-            id: newQuestionId,
-            questionHeader: 'Вы когда-нибудь использовали Google Формы?',
-            questionText: 'Пожалуйста, выберите один из вариантов ниже.',
-            questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
-            questionType: 'multiple_choice_single',
-            url: null,
-            options: [
-                { id: "1", text: "Да", url: null, typeUrl: null },
-                { id: "2", text: "Нет", url: null, typeUrl: null }
-            ],
-            correctAnswers: [],
-            selectedAnswers: []
-        };
-        case 'multiple_choice_multiple':
-        return {
-            id: newQuestionId,
-            questionHeader: 'Выберите языки программирования, которые вы знаете:',
-            questionText: 'Вы можете выбрать несколько вариантов.',
-            questionPostscript: 'Убедитесь, что вы выбрали все подходящие.',
-            questionType: 'multiple_choice_multiple',
-            url: null,
-            options: [
-                { id: "1", text: "JavaScript", url: null, typeUrl: null },
-                { id: "2", text: "Python", url: null, typeUrl: null },
-                { id: "3", text: "Java", url: null, typeUrl: null },
-                { id: "4", text: "C++", url: null, typeUrl: null }
-            ],
-            correctAnswers: ['1', '2'],
-            selectedAnswers: []
-        };
-        case 'open_ended_single':
-        return {
-            id: newQuestionId,
-            questionHeader: 'Опишите ваш опыт в программировании:',
-            questionText: 'Пожалуйста, дайте краткий ответ.',
-            questionPostscript: 'Это однострочный ответ.',
-            questionType: 'open_ended_single',
-            url: null,
-            correctAnswers: [],
-            selectedAnswers: []
-        };
-        case 'open_ended_multi':
-        return {
-            id: newQuestionId,
-            questionHeader: 'Опишите, как вы решаете проблемы в коде:',
-            questionText: 'Поделитесь вашим опытом и подходами.',
-            questionPostscript: 'Это многострочный ответ.',
-            questionType: 'open_ended_multi',
-            url: null, 
-            correctAnswers: [],
-            selectedAnswers: []
-        };
-        case 'image_selection_single':
-        return {
-            id: newQuestionId,
-            questionHeader: 'Вы когда-нибудь использовали Google Формы?',
-            questionText: 'Пожалуйста, выберите один из вариантов ниже.',
-            questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
-            questionType: 'image_selection_single',
-            url: null,
-            options: [
-                { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' }
-            ],
-            correctAnswers: [],
-            selectedAnswers: []
-        };
-        case 'image_selection_multiple':
-        return {
-            id: newQuestionId,
-            questionHeader: 'Вы когда-нибудь использовали Google Формы?',
-            questionText: 'Пожалуйста, выберите один из вариантов ниже.',
-            questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
-            questionType: 'image_selection_multiple',
-            url: null,
-            options: [
-                { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
-                { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' }
-            ],
-            correctAnswers: [],
-            selectedAnswers: []
-        };
-        case 'slider_single':
-        return {
-            id: newQuestionId,
-            questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать только одну)',
-            questionText: 'Нажмите на любую кнопку, чтобы выбрать вашу любимую.',
-            questionType: 'single_button_select',
-            url: null,
-            options: [
-                { id: "1", text: "1", url: null, typeUrl: null },
-                { id: "2", text: "2", url: null, typeUrl: null }
-            ],
-            correctAnswers: [],
-            selectedAnswers: []
-        };
-        case 'slider_multiple':
-        return {
-            id: newQuestionId,
-            questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать несколько)',
-            questionText: 'Нажмите на любые кнопки, чтобы выбрать ваши любимые.',
-            questionType: 'multiple_button_select',
-            url: null,
-            options: [
-                { id: "1", text: "1", url: null, typeUrl: null },
-                { id: "2", text: "2", url: null, typeUrl: null }
-            ],
-            correctAnswers: [],
-            selectedAnswers: []
-        };
-        default:
-        return {};
-    }
-    };
-
-    const handleEditQuestionId = (newId, questionId) => {
-        const existingIds = jsonData.questions.map(q => q.id);
-        if (existingIds.includes(newId) && newId !== questionId) {
-            alert('ID вопроса должен быть уникальным!');
-            return;
+        switch (templateType) {
+            case 'multiple_choice_single':
+            return {
+                id: newQuestionId,
+                questionHeader: 'Вы когда-нибудь использовали Google Формы?',
+                questionText: 'Пожалуйста, выберите один из вариантов ниже.',
+                questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
+                questionType: 'multiple_choice_single',
+                url: null,
+                options: [
+                    { id: "1", text: "Да", url: null, typeUrl: null },
+                    { id: "2", text: "Нет", url: null, typeUrl: null }
+                ],
+                correctAnswers: [],
+                selectedAnswers: []
+            };
+            case 'multiple_choice_multiple':
+            return {
+                id: newQuestionId,
+                questionHeader: 'Выберите языки программирования, которые вы знаете:',
+                questionText: 'Вы можете выбрать несколько вариантов.',
+                questionPostscript: 'Убедитесь, что вы выбрали все подходящие.',
+                questionType: 'multiple_choice_multiple',
+                url: null,
+                options: [
+                    { id: "1", text: "JavaScript", url: null, typeUrl: null },
+                    { id: "2", text: "Python", url: null, typeUrl: null },
+                    { id: "3", text: "Java", url: null, typeUrl: null },
+                    { id: "4", text: "C++", url: null, typeUrl: null }
+                ],
+                correctAnswers: ['1', '2'],
+                selectedAnswers: []
+            };
+            case 'open_ended_single':
+            return {
+                id: newQuestionId,
+                questionHeader: 'Опишите ваш опыт в программировании:',
+                questionText: 'Пожалуйста, дайте краткий ответ.',
+                questionPostscript: 'Это однострочный ответ.',
+                questionType: 'open_ended_single',
+                url: null,
+                correctAnswers: [],
+                selectedAnswers: []
+            };
+            case 'open_ended_multi':
+            return {
+                id: newQuestionId,
+                questionHeader: 'Опишите, как вы решаете проблемы в коде:',
+                questionText: 'Поделитесь вашим опытом и подходами.',
+                questionPostscript: 'Это многострочный ответ.',
+                questionType: 'open_ended_multi',
+                url: null, 
+                correctAnswers: [],
+                selectedAnswers: []
+            };
+            case 'image_selection_single':
+            return {
+                id: newQuestionId,
+                questionHeader: 'Вы когда-нибудь использовали Google Формы?',
+                questionText: 'Пожалуйста, выберите один из вариантов ниже.',
+                questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
+                questionType: 'image_selection_single',
+                url: null,
+                options: [
+                    { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' }
+                ],
+                correctAnswers: [],
+                selectedAnswers: []
+            };
+            case 'image_selection_multiple':
+            return {
+                id: newQuestionId,
+                questionHeader: 'Вы когда-нибудь использовали Google Формы?',
+                questionText: 'Пожалуйста, выберите один из вариантов ниже.',
+                questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
+                questionType: 'image_selection_multiple',
+                url: null,
+                options: [
+                    { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' }
+                ],
+                correctAnswers: [],
+                selectedAnswers: []
+            };
+            case 'slider_single':
+            return {
+                id: newQuestionId,
+                questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать только одну)',
+                questionText: 'Нажмите на любую кнопку, чтобы выбрать вашу любимую.',
+                questionType: 'single_button_select',
+                url: null,
+                options: [
+                    { id: "1", text: "1", url: null, typeUrl: null },
+                    { id: "2", text: "2", url: null, typeUrl: null }
+                ],
+                correctAnswers: [],
+                selectedAnswers: []
+            };
+            case 'slider_multiple':
+            return {
+                id: newQuestionId,
+                questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать несколько)',
+                questionText: 'Нажмите на любые кнопки, чтобы выбрать ваши любимые.',
+                questionType: 'multiple_button_select',
+                url: null,
+                options: [
+                    { id: "1", text: "1", url: null, typeUrl: null },
+                    { id: "2", text: "2", url: null, typeUrl: null }
+                ],
+                correctAnswers: [],
+                selectedAnswers: []
+            };
+            default:
+            return {};
         }
-
-        setJsonData((prevData) => ({
-            ...prevData,
-            questions: prevData.questions.map((q) =>
-                q.id === questionId ? { ...q, id: newId } : q
-            )
-        }));
     };
 
     const handleDeleteQuestion = (questionId) => {
@@ -572,23 +620,14 @@ const Forms = () => {
         });
     };
 
-    const scrollToLastQuestion = () => {
-        setTimeout(() => {
-            window.scrollTo({
-                top: document.body.scrollHeight,
-                behavior: 'smooth'
-            });
-        }, 0);
-    };
-
     return (
-        <div className="container mt-4">
+        <div className="container my-4">
             <div className="mb-3">
                 <Link to="/dashboard" className="">{"<<"} Вернуться на главную</Link>
             </div>
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2 className="mb-0">
-                    {jsonData.test?.title || "Неизвестное тестирование"} {/* Показываем название теста из данных */}
+                    {jsonData.test?.title || "Неизвестное тестирование"}
                 </h2>
                 {(userRole === 'TEACHER' || userRole === 'ADMIN') && (
                 <div>
@@ -905,10 +944,31 @@ const Forms = () => {
                         )}
                     </div>
                 ))}
-                <button type="submit" className="btn btn-primary mb-4">
-                    {(userRole === 'TEACHER' || userRole === 'ADMIN') ? 'Сохранить тест' : 'Отправить ответы'}
-                </button>
+                <div className="d-flex justify-content-end">
+                    <button type="submit" className="btn btn-primary">
+                        {(userRole === 'TEACHER' || userRole === 'ADMIN') ? 'Сохранить тест' : 'Отправить ответы'}
+                    </button>
+                </div>
             </form>
+            {isScrollButtonVisible && (
+                <button 
+                    className="btn btn-primary rounded-circle shadow-lg"
+                    style={{
+                        position: 'fixed',
+                        bottom: '30px',
+                        right: '30px',
+                        width: '50px',
+                        height: '50px',
+                        zIndex: 1000
+                    }}
+                    onClick={handleScrollClick}
+                    >
+                    <FontAwesomeIcon 
+                        icon={scrollDirection === 'up' ? faArrowUp : faArrowDown} 
+                        className="fs-5"
+                    />
+                </button>
+            )}
         </div>
     );
 };
