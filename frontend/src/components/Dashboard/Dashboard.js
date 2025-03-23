@@ -151,16 +151,33 @@ const Dashboard = () => {
           {assignedTests.map((assignedTest) => (
             <div key={assignedTest.id} className="col-md-4 mb-4">
               <div className="card h-100" onClick={() => handleTestClick(assignedTest.test.id)}>
-                <div className="card-body">
+                <div className="card-body d-flex flex-column">
                   <h5 className="card-title">📚 {assignedTest.test.title}</h5>
-                  <p className="card-text">тут должно быть описание</p>
-                  <a href="#" className="btn btn-primary">
-                    Start Test
-                  </a>
+                  <p className="card-text flex-grow-1">тут должно быть описание</p>
+                  <div className="d-flex justify-content-end mt-auto">
+                    <a href="#" className="btn btn-primary">
+                      Начать тестирование
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           ))}
+
+          {(profileData?.roles?.[0]?.role === 'ADMIN' || profileData?.roles?.[0]?.role === 'USER') && (
+            <div className="col-md-4 mb-4 d-flex align-items-stretch">
+              <div 
+                className="card h-100 w-100 d-flex align-items-center justify-content-center" 
+                style={{ cursor: 'pointer', minHeight: '200px' }}
+                onClick={() => navigate('/create-test')}
+              >
+                <div className="card-body text-center d-flex flex-column justify-content-center">
+                  <h5 className="card-title">➕ Создать новое тестетирование</h5>
+                  <p className="card-text text-muted">Нажмите чтобы создать новый тест</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <p>Loading...</p>

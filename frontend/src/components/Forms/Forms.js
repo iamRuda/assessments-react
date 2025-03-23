@@ -147,40 +147,38 @@ const Forms = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const token = getToken();
-        // console.log(token);
-        if (!token) {
-            console.error("No token found!");
-            return;
-        }
-        
+    
         if (userRole === 'USER' || userRole === 'ADMIN') {
             try {
-                console.log("Sending data:", jsonData); // Логируем отправляемые данные
-                const response = await fetch("http://localhost:8080/api/test/update", {
-                    method: "PUT",
+                const response = await fetch(`http://localhost:8080/api/test/update`, {
+                    method: 'PUT',
                     headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
                     },
-                    credentials: 'include', // Добавляем отправку кук
-                    body: JSON.stringify(jsonData)
+                    body: JSON.stringify(jsonData),
                 });
-                
-                if (response.ok) {
-                    console.log("Test saved successfully");
-                    window.location.reload();
-                } else {
-                    const errorResponse = await response.json(); // Пытаемся получить JSON с ошибкой
-                    console.error("Error saving test:", response.status, errorResponse);
+    
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Ошибка при обновлении теста');
                 }
+    
+                const result = await response.json();
+                alert('Тест успешно обновлён!');
+                console.log('Обновлённый тест:', result);
+                
             } catch (error) {
-                console.error("Network error:", error);
+                console.log('Отправляемые данные:', JSON.stringify(jsonData, null, 2));
+
+                console.error('Ошибка при обновлении:', error);
+                alert(`Ошибка при сохранении: ${error.message}`);
             }
         } else if (userRole === 'TESTTAKER') {
             // Логика отправки ответов студента
             console.log('Отправка ответов:', jsonData);
         } else {
-            console.log('Error roles');
+            console.log('Неизвестная роль пользователя');
         }
     };
 
