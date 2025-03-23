@@ -178,12 +178,12 @@ const Dashboard = () => {
               </div>
             </div>
           )}
-          {(profileData?.roles?.[0]?.role === 'ADMIN' || profileData?.roles?.[0]?.role === 'TEACHER') && (
+          {(profileData?.roles?.[0]?.role === 'ADMIN') && (
               <div className="col-md-4 mb-4 d-flex align-items-stretch">
                 <div
                     className="card h-100 w-100 d-flex align-items-center justify-content-center"
                     style={{ cursor: 'pointer', minHeight: '200px' }}
-                    onClick={() => navigate('/create-test')}
+                    onClick={() => navigate('/create-user')}
                 >
                   <div className="card-body text-center d-flex flex-column justify-content-center">
                     <h5 className="card-title">➕ Создать нового пользователя</h5>

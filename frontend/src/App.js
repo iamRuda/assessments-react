@@ -9,6 +9,7 @@ import Settings from "./components/Settings/Settings";
 import PrivateRoute from "./routes/PrivateRoute";
 import "./App.css";
 import "./dark.css";
+import UserCreation from "./components/Login/UserCreation";
 
 const App = () => {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
@@ -62,6 +63,7 @@ const App = () => {
           <Route path="/dashboard" element={<PrivateRoute element={Dashboard} />} />
           <Route path="/forms/:id" element={<PrivateRoute element={Forms} />} />
           <Route path="/settings" element={<PrivateRoute element={Settings} />} />
+          <Route path="/create-user" element={<PrivateRoute element={UserCreation} />} />
         </Routes>
       </Router>
     </div>
