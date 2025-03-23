@@ -78,8 +78,8 @@ const Dashboard = () => {
   }, [profileData]);
 
   // Function to redirect to Forms
-  const handleTestClick = () => {
-    navigate("/forms"); // Redirect to Forms component
+  const handleTestClick = (testId) => {
+    navigate(`/forms/${testId}`); // Redirect to Forms component with the test ID
   };
 
   // Navigate to the settings page
@@ -91,13 +91,13 @@ const Dashboard = () => {
     <div className="container">
       <header className="d-flex align-items-center justify-content-between my-4">
         <div className="d-flex align-items-center">
-          <img
-              src={profileData && profileData.imageUrl && profileData.imageUrl[0] ? profileData.imageUrl[0].url : "https://via.placeholder.com/100"}
-              alt="Avatar"
-              className="rounded-circle me-3"
-              width="100"
-              height="100"
-          />
+        <img
+        src={profileData && profileData.imageUrl && profileData.imageUrl.length > 0 && profileData.imageUrl[0].url ? profileData.imageUrl[0].url : "https://via.placeholder.com/100"}
+        alt="Avatar"
+        className="rounded-circle me-3"
+        width="100"
+        height="100"
+      />
         <div>
         <h2 className="mb-1">{profileData ? `${profileData.lastName} ${profileData.firstName}` : "Guest"}</h2>
         <p className="text-muted mb-0">
@@ -150,7 +150,7 @@ const Dashboard = () => {
         <div className="row">
           {assignedTests.map((assignedTest) => (
             <div key={assignedTest.id} className="col-md-4 mb-4">
-              <div className="card h-100" onClick={handleTestClick}>
+              <div className="card h-100" onClick={() => handleTestClick(assignedTest.test.id)}>
                 <div className="card-body">
                   <h5 className="card-title">📚 {assignedTest.test.title}</h5>
                   <p className="card-text">тут должно быть описание</p>

@@ -2,25 +2,18 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './forms.css';
 import './slider.css';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Forms = () => {
-    const { id } = useParams(); // Extract the test ID from the route parameters
     const [profileData, setProfileData] = useState(null);
     const [userRole, setUserRole] = useState(null);
     const [formData, setFormData] = useState({});
-    const [jsonData, setJsonData] = useState({
-        questions: []
-    });
-
-    const getToken = () => {
-        return localStorage.getItem("authToken");
-    };
 
     useEffect(() => {
+        const token = localStorage.getItem("authToken");
+
         const initProfileData = async () => {
           try {
-            const token = getToken();
             const response = await fetch("http://localhost:8080/api/user/profile", {
               method: "GET",
               headers: { Authorization: `Bearer ${token}` },
@@ -46,24 +39,134 @@ const Forms = () => {
         }
     }, [profileData]); // Срабатывает, только когда изменяются данные профиля
 
-    useEffect(() => {
-        const fetchTestData = async () => {
-            try {
-                const token = getToken();
-                const response = await fetch(`http://localhost:8080/api/test/findById/${id}`, {
-                    method: "GET",
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                const result = await response.json();
-                setJsonData(result);
-                console.log("Test data:", result);
-            } catch (error) {
-                console.error("Error fetching test data", error);
+    const [jsonData, setJsonData] = useState({
+        questions: [
+            {
+                id: 'question1',
+                questionHeader: 'Вы когда-нибудь использовали Google Формы?',
+                questionText: 'Пожалуйста, выберите один из вариантов ниже.',
+                questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
+                questionType: 'multiple_choice_single',
+                url: 'https://multi-admin.ru/mediabank_blog/11/121267/713d35c65bef4f7457062252f398f04fistock-462392661.jpg',
+                options: [
+                    { id: "1", text: "Да", url: null, typeUrl: null },
+                    { id: "2", text: "Нет", url: null, typeUrl: null }
+                ],
+                correctAnswers: ["1","2"],
+                selectedAnswers: []
+            },
+            {
+                id: 'question2',
+                questionHeader: 'Выберите языки программирования, которые вы знаете:',
+                questionText: 'Вы можете выбрать несколько вариантов.',
+                questionPostscript: 'Убедитесь, что вы выбрали все подходящие.',
+                questionType: 'multiple_choice_multiple',
+                url: null,
+                options: [
+                    { id: "1", text: "JavaScript", url: null, typeUrl: null },
+                    { id: "2", text: "Python", url: null, typeUrl: null },
+                    { id: "3", text: "Java", url: null, typeUrl: null },
+                    { id: "4", text: "C++", url: null, typeUrl: null }
+                ],
+                correctAnswers: ['1', '2'],
+                selectedAnswers: []
+            },
+            {
+                id: 'question3',
+                questionHeader: 'Опишите ваш опыт в программировании:',
+                questionText: 'Пожалуйста, дайте краткий ответ.',
+                questionPostscript: 'Это однострочный ответ.',
+                questionType: 'open_ended',
+                url: null,
+                correctAnswers: [],
+                selectedAnswers: []
+            },
+            {
+                id: 'question4', 
+                questionHeader: 'Опишите, как вы решаете проблемы в коде:',
+                questionText: 'Поделитесь вашим опытом и подходами.',
+                questionPostscript: 'Это многострочный ответ.',
+                questionType: 'open_ended',
+                url: null,
+                correctAnswers: [],
+                selectedAnswers: []
+            },
+            {
+                id: 'question5',
+                questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать только одну)',
+                questionText: 'Нажмите на любую кнопку, чтобы выбрать вашу любимую.',
+                questionType: 'single_button_select',
+                url: null,
+                options: [
+                    { id: "1", text: "1", url: null, typeUrl: null },
+                    { id: "2", text: "2", url: null, typeUrl: null },
+                    { id: "3", text: "3", url: null, typeUrl: null },
+                    { id: "4", text: "4", url: null, typeUrl: null },
+                    { id: "5", text: "5", url: null, typeUrl: null }
+                ],
+                correctAnswers: [],
+                selectedAnswers: []
+            },
+            {
+                id: 'question6',
+                questionHeader: 'Выберите вашу любимую кнопку из слайдера (Вы можете выбрать несколько)',
+                questionText: 'Нажмите на любые кнопки, чтобы выбрать ваши любимые.',
+                questionType: 'multiple_button_select',
+                url: null,
+                options: [
+                    { id: "1", text: "1", url: null, typeUrl: null },
+                    { id: "2", text: "2", url: null, typeUrl: null },
+                    { id: "3", text: "3", url: null, typeUrl: null },
+                    { id: "4", text: "4", url: null, typeUrl: null },
+                    { id: "5", text: "5", url: null, typeUrl: null }
+                ],
+                correctAnswers: [],
+                selectedAnswers: []
+            },
+            {
+                id: 'question7',
+                questionHeader: 'Вы когда-нибудь использовали Google Формы?',
+                questionText: 'Пожалуйста, выберите один из вариантов ниже.',
+                questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
+                questionType: 'image_selection_single',
+                url: null,
+                options: [
+                    { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '3', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '4', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '5', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '6', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '7', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '8', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '9', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' }
+                ],
+                correctAnswers: [],
+                selectedAnswers: []
+            },
+            {
+                id: 'question8',
+                questionHeader: 'Вы когда-нибудь использовали Google Формы?',
+                questionText: 'Пожалуйста, выберите один из вариантов ниже.',
+                questionPostscript: 'Ваш ответ помогает нам понять опыт пользователей с Google Формами.',
+                questionType: 'image_selection_multiple',
+                url: null,
+                options: [
+                    { id: '1', text: 'Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '2', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '3', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '4', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '5', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '6', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '7', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '8', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' },
+                    { id: '9', text: 'No Google Forms', url: 'https://via.placeholder.com/100', typeUrl: 'image' }
+                ],
+                correctAnswers: [],
+                selectedAnswers: []
             }
-        };
-
-        fetchTestData();
-    }, [id]);
+        ]
+    });
 
     // Состояния для редактирования JSON (уже реализовано) и для редактирования через удобные поля
     const [isEditingJson, setIsEditingJson] = useState({});
@@ -144,38 +247,11 @@ const Forms = () => {
         }));
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        const token = getToken();
-        // console.log(token);
-        if (!token) {
-            console.error("No token found!");
-            return;
-        }
-        
         if (userRole === 'USER' || userRole === 'ADMIN') {
-            try {
-                console.log("Sending data:", jsonData); // Логируем отправляемые данные
-                const response = await fetch("http://localhost:8080/api/test/update", {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`
-                    },
-                    credentials: 'include', // Добавляем отправку кук
-                    body: JSON.stringify(jsonData)
-                });
-                
-                if (response.ok) {
-                    console.log("Test saved successfully");
-                    window.location.reload();
-                } else {
-                    const errorResponse = await response.json(); // Пытаемся получить JSON с ошибкой
-                    console.error("Error saving test:", response.status, errorResponse);
-                }
-            } catch (error) {
-                console.error("Network error:", error);
-            }
+            // Логика сохранения теста для учителя/админа
+            console.log('Сохранение теста:', jsonData);
         } else if (userRole === 'TESTTAKER') {
             // Логика отправки ответов студента
             console.log('Отправка ответов:', jsonData);
@@ -980,4 +1056,3 @@ const Forms = () => {
 };
 
 export default Forms;
-
