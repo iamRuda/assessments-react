@@ -3,6 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faCog } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
+import UsersTable from "./UsersTable";
 
 const Dashboard = () => {
   const [assignedTests, setTests] = useState(null);
@@ -186,7 +187,7 @@ const Dashboard = () => {
               >
                 <div className="card-body text-center d-flex flex-column justify-content-center">
                   <h5 className="card-title">➕ Создать новое тестирование</h5>
-                  <p className="card-text text-muted">Нажмите чтобы создать новый тест</p>
+                  <p className="card-text text-muted">Нажмите, чтобы создать новый тест.</p>
                 </div>
               </div>
             </div>
@@ -204,12 +205,12 @@ const Dashboard = () => {
                   </div>
                 </div>
               </div>
-
           )}
         </div>
       ) : (
         <p>Loading...</p>
       )}
+      <UsersTable />
     </div>
   );
 };
