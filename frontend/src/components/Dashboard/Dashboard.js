@@ -157,25 +157,25 @@ const Dashboard = () => {
 
       {assignedTests ? (
         <div className="row">
-          {assignedTests.map((assignedTest) => (
-            <div key={assignedTest.id} className="col-md-4 mb-4">
-              <div className="card h-100">
-                <div className="card-body d-flex flex-column">
-                  <h5 className="card-title">📚 {assignedTest.test.title}</h5>
-                  <p className="card-text flex-grow-1">
-                    {assignedTest.test.description || "Описание отсутствует"}
-                  </p>
-                  <div className="d-flex justify-content-end mt-auto">
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => handleTestClick(assignedTest.test.id)}
-                    >
-                      {(userRole === 'TEACHER' || userRole === 'ADMIN') ? 'Редактировать тест' : 'Начать тест'}
-                    </button>
+          {assignedTests.length > 0 && assignedTests.map((assignedTest) => (
+              <div key={assignedTest.id} className="col-md-4 mb-4">
+                <div className="card h-100">
+                  <div className="card-body d-flex flex-column">
+                    <h5 className="card-title">📚 {assignedTest.test.title}</h5>
+                    <p className="card-text flex-grow-1">
+                      {assignedTest.test.description || "Описание отсутствует"}
+                    </p>
+                    <div className="d-flex justify-content-end mt-auto">
+                      <button
+                          className="btn btn-primary"
+                          onClick={() => handleTestClick(assignedTest.test.id)}
+                      >
+                        {(userRole === "TEACHER" || userRole === "ADMIN") ? "Редактировать тест" : "Начать тест"}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
           ))}
 
           {(profileData?.roles?.[0]?.role === 'ADMIN' || profileData?.roles?.[0]?.role === 'TEACHER') && (
@@ -210,7 +210,7 @@ const Dashboard = () => {
       ) : (
         <p>Loading...</p>
       )}
-      <UsersTable />
+      {profileData?.roles?.[0]?.role === "ADMIN" && <UsersTable />}
     </div>
   );
 };
