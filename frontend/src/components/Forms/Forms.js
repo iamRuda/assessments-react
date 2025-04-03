@@ -265,6 +265,15 @@ const Forms = () => {
         }
     };  
 
+    const handleMaxScoreChange = (questionId, value) => {
+        setJsonData(prevData => ({
+            ...prevData,
+            questions: prevData.questions.map(q => 
+                q.id === questionId ? { ...q, maxScore: Number(value) } : q
+            )
+        }));
+    };
+
     const handleStartFieldEditing = (questionId) => {
         const question = jsonData.questions.find(q => q.id === questionId);
         if (question) {
@@ -928,7 +937,19 @@ const Forms = () => {
                                     </div>
                                 )}
                                 <p className="text-muted mt-2">{question.questionPostscript}</p>
-                                
+                                {(userRole === 'TEACHER' || userRole === 'ADMIN') && (
+                                    <div className="max-score-container d-flex align-items-center">
+                                        <label className="mb-0">Баллы:</label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            step="1"
+                                            className="score-input"
+                                            value={question.maxScore || 0}
+                                            onChange={(e) => handleMaxScoreChange(question.id, e.target.value)}
+                                        />
+                                    </div>
+                                )}
                                 {(userRole === 'TEACHER' || userRole === 'ADMIN') && (
                                 <div className="mt-3">
                                     <button

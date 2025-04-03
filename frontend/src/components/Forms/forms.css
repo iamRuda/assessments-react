@@ -95,4 +95,27 @@
     width: 100%;
   }
 
+  .max-score-container {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: white;
+    padding: 5px 10px;
+    /* border-radius: 5px; */
+    /* box-shadow: 0 2px 4px rgba(0,0,0,0.1); */
+}
 
+.score-input {
+    border: none !important;
+    border-bottom: 1px solid #dee2e6 !important;
+    width: 60px;
+    text-align: center;
+    padding: 0 5px;
+    margin-left: 10px;
+}
+
+.score-input:focus {
+    outline: none;
+    box-shadow: none;
+    border-bottom-color: #80bdff !important;
+}
