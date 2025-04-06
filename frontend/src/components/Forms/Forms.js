@@ -184,10 +184,28 @@ const Forms = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const token = getToken();
-
         if (userRole === 'TEACHER' || userRole === 'ADMIN') {
-            // Заглушка для учителя и админа
-            alert('Функция сохранения теста для учителя/админа временно недоступна.');
+            try {
+                const response = await fetch(`http://localhost:8080/api/test/update`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(jsonData),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Ошибка при обновлении теста');
+                }
+
+                const result = await response.json();
+                alert('Тест успешно обновлён!');
+            } catch (error) {
+                console.error('Ошибка при обновлении:', error);
+                alert(`Ошибка при сохранении: ${error.message}`);
+            }
         } else if (userRole === 'STUDENT') {
             try {
                 console.log(JSON.stringify(jsonData))
@@ -221,7 +239,6 @@ const Forms = () => {
             }
         }
     };
-
 
     const handleJsonChange = (e, questionId) => {
         const updatedJson = e.target.value;
