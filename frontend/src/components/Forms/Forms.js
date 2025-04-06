@@ -148,6 +148,8 @@ const Forms = () => {
         });
     };
 
+    // TODO: Вынести хэндлеры в отдельный файл
+
     const handleSingleImageSelect = (e, questionId) => {
         const selectedValue = e.target.value;
         setJsonData((prevData) => ({
@@ -182,33 +184,44 @@ const Forms = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const token = getToken();
-    
+
         if (userRole === 'TEACHER' || userRole === 'ADMIN') {
+            // Заглушка для учителя и админа
+            alert('Функция сохранения теста для учителя/админа временно недоступна.');
+        } else if (userRole === 'STUDENT') {
             try {
-                const response = await fetch(`http://localhost:8080/api/test/update`, {
-                    method: 'PUT',
+                console.log(JSON.stringify(jsonData))
+                const response = await fetch("http://localhost:8080/api/test/complete", {
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
                     },
-                    body: JSON.stringify(jsonData),
+                    body: JSON.stringify(jsonData)
                 });
-    
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Ошибка при обновлении теста');
+
+                // Читаем текст ответа для дебага
+                const responseText = await response.text();
+                console.log("Response text:", responseText);
+
+                // Если ответ не пустой, пробуем парсить JSON
+                let responseData = {};
+                if (responseText) {
+                    responseData = JSON.parse(responseText);
                 }
-    
-                const result = await response.json();
-                alert('Тест успешно обновлён!');
+
+                if (!response.ok) {
+                    throw new Error(responseData.message || "Ошибка при отправке теста");
+                }
+
+                alert("Тест успешно отправлен на проверку!");
             } catch (error) {
-                console.error('Ошибка при обновлении:', error);
-                alert(`Ошибка при сохранении: ${error.message}`);
+                console.error("Ошибка при отправке теста:", error);
+                alert(`Ошибка при отправке теста: ${error.message}`);
             }
-        } else if (userRole === 'STUDENT') {
-            console.log('Отправка ответов:', jsonData);
         }
     };
+
 
     const handleJsonChange = (e, questionId) => {
         const updatedJson = e.target.value;
@@ -667,11 +680,13 @@ const Forms = () => {
             </div>
             <form onSubmit={handleSubmit}>
                 {jsonData.questions.map((question) => (
-                    <div key={question.id} className="card mb-4 p-3 shadow-sm position-relative" style={{ borderRadius: '10px' }}>
+                    <div key={question.id} className="card mb-4 p-3 shadow-sm position-relative"
+                         style={{borderRadius: '10px'}}>
                         <h5 className="mb-3">{question.questionHeader}</h5>
                         {question.url && (
                             <div className="mb-3">
-                                <img src={question.url} alt="Question related" className="img-fluid" style={{ maxHeight: '50vh', objectFit: 'cover' }} />
+                                <img src={question.url} alt="Question related" className="img-fluid"
+                                     style={{maxHeight: '50vh', objectFit: 'cover'}}/>
                             </div>
                         )}
                         {isEditingFields[question.id] ? (
@@ -695,8 +710,8 @@ const Forms = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label>Заголовок вопроса</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         className="form-control"
                                         value={editingData[question.id]?.questionHeader || ''}
                                         onChange={(e) => handleFieldChange(question.id, 'questionHeader', e.target.value)}
@@ -704,7 +719,7 @@ const Forms = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label>Текст вопроса</label>
-                                    <textarea 
+                                    <textarea
                                         className="form-control"
                                         value={editingData[question.id]?.questionText || ''}
                                         onChange={(e) => handleFieldChange(question.id, 'questionText', e.target.value)}
@@ -712,8 +727,8 @@ const Forms = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label>Постскрипт</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         className="form-control"
                                         value={editingData[question.id]?.questionPostscript || ''}
                                         onChange={(e) => handleFieldChange(question.id, 'questionPostscript', e.target.value)}
@@ -721,8 +736,8 @@ const Forms = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label>URL изображения вопроса</label>
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         className="form-control"
                                         value={editingData[question.id]?.url || ''}
                                         onChange={(e) => handleFieldChange(question.id, 'url', e.target.value)}
@@ -733,24 +748,24 @@ const Forms = () => {
                                         <label>Правильные ответы</label>
                                         {editingData[question.id]?.correctAnswers && editingData[question.id].correctAnswers.map((answer, index) => (
                                             <div key={index} className="input-group mb-2">
-                                                <input 
-                                                    type="text" 
+                                                <input
+                                                    type="text"
                                                     className="form-control"
                                                     value={answer}
                                                     onChange={(e) => handleCorrectAnswerChange(question.id, index, e.target.value)}
                                                 />
-                                                <button 
-                                                    type="button" 
-                                                    className="btn btn-outline-danger" 
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-outline-danger"
                                                     onClick={() => handleDeleteCorrectAnswer(question.id, index)}
                                                 >
                                                     Удалить
                                                 </button>
                                             </div>
                                         ))}
-                                        <button 
-                                            type="button" 
-                                            className="btn btn-outline-primary" 
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline-primary"
                                             onClick={() => handleAddCorrectAnswer(question.id)}
                                         >
                                             Добавить правильный ответ
@@ -762,14 +777,14 @@ const Forms = () => {
                                         {editingData[question.id]?.options && editingData[question.id].options.map((option) => (
                                             <div key={option.id} className="input-group mb-2">
                                                 <span className="input-group-text">{option.id}</span>
-                                                <input 
-                                                    type="text" 
+                                                <input
+                                                    type="text"
                                                     className="form-control"
                                                     value={option.text}
                                                     onChange={(e) => handleOptionTextChange(question.id, option.id, e.target.value)}
                                                 />
                                                 {['IMAGE_SELECTION_SINGLE', 'IMAGE_SELECTION_MULTIPLE'].includes(editingData[question.id]?.questionType) && (
-                                                    <input 
+                                                    <input
                                                         type="text"
                                                         className="form-control"
                                                         placeholder="URL изображения"
@@ -777,26 +792,30 @@ const Forms = () => {
                                                         onChange={(e) => handleOptionUrlChange(question.id, option.id, e.target.value)}
                                                     />
                                                 )}
-                                                <button 
-                                                    type="button" 
-                                                    className="btn btn-outline-danger" 
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-outline-danger"
                                                     onClick={() => handleDeleteOption(question.id, option.id)}
                                                 >
                                                     Удалить
                                                 </button>
                                             </div>
                                         ))}
-                                        <button 
-                                            type="button" 
-                                            className="btn btn-outline-primary" 
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline-primary"
                                             onClick={() => handleAddOption(question.id)}
                                         >
                                             Добавить вариант
                                         </button>
                                     </div>
                                 )}
-                                <button type="button" className="btn btn-success me-2" onClick={() => handleSaveFieldEdits(question.id)}>Сохранить изменения</button>
-                                <button type="button" className="btn btn-secondary" onClick={() => handleCancelFieldEdits(question.id)}>Отменить</button>
+                                <button type="button" className="btn btn-success me-2"
+                                        onClick={() => handleSaveFieldEdits(question.id)}>Сохранить изменения
+                                </button>
+                                <button type="button" className="btn btn-secondary"
+                                        onClick={() => handleCancelFieldEdits(question.id)}>Отменить
+                                </button>
                             </div>
                         ) : isEditingJson[question.id] ? (
                             <div>
@@ -891,12 +910,13 @@ const Forms = () => {
                                     <div className="row">
                                         {question.options.map((option) => (
                                             <div key={option.id} className="col-4 text-center mb-3">
-                                                <label htmlFor={`image_${question.id}_${option.id}`} className="d-block position-relative img-form">
+                                                <label htmlFor={`image_${question.id}_${option.id}`}
+                                                       className="d-block position-relative img-form">
                                                     <img
                                                         src={option.url}
                                                         alt={option.text}
                                                         className="img-thumbnail"
-                                                        style={{ cursor: 'pointer', borderRadius: '10px' }}
+                                                        style={{cursor: 'pointer', borderRadius: '10px'}}
                                                     />
                                                     <input
                                                         className="form-check-input checkbox-overlay"
@@ -916,12 +936,13 @@ const Forms = () => {
                                     <div className="row">
                                         {question.options.map((option) => (
                                             <div key={option.id} className="col-4 text-center mb-3">
-                                                <label htmlFor={`image_${question.id}_${option.id}`} className="d-block position-relative img-form">
+                                                <label htmlFor={`image_${question.id}_${option.id}`}
+                                                       className="d-block position-relative img-form">
                                                     <img
                                                         src={option.url}
                                                         alt={option.text}
                                                         className="img-thumbnail"
-                                                        style={{ cursor: 'pointer', borderRadius: '10px' }}
+                                                        style={{cursor: 'pointer', borderRadius: '10px'}}
                                                     />
                                                     <input
                                                         className="form-check-input checkbox-overlay"
@@ -951,33 +972,34 @@ const Forms = () => {
                                     </div>
                                 )}
                                 {(userRole === 'TEACHER' || userRole === 'ADMIN') && (
-                                <div className="mt-3">
-                                    <button
-                                        type="button"
-                                        className="btn btn-secondary me-2"
-                                        onClick={() => handleEditJson(question.id)}
-                                    >
-                                        Редактировать JSON
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="btn btn-info me-2"
-                                        onClick={() => handleStartFieldEditing(question.id)}
-                                    >
-                                        Редактировать вопрос
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="btn btn-danger"
-                                        onClick={() => handleDeleteQuestion(question.id)}
-                                    >
-                                        Удалить вопрос
-                                    </button>
-                                </div>)}
+                                    <div className="mt-3">
+                                        <button
+                                            type="button"
+                                            className="btn btn-secondary me-2"
+                                            onClick={() => handleEditJson(question.id)}
+                                        >
+                                            Редактировать JSON
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="btn btn-info me-2"
+                                            onClick={() => handleStartFieldEditing(question.id)}
+                                        >
+                                            Редактировать вопрос
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="btn btn-danger"
+                                            onClick={() => handleDeleteQuestion(question.id)}
+                                        >
+                                            Удалить вопрос
+                                        </button>
+                                    </div>)}
                             </div>
                         )}
                     </div>
                 ))}
+                {/*Надо понять, какая логика при сохранении*/}
                 <div className="d-flex justify-content-end">
                     <button type="submit" className="btn btn-primary">
                         {(userRole === 'TEACHER' || userRole === 'ADMIN') ? 'Сохранить тест' : 'Отправить ответы'}
@@ -985,7 +1007,7 @@ const Forms = () => {
                 </div>
             </form>
             {isScrollButtonVisible && (
-                <button 
+                <button
                     className="btn btn-primary rounded-circle shadow-lg"
                     style={{
                         position: 'fixed',
