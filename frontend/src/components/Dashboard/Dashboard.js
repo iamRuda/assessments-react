@@ -11,6 +11,7 @@ const Dashboard = () => {
   const [userRole, setUserRole] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [showCreateTestModal, setShowCreateTestModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,7 +42,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (profileData && profileData.roles && profileData.roles.length > 0) {
-        setUserRole(profileData.roles[0].role);
+      setUserRole(profileData.roles[0].role);
     }
   }, [profileData]);
 
@@ -76,7 +77,27 @@ const Dashboard = () => {
     navigate("/settings");
   };
 
-  // Функция для получения URL аватара
+  const handleCreateTest = async (testTitle) => {
+    const token = localStorage.getItem("authToken");
+    try {
+      const response = await fetch("http://localhost:8080/api/test/create", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: testTitle,
+        }),
+      });
+      
+      const newTest = await response.json();
+      navigate(`/forms/${newTest.id}`);
+    } catch (error) {
+      console.error("Ошибка создания теста:", error);
+    }
+  };
+
   const getAvatarUrl = () => {
     if (!profileData || !profileData.imageUrl) return "https://placehold.co/100";
     if (Array.isArray(profileData.imageUrl)) {
@@ -90,11 +111,11 @@ const Dashboard = () => {
       <header className="d-flex align-items-center justify-content-between my-4">
         <div className="d-flex align-items-center">
           <img
-            src={getAvatarUrl()}
-            alt="Avatar"
-            className="rounded-circle me-3"
-            width="100"
-            height="100"
+              src={getAvatarUrl()}
+              alt="Avatar"
+              className="rounded-circle me-3"
+              width="100"
+              height="100"
           />
           <div>
             <h2 className="mb-1">
@@ -110,16 +131,16 @@ const Dashboard = () => {
 
         <div className="d-flex align-items-center">
           <button
-            className="btn btn-link"
-            title="Notifications"
-            onClick={() => setShowNotifications(!showNotifications)}
+              className="btn btn-link"
+              title="Notifications"
+              onClick={() => setShowNotifications(!showNotifications)}
           >
             <FontAwesomeIcon icon={faBell} size="lg"/>
           </button>
           <button
-            className="btn btn-link"
-            title="Settings"
-            onClick={handleSettingsClick}
+              className="btn btn-link"
+              title="Settings"
+              onClick={handleSettingsClick}
           >
             <FontAwesomeIcon icon={faCog} size="lg"/>
           </button>
@@ -127,90 +148,154 @@ const Dashboard = () => {
       </header>
 
       {showNotifications && (
-        <div className="position-relative">
-          <div className="position-absolute end-0 me-3" style={{ zIndex: 1000 }}>
-            <div className="card shadow" style={{ maxWidth: "500px" }}>
-              <div className="card-body">
-                <h5 className="card-title">Уведомления</h5>
-                {notifications.length > 0 ? (
-                  notifications.map((notification, index) => (
-                    <div key={index} className="mb-3">
-                      <div className="notification-card card">
-                        <div className="card-body">
-                          <h6 className="card-title">{notification.title}</h6>
-                          <p className="card-text">{notification.text}</p>
-                          <a href={notification.link} className="btn btn-primary">
-                            Подробнее
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="mb-0">Нет новых уведомлений.</p>
-                )}
+          <div className="position-relative">
+            <div className="position-absolute end-0 me-3" style={{ zIndex: 1000 }}>
+              <div className="card shadow" style={{ maxWidth: "500px" }}>
+                <div className="card-body">
+                  <h5 className="card-title">Уведомления</h5>
+                  {notifications.length > 0 ? (
+                      notifications.map((notification, index) => (
+                          <div key={index} className="mb-3">
+                            <div className="notification-card card">
+                              <div className="card-body">
+                                <h6 className="card-title">{notification.title}</h6>
+                                <p className="card-text">{notification.text}</p>
+                                <a href={notification.link} className="btn btn-primary">
+                                  Подробнее
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                      ))
+                  ) : (
+                      <p className="mb-0">Нет новых уведомлений.</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
       )}
 
       {assignedTests ? (
-        <div className="row">
-          {assignedTests.length > 0 && assignedTests.map((assignedTest) => (
-              <div key={assignedTest.id} className="col-md-4 mb-4">
-                <div className="card h-100">
-                  <div className="card-body d-flex flex-column">
-                    <h5 className="card-title">📚 {assignedTest.test.title}</h5>
-                    <p className="card-text flex-grow-1">
-                      {assignedTest.test.description || "Описание отсутствует"}
-                    </p>
-                    <div className="d-flex justify-content-end mt-auto">
-                      <button
-                          className="btn btn-primary"
-                          onClick={() => handleTestClick(assignedTest.test.id)}
-                      >
-                        {(userRole === "TEACHER" || userRole === "ADMIN") ? "Редактировать тест" : "Начать тест"}
-                      </button>
+          <div className="row">
+            {assignedTests.length > 0 && assignedTests.map((assignedTest) => (
+                <div key={assignedTest.id} className="col-md-4 mb-4">
+                  <div className="card h-100">
+                    <div className="card-body d-flex flex-column">
+                      <h5 className="card-title">📚 {assignedTest.test.title}</h5>
+                      <p className="card-text flex-grow-1">
+                        {assignedTest.test.description || "Описание отсутствует"}
+                      </p>
+                      <div className="d-flex justify-content-end mt-auto">
+                        <button
+                            className="btn btn-primary"
+                            onClick={() => handleTestClick(assignedTest.test.id)}
+                        >
+                          {(userRole === "TEACHER" || userRole === "ADMIN") ? "Редактировать тест" : "Начать тест"}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-          ))}
+            ))}
 
-          {(profileData?.roles?.[0]?.role === 'ADMIN' || profileData?.roles?.[0]?.role === 'TEACHER') && (
-            <div className="col-md-4 mb-4 d-flex align-items-stretch">
-              <div
-                className="card h-100 w-100 d-flex align-items-center justify-content-center"
-                style={{ cursor: 'pointer', minHeight: '200px' }}
-                onClick={() => navigate('/create-test')}
-              >
-                <div className="card-body text-center d-flex flex-column justify-content-center">
-                  <h5 className="card-title">➕ Создать новое тестирование</h5>
-                  <p className="card-text text-muted">Нажмите, чтобы создать новый тест.</p>
-                </div>
-              </div>
-            </div>
-          )}
-          {(profileData?.roles?.[0]?.role === 'ADMIN') && (
-              <div className="col-md-4 mb-4 d-flex align-items-stretch">
-                <div
-                    className="card h-100 w-100 d-flex align-items-center justify-content-center"
-                    style={{ cursor: 'pointer', minHeight: '200px' }}
-                    onClick={() => navigate('/create-user')}
-                >
-                  <div className="card-body text-center d-flex flex-column justify-content-center">
-                    <h5 className="card-title">➕ Создать нового пользователя</h5>
-                    <p className="card-text text-muted">Нажмите, чтобы создать нового ученика или преподавателя.</p>
+            {(profileData?.roles?.[0]?.role === 'ADMIN' || profileData?.roles?.[0]?.role === 'TEACHER') && (
+                <div className="col-md-4 mb-4 d-flex align-items-stretch">
+                  <div
+                      className="card h-100 w-100 d-flex align-items-center justify-content-center"
+                      style={{ cursor: 'pointer', minHeight: '200px' }}
+                      onClick={() => setShowCreateTestModal(true)}
+                  >
+                    <div className="card-body text-center d-flex flex-column justify-content-center">
+                      <h5 className="card-title">➕ Создать новое тестирование</h5>
+                      <p className="card-text text-muted">Нажмите, чтобы создать новый тест.</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-          )}
-        </div>
+            )}
+            {(profileData?.roles?.[0]?.role === 'ADMIN') && (
+                <div className="col-md-4 mb-4 d-flex align-items-stretch">
+                  <div
+                      className="card h-100 w-100 d-flex align-items-center justify-content-center"
+                      style={{ cursor: 'pointer', minHeight: '200px' }}
+                      onClick={() => navigate('/create-user')}
+                  >
+                    <div className="card-body text-center d-flex flex-column justify-content-center">
+                      <h5 className="card-title">➕ Создать нового пользователя</h5>
+                      <p className="card-text text-muted">Нажмите, чтобы создать нового ученика или преподавателя.</p>
+                    </div>
+                  </div>
+                </div>
+            )}
+          </div>
       ) : (
-        <p>Loading...</p>
+          <p>Loading...</p>
       )}
+      
+      {showCreateTestModal && (
+          <div className="modal-overlay" onClick={() => setShowCreateTestModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <h2>Создание теста</h2>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                handleCreateTest(formData.get('testTitle'));
+                setShowCreateTestModal(false);
+              }}>
+                <div className="mb-3">
+                  <label htmlFor="testTitle" className="form-label">Название теста</label>
+                  <input 
+                    type="text" 
+                    className="form-control" 
+                    id="testTitle" 
+                    name="testTitle" 
+                    required 
+                    autoFocus
+                  />
+                </div>
+                <div className="d-flex justify-content-end gap-2">
+                  <button 
+                    type="button" 
+                    className="btn btn-secondary" 
+                    onClick={() => setShowCreateTestModal(false)}
+                  >
+                    Закрыть
+                  </button>
+                  <button type="submit" className="btn btn-primary">Создать</button>
+                </div>
+              </form>
+            </div>
+          </div>
+      )}
+
       {profileData?.roles?.[0]?.role === "ADMIN" && <UsersTable />}
+
+      <style>{`
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1050;
+        }
+        .modal-content {
+          background: white;
+          padding: 25px;
+          border-radius: 10px;
+          width: 90%;
+          max-width: 500px;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .modal-content h2 {
+          margin-bottom: 20px;
+          font-size: 1.5rem;
+        }
+      `}</style>
     </div>
   );
 };

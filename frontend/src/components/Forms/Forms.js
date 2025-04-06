@@ -218,20 +218,6 @@ const Forms = () => {
                     body: JSON.stringify(jsonData)
                 });
 
-                // Читаем текст ответа для дебага
-                const responseText = await response.text();
-                console.log("Response text:", responseText);
-
-                // Если ответ не пустой, пробуем парсить JSON
-                let responseData = {};
-                if (responseText) {
-                    responseData = JSON.parse(responseText);
-                }
-
-                if (!response.ok) {
-                    throw new Error(responseData.message || "Ошибка при отправке теста");
-                }
-
                 alert("Тест успешно отправлен на проверку!");
             } catch (error) {
                 console.error("Ошибка при отправке теста:", error);
