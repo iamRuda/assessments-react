@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './forms.css';
 import './slider.css';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faArrowUp, 
@@ -12,8 +12,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 const Forms = () => {
+    const navigate = useNavigate();
+
     const { id } = useParams();
-    
+    const [isLoading, setIsLoading] = useState(true);
+    const [isNotFound, setIsNotFound] = useState(false);
     const [profileData, setProfileData] = useState(null);
     const [userRole, setUserRole] = useState(null);
     const [formData, setFormData] = useState({});
@@ -22,6 +25,7 @@ const Forms = () => {
     const [newTitle, setNewTitle] = useState('');
     const [isGradingModalOpen, setIsGradingModalOpen] = useState(false);
     const [localThresholds, setLocalThresholds] = useState([]);
+    const [isStrictValidation, setIsStrictValidation] = useState(true);  // Флаг строгой проверки
 
     const getToken = () => {
         return localStorage.getItem("authToken");
@@ -54,16 +58,32 @@ const Forms = () => {
     
     useEffect(() => {
         const fetchTestData = async () => {
+            setIsLoading(true);
             try {
                 const token = getToken();
                 const response = await fetch(`http://localhost:8080/api/test/findById/${id}`, {
                     method: "GET",
                     headers: { Authorization: `Bearer ${token}` },
                 });
+                
+                if ((response.status === 403) || (response.status === 404)) {
+                    setIsNotFound(true);
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки теста');
+                }
+
                 const result = await response.json();
                 setJsonData(result);
             } catch (error) {
                 console.error("Error fetching test data", error);
+                if (error.message.includes('404')) {
+                    setIsNotFound(true);
+                }
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -186,8 +206,42 @@ const Forms = () => {
         }));
     };
 
+    const validateForm = () => {
+        if (userRole === 'STUDENT') {
+            // Проверка для студентов
+            for (const question of jsonData.questions) {
+                if (!question.selectedAnswers || question.selectedAnswers.length === 0) {
+                    return false; // Найден вопрос без ответа
+                }
+            }
+            return true; // Все вопросы имеют ответы
+        } else if (userRole === 'TEACHER' || userRole === 'ADMIN') {
+            // Проверка для преподавателей или админов
+            for (const question of jsonData.questions) {
+                if (!question.questionHeader || !question.questionText || !question.maxScore) {
+                    return false; // Найден вопрос без обязательных полей
+                }
+                if (question.options && question.options.length > 0) {
+                    for (const option of question.options) {
+                        if (!option.text) {
+                            return false; // Найдена опция без текста
+                        }
+                    }
+                }
+            }
+            return true; // Все обязательные поля заполнены
+        }
+        return false; // Неизвестная роль
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validateForm()) {
+            alert('Пожалуйста, заполните все обязательные поля.');
+            return;
+        }
+
         const token = getToken();
         if (userRole === 'TEACHER' || userRole === 'ADMIN') {
             try {
@@ -747,6 +801,30 @@ const Forms = () => {
         }));
         setIsGradingModalOpen(false);
     };
+
+    if (isNotFound) {
+        return (
+            <div className="container text-center mt-5">
+                <h1 className="display-1">Упс...</h1>
+                <p className="lead">Тест не найден или у вас нет доступа к нему</p>
+                <Link to="/dashboard" className="btn btn-primary">
+                    Вернуться на главную
+                </Link>
+            </div>
+        );
+    }
+
+    // Рендер лоадера во время загрузки
+    if (isLoading) {
+        return (
+            <div className="container text-center mt-5">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Загрузка...</span>
+                </div>
+                <p className="mt-2">Загрузка теста...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="container my-4">

@@ -65,7 +65,7 @@ const App = () => {
           <Route path="/forms/:id" element={<PrivateRoute element={Forms} />} />
           <Route path="/settings" element={<PrivateRoute element={Settings} />} />
           <Route path="/upload" element={<PrivateRoute element={Upload} />} />
-          <Route path="/public/file/:filename" element={<FileViewer />} />
+          {/* <Route path="/public/file/:filename" element={<FileViewer />} /> */}
         </Routes>
       </Router>
     </div>

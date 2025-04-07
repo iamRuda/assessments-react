@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faCog } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faCog, faChartLine, faShare } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import UsersTable from "./UsersTable";
 
@@ -203,23 +203,56 @@ const Dashboard = () => {
           <div className="row">
             {assignedTests.length > 0 && assignedTests.map((assignedTest) => (
                 <div key={assignedTest.id} className="col-md-4 mb-4">
-                  <div className="card h-100">
-                    <div className="card-body d-flex flex-column">
-                      <h5 className="card-title">📚 {assignedTest.test.title}</h5>
-                      <p className="card-text flex-grow-1">
-                        {assignedTest.test.description || "Описание отсутствует"}
-                      </p>
-                      <div className="d-flex justify-content-end mt-auto">
-                        <button
-                            className="btn btn-primary"
-                            onClick={() => handleTestClick(assignedTest.test.id)}
-                        >
-                          {(userRole === "TEACHER" || userRole === "ADMIN") ? "Редактировать тест" : "Начать тест"}
-                        </button>
+                <div className="card h-100 position-relative">
+                  <div className="card-body d-flex flex-column">
+                    <h5 className="card-title">📚 {assignedTest.test.title}</h5>
+                    <p className="card-text flex-grow-1">
+                      {assignedTest.test.description || "Описание отсутствует"}
+                    </p>
+                    
+                    {/* Блок с кнопками */}
+                    <div className="mt-auto pt-3">
+                      <div className="d-flex justify-content-between align-items-center">
+                        {/* Аналитика */}
+                        {(userRole === "TEACHER" || userRole === "ADMIN") && (
+                          <div className="position-absolute start-0 bottom-0 ms-3 mb-3">
+                            <button
+                              className="btn btn-success"
+                              onClick={() => navigate(`/analytics/${assignedTest.test.id}`)}
+                            >
+                              <FontAwesomeIcon icon={faChartLine} className="me-2" />
+                              Аналитика
+                            </button>
+                          </div>
+                        )}
+              
+                        {/* Группа правых кнопок */}
+                        <div className="ms-auto">
+                          <div className="d-flex flex-column gap-2">
+                            {(userRole === "TEACHER" || userRole === "ADMIN") && (
+                              <button
+                                className="btn btn-secondary"
+                                onClick={() => navigate(`/assign-test/${assignedTest.test.id}`)}
+                              >
+                                <FontAwesomeIcon icon={faShare} className="me-2" />
+                                Назначить тест
+                              </button>
+                            )}
+                            <button
+                              className="btn btn-primary"
+                              onClick={() => handleTestClick(assignedTest.test.id)}
+                            >
+                              {(userRole === "TEACHER" || userRole === "ADMIN") 
+                                ? "Редактировать тест" 
+                                : "Начать тест"}
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
+              </div>
             ))}
 
             {(profileData?.roles?.[0]?.role === 'ADMIN' || profileData?.roles?.[0]?.role === 'TEACHER') && (

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 const FileViewer = () => {
+  /*
   const { filename } = useParams();
   const [fileInfo, setFileInfo] = useState(null);
   const decodedFilename = decodeURIComponent(filename);
@@ -79,7 +80,7 @@ const FileViewer = () => {
         </div>
       )}
     </div>
-  );
+  );*/
 };
 
 export default FileViewer;
