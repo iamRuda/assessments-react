@@ -17,6 +17,7 @@ const Forms = () => {
     const { id } = useParams();
     const [isLoading, setIsLoading] = useState(true);
     const [isNotFound, setIsNotFound] = useState(false);
+    const [isTestCompleted, setIsTestCompleted] = useState(false);
     const [profileData, setProfileData] = useState(null);
     const [userRole, setUserRole] = useState(null);
     const [formData, setFormData] = useState({});
@@ -26,6 +27,29 @@ const Forms = () => {
     const [isGradingModalOpen, setIsGradingModalOpen] = useState(false);
     const [localThresholds, setLocalThresholds] = useState([]);
     const [isStrictValidation, setIsStrictValidation] = useState(true);  // Флаг строгой проверки
+
+    useEffect(() => {
+        const checkTestCompletion = async () => {
+            if (userRole === 'STUDENT' && profileData?.id) {
+                try {
+                    const token = getToken();
+                    const response = await fetch(
+                        `http://localhost:8080/api/result/findByUserIdAndTestId/${profileData.id}/${id}`,
+                        { headers: { Authorization: `Bearer ${token}` } }
+                    );
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        setIsTestCompleted(result.completed);
+                    }
+                } catch (error) {
+                    console.error("Error checking test completion", error);
+                }
+            }
+        };
+
+        checkTestCompletion();
+    }, [id, userRole, profileData]);
 
     const getToken = () => {
         return localStorage.getItem("authToken");
@@ -186,7 +210,29 @@ const Forms = () => {
             )
         }));
     };
-    
+
+    // Проверка статуса теста
+    useEffect(() => {
+        const checkTestStatus = async () => {
+            if (userRole === 'STUDENT') {
+                try {
+                    const response = await fetch(
+                        `http://localhost:8080/api/result/findByUserIdAndTestId/${profileData.id}/${id}`,
+                        { headers: { Authorization: `Bearer ${getToken()}` } }
+                    );
+                    if (response.ok) {
+                        const result = await response.json();
+                        setIsTestCompleted(result.completed);
+                    }
+                } catch (error) {
+                    console.error("Error checking test status:", error);
+                }
+            }
+        };
+        checkTestStatus();
+    }, [id, userRole, profileData]);
+
+
     const handleMultipleImageSelect = (e, questionId) => {
         const selectedValue = e.target.value;
         const isChecked = e.target.checked;
@@ -207,6 +253,7 @@ const Forms = () => {
     };
 
     const validateForm = () => {
+        if (userRole === 'STUDENT' && isTestCompleted) return false;
         if (userRole === 'STUDENT') {
             // Проверка для студентов
             for (const question of jsonData.questions) {
@@ -233,7 +280,7 @@ const Forms = () => {
         }
         return false; // Неизвестная роль
     };
-
+    // Логика потверждения
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -705,6 +752,10 @@ const Forms = () => {
         }
     };
 
+    const handleCloseTest = () => {
+        navigate('/dashboard');
+    };
+
     const handleDeleteQuestion = (questionId) => {
         setJsonData((prevData) => ({
             ...prevData,
@@ -1124,126 +1175,240 @@ const Forms = () => {
                         ) : (
                             <div>
                                 <p className="text-dark">{question.questionText}</p>
-                                {question.options && (question.questionType === 'MULTIPLE_CHOICE_SINGLE' || question.questionType === 'MULTIPLE_CHOICE_MULTIPLE') && (
-                                    question.options.map((option) => (
-                                        <div key={option.id} className="form-check">
-                                            <input
-                                                type={question.questionType === 'MULTIPLE_CHOICE_SINGLE' ? 'radio' : 'checkbox'}
-                                                className="form-check-input"
-                                                value={option.id}
-                                                checked={question.selectedAnswers.includes(option.id)}
-                                                onChange={(e) => handleChange(e.target.value, question.id, question.questionType === 'MULTIPLE_CHOICE_MULTIPLE')}
-                                            />
-                                            <label className="form-check-label">{option.text}</label>
-                                        </div>
-                                    ))
-                                )}
-                                {question.questionType === 'OPEN_ENDED_SINGLE' && (
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        value={question.selectedAnswers[0] || ''}
-                                        onChange={(e) => handleChange(e.target.value, question.id, false)}
-                                    />
-                                )}
-                                {question.questionType === 'OPEN_ENDED_MULTI' && (
-                                    <textarea
-                                        className="form-control"
-                                        rows="3"
-                                        value={question.selectedAnswers[0] || ''}
-                                        onChange={(e) => handleChange(e.target.value, question.id, false)}
-                                    />
-                                )}
-                                {question.questionType === 'SINGLE_BUTTON_SELECT' && (
-                                    <div className="slider-container">
-                                        <div className="slider-track">
-                                            {question.options.map((option) => (
-                                                <div key={option.id} className="slide">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleChange(option.id, question.id, false)}
-                                                        className="d-block"
-                                                        style={{
-                                                            backgroundColor: question.selectedAnswers.includes(option.id) ? '#ff9900' : '#007bff'
-                                                        }}
-                                                    >
-                                                        {option.text}
-                                                    </button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                                {question.questionType === 'MULTIPLE_BUTTON_SELECT' && (
-                                    <div className="slider-container">
-                                        <div className="slider-track">
-                                            {question.options.map((option) => (
-                                                <div key={option.id} className="slide">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleChange(option.id, question.id, true)}
-                                                        className="d-block"
-                                                        style={{
-                                                            backgroundColor: question.selectedAnswers.includes(option.id) ? '#ff9900' : '#007bff'
-                                                        }}
-                                                    >
-                                                        {option.text}
-                                                    </button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                                {question.questionType === 'IMAGE_SELECTION_SINGLE' && (
-                                    <div className="row">
-                                        {question.options.map((option) => (
-                                            <div key={option.id} className="col-4 text-center mb-3">
-                                                <label htmlFor={`image_${question.id}_${option.id}`}
-                                                       className="d-block position-relative img-form">
-                                                    <img
-                                                        src={option.url}
-                                                        alt={option.text}
-                                                        className="img-thumbnail"
-                                                        style={{cursor: 'pointer', borderRadius: '10px'}}
-                                                    />
-                                                    <input
-                                                        className="form-check-input checkbox-overlay"
-                                                        type="radio"
-                                                        id={`image_${question.id}_${option.id}`}
-                                                        name={`selectedImage_${question.id}`}
-                                                        value={option.id}
-                                                        checked={question.selectedAnswers[0] === option.id}
-                                                        onChange={(e) => handleSingleImageSelect(e, question.id)}
-                                                    />
-                                                </label>
+
+                                {isTestCompleted && userRole === 'STUDENT' ? (
+                                    // Блок отображения завершенных ответов
+                                    <div className="completed-answers">
+                                        {['MULTIPLE_CHOICE_SINGLE', 'MULTIPLE_CHOICE_MULTIPLE'].includes(question.questionType) && (
+                                            <div className="mb-3">
+                                                <strong>
+                                                    {question.questionType === 'MULTIPLE_CHOICE_SINGLE'
+                                                        ? "Выбранный ответ:"
+                                                        : "Выбранные ответы:"}
+                                                </strong>
+                                                {question.options
+                                                    .filter(opt => question.selectedAnswers.includes(opt.id))
+                                                    .map(opt => (
+                                                        <div key={opt.id} className="ms-2 text-success">
+                                                            ✔ {opt.text}
+                                                        </div>
+                                                    ))}
                                             </div>
-                                        ))}
+                                        )}
+
+                                        {question.questionType === 'OPEN_ENDED_SINGLE' && (
+                                            <div className="mb-3">
+                                                <strong>Ваш ответ:</strong>
+                                                <div className="ms-2 bg-light p-2 rounded">
+                                                    {question.selectedAnswers[0] || 'Нет ответа'}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {question.questionType === 'OPEN_ENDED_MULTI' && (
+                                            <div className="mb-3">
+                                                <strong>Ваш ответ:</strong>
+                                                <pre className="ms-2 bg-light p-2 rounded">
+                                        {question.selectedAnswers[0] || 'Нет ответа'}
+                                    </pre>
+                                            </div>
+                                        )}
+
+                                        {question.questionType.startsWith('IMAGE_SELECTION') && (
+                                            <div className="row">
+                                                {question.options
+                                                    .filter(opt => question.selectedAnswers.includes(opt.id))
+                                                    .map(opt => (
+                                                        <div key={opt.id} className="col-4 text-center mb-3 position-relative">
+                                                            <img
+                                                                src={opt.url}
+                                                                alt={opt.text}
+                                                                className="img-thumbnail"
+                                                                style={{
+                                                                    border: '2px solid #28a745',
+                                                                    opacity: 0.9
+                                                                }}
+                                                            />
+                                                            <div className="position-absolute top-0 end-0 m-1 bg-success text-white rounded-circle p-1">
+                                                                ✓
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                            </div>
+                                        )}
+
+                                        {question.questionType.includes('BUTTON_SELECT') && (
+                                            <div className="slider-container">
+                                                <div className="slider-track">
+                                                    {question.options.map((option) => (
+                                                        <div key={option.id} className="slide">
+                                                            <div
+                                                                className="d-block"
+                                                                style={{
+                                                                    backgroundColor: question.selectedAnswers.includes(option.id)
+                                                                        ? '#28a745'
+                                                                        : '#6c757d',
+                                                                    color: 'white',
+                                                                    opacity: 0.7,
+                                                                    cursor: 'default'
+                                                                }}
+                                                            >
+                                                                {option.text}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                                {question.questionType === 'IMAGE_SELECTION_MULTIPLE' && (
-                                    <div className="row">
-                                        {question.options.map((option) => (
-                                            <div key={option.id} className="col-4 text-center mb-3">
-                                                <label htmlFor={`image_${question.id}_${option.id}`}
-                                                       className="d-block position-relative img-form">
-                                                    <img
-                                                        src={option.url}
-                                                        alt={option.text}
-                                                        className="img-thumbnail"
-                                                        style={{cursor: 'pointer', borderRadius: '10px'}}
-                                                    />
+                                ) : (
+                                    // Оригинальные интерактивные элементы
+                                    <>
+                                        {question.options && (question.questionType === 'MULTIPLE_CHOICE_SINGLE' || question.questionType === 'MULTIPLE_CHOICE_MULTIPLE') && (
+                                            question.options.map((option) => (
+                                                <div key={option.id} className="form-check">
                                                     <input
-                                                        className="form-check-input checkbox-overlay"
-                                                        type="checkbox"
-                                                        id={`image_${question.id}_${option.id}`}
+                                                        type={question.questionType === 'MULTIPLE_CHOICE_SINGLE' ? 'radio' : 'checkbox'}
+                                                        className="form-check-input"
                                                         value={option.id}
                                                         checked={question.selectedAnswers.includes(option.id)}
-                                                        onChange={(e) => handleMultipleImageSelect(e, question.id)}
+                                                        onChange={(e) => handleChange(e.target.value, question.id, question.questionType === 'MULTIPLE_CHOICE_MULTIPLE')}
+                                                        disabled={isTestCompleted && userRole === 'STUDENT'}
                                                     />
-                                                </label>
+                                                    <label className="form-check-label">{option.text}</label>
+                                                </div>
+                                            ))
+                                        )}
+
+                                        {question.questionType === 'OPEN_ENDED_SINGLE' && (
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                value={question.selectedAnswers[0] || ''}
+                                                onChange={(e) => handleChange(e.target.value, question.id, false)}
+                                                disabled={isTestCompleted && userRole === 'STUDENT'}
+                                            />
+                                        )}
+
+                                        {question.questionType === 'OPEN_ENDED_MULTI' && (
+                                            <textarea
+                                                className="form-control"
+                                                rows="3"
+                                                value={question.selectedAnswers[0] || ''}
+                                                onChange={(e) => handleChange(e.target.value, question.id, false)}
+                                                disabled={isTestCompleted && userRole === 'STUDENT'}
+                                            />
+                                        )}
+
+                                        {question.questionType === 'SINGLE_BUTTON_SELECT' && (
+                                            <div className="slider-container">
+                                                <div className="slider-track">
+                                                    {question.options.map((option) => (
+                                                        <div key={option.id} className="slide">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => !isTestCompleted && handleChange(option.id, question.id, false)}
+                                                                className="d-block"
+                                                                style={{
+                                                                    backgroundColor: question.selectedAnswers.includes(option.id)
+                                                                        ? '#ff9900'
+                                                                        : '#007bff',
+                                                                    opacity: isTestCompleted ? 0.7 : 1
+                                                                }}
+                                                                disabled={isTestCompleted}
+                                                            >
+                                                                {option.text}
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
-                                        ))}
-                                    </div>
+                                        )}
+
+                                        {question.questionType === 'MULTIPLE_BUTTON_SELECT' && (
+                                            <div className="slider-container">
+                                                <div className="slider-track">
+                                                    {question.options.map((option) => (
+                                                        <div key={option.id} className="slide">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => !isTestCompleted && handleChange(option.id, question.id, true)}
+                                                                className="d-block"
+                                                                style={{
+                                                                    backgroundColor: question.selectedAnswers.includes(option.id)
+                                                                        ? '#ff9900'
+                                                                        : '#007bff',
+                                                                    opacity: isTestCompleted ? 0.7 : 1
+                                                                }}
+                                                                disabled={isTestCompleted}
+                                                            >
+                                                                {option.text}
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {question.questionType === 'IMAGE_SELECTION_SINGLE' && (
+                                            <div className="row">
+                                                {question.options.map((option) => (
+                                                    <div key={option.id} className="col-4 text-center mb-3">
+                                                        <img
+                                                            src={option.url}
+                                                            alt={option.text}
+                                                            className="img-thumbnail"
+                                                            style={{
+                                                                cursor: isTestCompleted ? 'default' : 'pointer',
+                                                                border: question.selectedAnswers.includes(option.id)
+                                                                    ? '2px solid #28a745'
+                                                                    : '1px solid #dee2e6'
+                                                            }}
+                                                        />
+                                                        {!isTestCompleted && (
+                                                            <input
+                                                                className="form-check-input checkbox-overlay"
+                                                                type="radio"
+                                                                name={`selectedImage_${question.id}`}
+                                                                value={option.id}
+                                                                checked={question.selectedAnswers.includes(option.id)}
+                                                                onChange={(e) => handleSingleImageSelect(e, question.id)}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {question.questionType === 'IMAGE_SELECTION_MULTIPLE' && (
+                                            <div className="row">
+                                                {question.options.map((option) => (
+                                                    <div key={option.id} className="col-4 text-center mb-3">
+                                                        <img
+                                                            src={option.url}
+                                                            alt={option.text}
+                                                            className="img-thumbnail"
+                                                            style={{
+                                                                cursor: isTestCompleted ? 'default' : 'pointer',
+                                                                border: question.selectedAnswers.includes(option.id)
+                                                                    ? '2px solid #28a745'
+                                                                    : '1px solid #dee2e6'
+                                                            }}
+                                                        />
+                                                        {!isTestCompleted && (
+                                                            <input
+                                                                className="form-check-input checkbox-overlay"
+                                                                type="checkbox"
+                                                                value={option.id}
+                                                                checked={question.selectedAnswers.includes(option.id)}
+                                                                onChange={(e) => handleMultipleImageSelect(e, question.id)}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </>
                                 )}
                                 <p className="text-muted mt-2">{question.questionPostscript}</p>
                                 {(userRole === 'TEACHER' || userRole === 'ADMIN') && (
@@ -1287,10 +1452,17 @@ const Forms = () => {
                         )}
                     </div>
                 ))}
-                {/*Надо понять, какая логика при сохранении*/}
                 <div className="d-flex justify-content-end">
-                    <button type="submit" className="btn btn-primary">
-                        {(userRole === 'TEACHER' || userRole === 'ADMIN') ? 'Сохранить тест' : 'Отправить ответы'}
+                    <button
+                        type={isTestCompleted ? "button" : "submit"}
+                        className="btn btn-primary"
+                        onClick={isTestCompleted ? handleCloseTest : undefined}
+                    >
+                        {isTestCompleted && userRole === 'STUDENT' ? (
+                            'Закрыть'
+                        ) : (userRole === 'TEACHER' || userRole === 'ADMIN') ?
+                            'Сохранить тест' :
+                            'Отправить ответы'}
                     </button>
                 </div>
             </form>

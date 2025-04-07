@@ -13,6 +13,67 @@ const Dashboard = () => {
   const [notifications, setNotifications] = useState([]);
   const [showCreateTestModal, setShowCreateTestModal] = useState(false);
   const navigate = useNavigate();
+  const [groups, setGroups] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState('');
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [currentTestId, setCurrentTestId] = useState(null);
+
+  // Добавляем загрузку групп
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    const fetchGroups = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/group/findAll", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+        if (!response.ok) throw new Error("Failed to fetch groups");
+        const groupsData = await response.json();
+        // Фильтруем группу Teachers
+        setGroups(groupsData.filter(g => g.name !== "Teachers"));
+      } catch (error) {
+        console.error("Error fetching groups:", error);
+      }
+    };
+
+    if (userRole === 'TEACHER') {
+      fetchGroups();
+    }
+  }, [userRole]);
+
+  // Обработчик назначения теста
+  const handleAssignTest = async () => {
+    if (!selectedGroup || !currentTestId) return;
+
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await fetch("http://localhost:8080/api/testAssignment/assign", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          testId: currentTestId,
+          groupName: selectedGroup,
+        }),
+      });
+
+      if (response.ok) {
+        alert("Тест успешно назначен!");
+        setShowAssignModal(false);
+      } else {
+        throw new Error("Ошибка назначения теста");
+      }
+    } catch (error) {
+      console.error("Assignment error:", error);
+      alert(error.message);
+    }
+  };
+
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -46,7 +107,7 @@ const Dashboard = () => {
   }, []);
 
 
-
+  // Логика вывода тестов
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     const getAssignedTests = async () => {
@@ -168,6 +229,46 @@ const Dashboard = () => {
         </div>
       </header>
 
+      {showAssignModal && (
+          <div className="modal-overlay" onClick={() => setShowAssignModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <h3>Назначить тест группе</h3>
+              <div className="mb-3">
+                <label className="form-label">Выберите группу:</label>
+                <select
+                    className="form-select"
+                    value={selectedGroup}
+                    onChange={(e) => setSelectedGroup(e.target.value)}
+                >
+                  <option value="">Выберите группу</option>
+                  {groups.map(group => (
+                      <option key={group.id} value={group.name}>
+                        {group.name}
+                      </option>
+                  ))}
+                </select>
+              </div>
+              <div className="d-flex justify-content-end gap-2">
+                <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setShowAssignModal(false)}
+                >
+                  Отмена
+                </button>
+                <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={handleAssignTest}
+                    disabled={!selectedGroup}
+                >
+                  Назначить
+                </button>
+              </div>
+            </div>
+          </div>
+      )}
+
       {showNotifications && (
           <div className="position-relative">
             <div className="position-absolute end-0 me-3" style={{ zIndex: 1000 }}>
@@ -201,60 +302,71 @@ const Dashboard = () => {
 
       {assignedTests ? (
           <div className="row">
-            {assignedTests.length > 0 && assignedTests.map((assignedTest) => (
-                <div key={assignedTest.id} className="col-md-4 mb-4">
-                <div className="card h-100 position-relative">
-                  <div className="card-body d-flex flex-column">
-                    <h5 className="card-title">📚 {assignedTest.test.title}</h5>
-                    <p className="card-text flex-grow-1">
-                      {assignedTest.test.description || "Описание отсутствует"}
-                    </p>
-                    
-                    {/* Блок с кнопками */}
-                    <div className="mt-auto pt-3">
-                      <div className="d-flex justify-content-between align-items-center">
-                        {/* Аналитика */}
-                        {(userRole === "TEACHER" || userRole === "ADMIN") && (
-                          <div className="position-absolute start-0 bottom-0 ms-3 mb-3">
-                            <button
-                              className="btn btn-success"
-                              onClick={() => navigate(`/analytics/${assignedTest.test.id}`)}
-                            >
-                              <FontAwesomeIcon icon={faChartLine} className="me-2" />
-                              Аналитика
-                            </button>
+            {assignedTests.length > 0 && assignedTests.map((assignedTest) => {
+              const isCompleted = assignedTest.result?.completed;
+              const totalScore = assignedTest.result?.totalScore || 0;
+              const maxScore = assignedTest.test?.maxScore || 0;
+              const mark = assignedTest.result?.mark || 'Оценка не выставлена';
+
+              return (
+                  <div key={assignedTest.id} className="col-md-4 mb-4">
+                    <div className="card h-100 position-relative">
+                      {/* Добавляем бейдж выполнения */}
+                      {isCompleted && (
+                          <div className="position-absolute top-0 end-0 m-2">
+            <span className="badge bg-success">
+              <i className="bi bi-check2"></i> Выполнено
+            </span>
                           </div>
+                      )}
+
+                      <div className="card-body d-flex flex-column">
+                        <h5 className="card-title">📚 {assignedTest.test.title}</h5>
+
+                        {/* Блок с баллами */}
+                        {isCompleted && (
+                            <div className="mb-2">
+              <span className="text-success fw-bold">
+                {totalScore}/{maxScore} баллов
+              </span>
+                              <div className="text-muted small">Оценка: {mark}</div>
+                            </div>
                         )}
-              
-                        {/* Группа правых кнопок */}
-                        <div className="ms-auto">
-                          <div className="d-flex flex-column gap-2">
-                            {(userRole === "TEACHER" || userRole === "ADMIN") && (
-                              <button
-                                className="btn btn-secondary"
-                                onClick={() => navigate(`/assign-test/${assignedTest.test.id}`)}
-                              >
-                                <FontAwesomeIcon icon={faShare} className="me-2" />
-                                Назначить тест
-                              </button>
-                            )}
-                            <button
-                              className="btn btn-primary"
+
+                        <p className="card-text flex-grow-1">
+                          {assignedTest.test.description || "Описание отсутствует"}
+                        </p>
+
+
+
+                        {/* Модифицируем кнопку */}
+                        <div className="mt-auto pt-3">
+                          {(userRole === "TEACHER" || userRole === "ADMIN") && (
+                              <div className="position-absolute start-0 bottom-0 ms-3 mb-3">
+                                <button
+                                    className="btn btn-success"
+                                    onClick={() => {
+                                      setCurrentTestId(assignedTest.test.id);
+                                      setShowAssignModal(true);
+                                    }}
+                                >
+                                  <FontAwesomeIcon icon={faShare} className="me-2" />
+                                  Назначить тест
+                                </button>
+                              </div>
+                          )}
+                          <button
+                              className="btn btn-primary w-100"
                               onClick={() => handleTestClick(assignedTest.test.id)}
-                            >
-                              {(userRole === "TEACHER" || userRole === "ADMIN") 
-                                ? "Редактировать тест" 
-                                : "Начать тест"}
-                            </button>
-                          </div>
+                          >
+                            {isCompleted ? 'Результаты' : 'Начать тест'}
+                          </button>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            ))}
-
+              );
+            })}
             {(profileData?.roles?.[0]?.role === 'ADMIN' || profileData?.roles?.[0]?.role === 'TEACHER') && (
                 <div className="col-md-4 mb-4 d-flex align-items-stretch">
                   <div
