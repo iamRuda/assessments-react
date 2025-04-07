@@ -4,16 +4,24 @@ import './forms.css';
 import './slider.css';
 import { Link, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faArrowUp, 
+  faArrowDown, 
+  faPencilAlt,
+  faChartBar
+} from '@fortawesome/free-solid-svg-icons';
 
 const Forms = () => {
     const { id } = useParams();
+    
     const [profileData, setProfileData] = useState(null);
     const [userRole, setUserRole] = useState(null);
     const [formData, setFormData] = useState({});
-    const [jsonData, setJsonData] = useState({
-        questions: []
-    });
+    const [jsonData, setJsonData] = useState({ questions: [] });
+    const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [newTitle, setNewTitle] = useState('');
+    const [isGradingModalOpen, setIsGradingModalOpen] = useState(false);
+    const [localThresholds, setLocalThresholds] = useState([]);
 
     const getToken = () => {
         return localStorage.getItem("authToken");
@@ -53,7 +61,6 @@ const Forms = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const result = await response.json();
-                console.log('Test data:', result);
                 setJsonData(result);
             } catch (error) {
                 console.error("Error fetching test data", error);
@@ -148,8 +155,6 @@ const Forms = () => {
         });
     };
 
-    // TODO: Вынести хэндлеры в отдельный файл
-
     const handleSingleImageSelect = (e, questionId) => {
         const selectedValue = e.target.value;
         setJsonData((prevData) => ({
@@ -202,13 +207,13 @@ const Forms = () => {
 
                 const result = await response.json();
                 alert('Тест успешно обновлён!');
+                window.location.reload();
             } catch (error) {
                 console.error('Ошибка при обновлении:', error);
                 alert(`Ошибка при сохранении: ${error.message}`);
             }
         } else if (userRole === 'STUDENT') {
             try {
-                console.log(JSON.stringify(jsonData))
                 const response = await fetch("http://localhost:8080/api/test/complete", {
                     method: "POST",
                     headers: {
@@ -219,6 +224,7 @@ const Forms = () => {
                 });
 
                 alert("Тест успешно отправлен на проверку!");
+                navigate('/dashboard');
             } catch (error) {
                 console.error("Ошибка при отправке теста:", error);
                 alert(`Ошибка при отправке теста: ${error.message}`);
@@ -447,7 +453,7 @@ const Forms = () => {
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <h2>Выберите шаблон вопроса</h2>
               <div className="template-buttons d-flex flex-wrap justify-content-center">
-                {[ // ⚠️ Изменены типы вопросов на верхний регистр
+                {[
                   { type: 'MULTIPLE_CHOICE_SINGLE', label: 'Один ответ', imageUrl: '/icons/ui-radios.svg' },
                   { type: 'MULTIPLE_CHOICE_MULTIPLE', label: 'Несколько ответов', imageUrl: '/icons/ui-checks.svg' },
                   { type: 'OPEN_ENDED_SINGLE', label: 'Однострочный ответ', imageUrl: '/icons/input.svg' },
@@ -509,7 +515,7 @@ const Forms = () => {
     };
 
     const getTemplateQuestion = (templateType, newQuestionId) => {
-        switch (templateType) { // ⚠️ Все case изменены на верхний регистр
+        switch (templateType) {
             case 'MULTIPLE_CHOICE_SINGLE':
             return {
                 id: newQuestionId,
@@ -658,29 +664,230 @@ const Forms = () => {
         });
     };
 
+    const handleOpenGradingModal = () => {
+        const thresholds = jsonData.test?.gradingThresholds 
+            ? Object.entries(jsonData.test.gradingThresholds)
+                .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
+                .map(([key, value]) => ({
+                    id: `threshold_${key}_${Date.now()}`,
+                    percentage: key,
+                    grade: value
+                }))
+            : [];
+        setLocalThresholds(thresholds);
+        setIsGradingModalOpen(true);
+    };
+
+    const handleCloseGradingModal = () => {
+        setIsGradingModalOpen(false);
+    };
+
+    const handleThresholdChange = (id, field, value) => {
+        setLocalThresholds(prev => 
+            prev.map(threshold => {
+                if (threshold.id === id) {
+                    if (field === 'percentage' && threshold.percentage === '0') return threshold;
+                    return { ...threshold, [field]: value };
+                }
+                return threshold;
+            })
+        );
+    };
+
+    const handleAddThreshold = () => {
+        const newThreshold = { 
+            id: `threshold_new_${Date.now()}`,
+            percentage: '50', 
+            grade: 'Новая оценка' 
+        };
+        setLocalThresholds(prev => [...prev, newThreshold]);
+    };
+
+    const handleSortThresholds = () => {
+        setLocalThresholds(prev => {
+            const sorted = [...prev].sort((a, b) => parseInt(a.percentage) - parseInt(b.percentage));
+            return sorted;
+        });
+    };
+
+    const handleRemoveThreshold = (id) => {
+        const threshold = localThresholds.find(t => t.id === id);
+        if (!threshold) return;
+        
+        if (threshold.percentage === '0') {
+            alert('Порог 0% нельзя удалить!');
+            return;
+        }
+        const updated = localThresholds.filter(t => t.id !== id);
+        setLocalThresholds(updated);
+    };
+
+    const handleSaveGrading = () => {
+        // Финализируем сортировку перед сохранением
+        const sorted = [...localThresholds].sort((a, b) => parseInt(a.percentage) - parseInt(b.percentage));
+        
+        // Проверки
+        const hasEmptyGrade = sorted.some(t => t.grade.trim() === '');
+        if (hasEmptyGrade) return alert('Название оценки не может быть пустым!');
+        
+        if (!sorted.some(t => t.percentage === '0')) {
+            return alert('Должен присутствовать порог 0%!');
+        }
+    
+        // Преобразуем в объект
+        const gradingThresholds = sorted.reduce((acc, curr) => {
+            acc[curr.percentage] = curr.grade;
+            return acc;
+        }, {});
+    
+        // Сохраняем данные
+        setJsonData(prev => ({
+            ...prev,
+            test: { ...prev.test, gradingThresholds }
+        }));
+        setIsGradingModalOpen(false);
+    };
+
     return (
         <div className="container my-4">
             <div className="mb-3">
                 <Link to="/dashboard" className="">{"<<"} Вернуться на главную</Link>
             </div>
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="mb-0">
-                    {jsonData.test?.title || "Неизвестное тестирование"}
-                </h2>
-                {(userRole === 'TEACHER' || userRole === 'ADMIN') && (
-                <div>
-                    <button className="btn btn-primary" onClick={handleAddQuestion}>
-                    Добавить вопрос
-                    </button>
-                    {isModalOpen && (
-                    <QuestionTemplateModal
-                        onClose={handleCloseModal}
-                        onSelectTemplate={handleSelectTemplate}
-                    />
+                <div className="d-flex align-items-center gap-3">
+                    {isEditingTitle ? (
+                        <input
+                            type="text"
+                            className="form-control form-control-lg"
+                            value={newTitle}
+                            onChange={(e) => setNewTitle(e.target.value)}
+                            onBlur={() => {
+                                setJsonData(prev => ({
+                                    ...prev,
+                                    test: { ...prev.test, title: newTitle }
+                                }));
+                                setIsEditingTitle(false);
+                            }}
+                            onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                    setJsonData(prev => ({
+                                        ...prev,
+                                        test: { ...prev.test, title: newTitle }
+                                    }));
+                                    setIsEditingTitle(false);
+                                }
+                            }}
+                            autoFocus
+                        />
+                    ) : (
+                        <h2 className="mb-0">
+                            {jsonData.test?.title || "Получение данных..."}
+                        </h2>
+                    )}
+                    {(userRole === 'TEACHER' || userRole === 'ADMIN') && (
+                        <button 
+                            className="btn btn-link p-0"
+                            onClick={() => {
+                                setNewTitle(jsonData.test?.title || '');
+                                setIsEditingTitle(true);
+                            }}
+                        >
+                            <FontAwesomeIcon icon={faPencilAlt} className="fs-5 text-muted" />
+                        </button>
                     )}
                 </div>
+                {(userRole === 'TEACHER' || userRole === 'ADMIN') && (
+                    <div>
+                        <button 
+                            className="btn btn-secondary me-2"
+                            onClick={handleOpenGradingModal}
+                        >
+                            <FontAwesomeIcon icon={faChartBar} className="me-2" />
+                            Изменить оценивание
+                        </button>
+                        <button className="btn btn-primary" onClick={handleAddQuestion}>
+                            Добавить вопрос
+                        </button>
+                        {isModalOpen && (
+                            <QuestionTemplateModal
+                                onClose={handleCloseModal}
+                                onSelectTemplate={handleSelectTemplate}
+                            />
+                        )}
+                    </div>
                 )}
             </div>
+
+            {/* Модальное окно критериев оценивания */}
+            {isGradingModalOpen && (
+                <div className="modal-overlay" onClick={handleCloseGradingModal}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <h3>Критерии оценивания</h3>
+                        <div className="mb-3">
+                            <p className="text-muted">Укажите минимальный процент для оценки (пример: 0 - 2, 50 - 3)</p>
+                            {localThresholds.map((threshold) => (
+                                <div key={threshold.id} className="input-group mb-2">
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        className="form-control"
+                                        placeholder="Процент"
+                                        value={threshold.percentage}
+                                        onChange={(e) => handleThresholdChange(threshold.id, 'percentage', e.target.value)}
+                                        readOnly={threshold.percentage === '0'}
+                                        onKeyPress={(e) => e.key === 'Enter' && handleSortThresholds()}
+                                        onBlur={handleSortThresholds}
+                                    />
+                                    <span className="input-group-text">-</span>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Оценка"
+                                        value={threshold.grade}
+                                        onChange={(e) => handleThresholdChange(threshold.id, 'grade', e.target.value)}
+                                        onKeyPress={(e) => e.key === 'Enter' && handleSortThresholds()}
+                                        onBlur={handleSortThresholds}
+                                    />
+                                    {threshold.percentage !== '0' && (
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline-danger"
+                                            onClick={() => handleRemoveThreshold(threshold.id)}
+                                        >
+                                            ×
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                            <button
+                                type="button"
+                                className="btn btn-outline-primary mb-3"
+                                onClick={handleAddThreshold}
+                            >
+                                Добавить критерий
+                            </button>
+                        </div>
+                        <div className="d-flex justify-content-end gap-2">
+                            <button 
+                                type="button" 
+                                className="btn btn-secondary"
+                                onClick={handleCloseGradingModal}
+                            >
+                                Отмена
+                            </button>
+                            <button 
+                                type="button" 
+                                className="btn btn-primary"
+                                onClick={handleSaveGrading}
+                            >
+                                Сохранить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <form onSubmit={handleSubmit}>
                 {jsonData.questions.map((question) => (
                     <div key={question.id} className="card mb-4 p-3 shadow-sm position-relative"
@@ -696,7 +903,7 @@ const Forms = () => {
                             <div>
                                 <div className="mb-3">
                                     <label>Тип вопроса</label>
-                                    <select // ⚠️ Обновлены значения option
+                                    <select
                                         className="form-select"
                                         value={editingData[question.id]?.questionType || 'MULTIPLE_CHOICE_SINGLE'}
                                         onChange={(e) => handleFieldChange(question.id, 'questionType', e.target.value)}
