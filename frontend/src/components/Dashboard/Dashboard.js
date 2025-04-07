@@ -25,6 +25,11 @@ const Dashboard = () => {
         });
         const result = await response.json();
         setProfileData(result);
+
+        if (result && result.roles && result.roles.length > 0) {
+          setUserRole(result.roles[0].role);
+        }
+
         localStorage.setItem("profile", JSON.stringify(result));
       } catch (error) {
         console.error("Error fetching profile data", error);
@@ -40,34 +45,50 @@ const Dashboard = () => {
     ]);
   }, []);
 
-  useEffect(() => {
-    if (profileData && profileData.roles && profileData.roles.length > 0) {
-      setUserRole(profileData.roles[0].role);
-    }
-  }, [profileData]);
+
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     const getAssignedTests = async () => {
       if (!profileData || !profileData.group || !profileData.group.name) return;
 
+      let URL_MAPPING = '';
+      switch (userRole){
+        case 'ADMIN':{
+          URL_MAPPING = `/test/findAll`
+          break;
+        }
+        case 'TEACHER':{
+          URL_MAPPING = `/test/findTestByCreator`
+          break;
+        }
+        case 'STUDENT':{
+          URL_MAPPING = `/testAssignment/findByGroupName/${profileData.group.name}`
+          break;
+        }
+      }
+
       try {
         const response = await fetch(
-          `http://localhost:8080/api/testAssignment/findByGroupName/${profileData.group.name}`,
+          `http://localhost:8080/api` + URL_MAPPING,
           {
             method: "GET",
             headers: { Authorization: `Bearer ${token}` },
           }
         );
         const tests = await response.json();
-        setTests(tests);
+        if(userRole !== 'STUDENT'){
+          setTests(tests.map(test => ({ test })))
+        }else{
+          setTests(tests);
+        }
       } catch (error) {
         console.error("Error fetching test assignments", error);
       }
     };
 
     getAssignedTests();
-  }, [profileData]);
+  }, [userRole]);
 
   const handleTestClick = (testId) => {
     navigate(`/forms/${testId}`);
@@ -175,6 +196,8 @@ const Dashboard = () => {
             </div>
           </div>
       )}
+
+
 
       {assignedTests ? (
           <div className="row">
