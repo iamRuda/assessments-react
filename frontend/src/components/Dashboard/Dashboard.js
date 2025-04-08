@@ -309,46 +309,46 @@ const Dashboard = () => {
             const mark = assignedTest.result?.mark || 'Оценка не выставлена';
 
             return (
-              <div key={assignedTest.id} className="col-md-4 mb-4">
+              <div key={assignedTest.test.id} className="col-md-4 mb-4">
                 <div className="card h-100 position-relative">
                 {userRole === "STUDENT" ? (
-                  <div className="card-body d-flex flex-column">
-                    {/* Заголовок и статус */}
-                    <div className="d-flex justify-content-between align-items-start">
-                      <h5 className="card-title">📚 {assignedTest.test.title}</h5>
-                      {isCompleted && (
-                        <span className="badge bg-success">
-                          <i className="bi bi-check2"></i> Выполнено
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Описание теста */}
-                    <p className="card-text flex-grow-1">
-                      {assignedTest.test.description || "Описание отсутствует"}
-                    </p>
-
-                    {/* Блок с результатами и кнопкой */}
-                    <div className="d-flex justify-content-between align-items-center mt-auto">
-                      {isCompleted ? (
-                        <div className="d-flex align-items-baseline gap-2">
-                          <span className="text-primary fw-semibold fs-3">{mark}</span>
-                          <span className="text-muted align-self-center">
-                            ({totalScore}/{maxScore} баллов)
-                          </span>
-                        </div>
-                      ) : (
-                        <div></div>
-                      )}
-                      <button
-                        className="btn btn-primary"
-                        onClick={() => handleTestClick(assignedTest.test.id)}
-                      >
-                        {isCompleted ? 'Результаты' : 'Начать тест'}
-                      </button>
-                    </div>
+                <div className="card-body d-flex flex-column">
+                  {/* Заголовок и статус */}
+                  <div className="d-flex justify-content-between align-items-start">
+                    <h5 className="card-title">📚 {assignedTest.test.title}</h5>
+                    {isCompleted && (
+                      <span className="badge bg-success">
+                        <i className="bi bi-check2"></i> Выполнено
+                      </span>
+                    )}
                   </div>
-                ) : (
+
+                  {/* Описание теста */}
+                  <p className="card-text flex-grow-1">
+                    {assignedTest.test.description || "Описание отсутствует"}
+                  </p>
+
+                  {/* Блок с результатами и кнопкой */}
+                  <div className="d-flex justify-content-between align-items-center mt-auto">
+                    {isCompleted ? (
+                      <div className="d-flex align-items-baseline gap-2">
+                        <span className="text-primary fw-semibold fs-3">{mark}</span>
+                        <span className="text-muted align-self-center">
+                          ({totalScore}/{maxScore} баллов)
+                        </span>
+                      </div>
+                    ) : (
+                      <div></div>
+                    )}
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => handleTestClick(assignedTest.test.id)}
+                    >
+                      {isCompleted ? 'Результаты' : 'Начать тест'}
+                    </button>
+                  </div>
+                </div>
+              ) : (
                     /* Вёрстка для преподавателя/админа */
                     <>
                       {isCompleted && (
