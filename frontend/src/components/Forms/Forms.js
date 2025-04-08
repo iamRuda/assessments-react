@@ -25,6 +25,7 @@ const Forms = () => {
     const [userRole, setUserRole] = useState(null);
     const [formData, setFormData] = useState({});
     const [jsonData, setJsonData] = useState({questions: []});
+    const [resultData, setResultData] = useState(null);
     const [isEditingTitle, setIsEditingTitle] = useState(false);
     const [newTitle, setNewTitle] = useState('');
     const [isGradingModalOpen, setIsGradingModalOpen] = useState(false);
@@ -45,7 +46,7 @@ const Forms = () => {
         };
       }, [jsonData.test?.color]);
 
-    useEffect(() => {
+      useEffect(() => {
         const checkTestCompletion = async () => {
             if (userRole === 'STUDENT' && profileData?.id) {
                 try {
@@ -54,17 +55,18 @@ const Forms = () => {
                         `http://localhost:8080/api/result/findByUserIdAndTestId/${profileData.id}/${id}`,
                         {headers: {Authorization: `Bearer ${token}`}}
                     );
-
+    
                     if (response.ok) {
                         const result = await response.json();
                         setIsTestCompleted(result.completed);
+                        // Исправлено здесь: берем данные из result.result
+                        setResultData(result.result); 
                     }
                 } catch (error) {
                     console.error("Error checking test completion", error);
                 }
             }
         };
-
         checkTestCompletion();
     }, [id, userRole, profileData]);
 
@@ -1389,88 +1391,144 @@ const Forms = () => {
                                 <p className="text-dark">{question.questionText}</p>
 
                                 {isTestCompleted && userRole === 'STUDENT' ? (
-                                    // Блок отображения завершенных ответов
                                     <div className="completed-answers">
-                                        {['MULTIPLE_CHOICE_SINGLE', 'MULTIPLE_CHOICE_MULTIPLE'].includes(question.questionType) && (
-                                            <div className="mb-3">
-                                                <strong>
-                                                    {question.questionType === 'MULTIPLE_CHOICE_SINGLE'
-                                                        ? "Выбранный ответ:"
-                                                        : "Выбранные ответы:"}
-                                                </strong>
-                                                {question.options
-                                                    .filter(opt => question.selectedAnswers.includes(opt.id))
-                                                    .map(opt => (
-                                                        <div key={opt.id} className="ms-2 text-success">
-                                                            ✔ {opt.text}
+                                        {resultData?.questionsWithScoreAndSelectedAnswers && 
+                                        Object.entries(resultData.questionsWithScoreAndSelectedAnswers).map(([questionId, questionResult]) => {
+                                            const currentQuestion = jsonData.questions.find(q => q.id === questionId);
+                                            
+                                            return currentQuestion ? (
+                                                <div key={questionId} className="card mb-4 p-3 shadow-sm">
+                                                    {/* Заголовок вопроса */}
+                                                    <h5>{currentQuestion.questionHeader}</h5>
+                                                    
+                                                    {/* Для вопросов с вариантами ответов */}
+                                                    {['MULTIPLE_CHOICE_SINGLE', 'MULTIPLE_CHOICE_MULTIPLE'].includes(currentQuestion.questionType) && (
+                                                        <div className="mb-3">
+                                                            <strong>
+                                                                {currentQuestion.questionType === 'MULTIPLE_CHOICE_SINGLE'
+                                                                    ? "Выбранный ответ:"
+                                                                    : "Выбранные ответы:"}
+                                                            </strong>
+                                                            {currentQuestion.options
+                                                                .filter(opt => 
+                                                                    questionResult.selectedAnswers.includes(opt.id) ||
+                                                                    questionResult.selectedAnswers.includes(opt.id.toString())
+                                                                )
+                                                                .map(opt => (
+                                                                    <div key={opt.id} className="ms-2 text-success">
+                                                                        ✔ {opt.text} 
+                                                                        <span className="text-muted ms-2">
+                                                                            (Баллы: {questionResult.score}/{currentQuestion.maxScore})
+                                                                        </span>
+                                                                    </div>
+                                                                ))}
                                                         </div>
-                                                    ))}
-                                            </div>
-                                        )}
+                                                    )}
 
-                                        {question.questionType === 'OPEN_ENDED_SINGLE' && (
-                                            <div className="mb-3">
-                                                <strong>Ваш ответ:</strong>
-                                                <div className="ms-2 bg-light p-2 rounded">
-                                                    {question.selectedAnswers[0] || 'Нет ответа'}
+                                                    {/* Open Ended */}
+                                                    {currentQuestion.questionType.startsWith('OPEN_ENDED') && (
+                                                        <div className="mb-3">
+                                                            <strong>Ваш ответ:</strong>
+                                                            <div className="ms-2 bg-light p-2 rounded">
+                                                                {questionResult.selectedAnswers[0] || 'Нет ответа'}
+                                                                <div className="text-muted mt-2">
+                                                                    Баллы: {questionResult.score}/{currentQuestion.maxScore}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Image Selection */}
+                                                    {currentQuestion.questionType.startsWith('IMAGE_SELECTION') && (
+                                                        <div className="row">
+                                                            {currentQuestion.options
+                                                                .filter(opt => questionResult.selectedAnswers.includes(opt.id))
+                                                                .map(opt => (
+                                                                    <div key={opt.id} className="col-4 text-center mb-3 position-relative">
+                                                                        <img
+                                                                            src={opt.url}
+                                                                            alt={opt.text}
+                                                                            className="img-thumbnail"
+                                                                            style={{
+                                                                                border: '2px solid #28a745',
+                                                                                opacity: 0.9
+                                                                            }}
+                                                                        />
+                                                                        <div className="position-absolute top-0 end-0 m-1 bg-success text-white rounded-circle p-1">
+                                                                            ✓
+                                                                        </div>
+                                                                        <div className="text-muted mt-1">
+                                                                            Баллы: {questionResult.score}/{currentQuestion.maxScore}
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                        </div>
+                                                    )}
+
+                                                    {/* Button Select */}
+                                                    {currentQuestion.questionType.includes('BUTTON_SELECT') && (
+                                                        <div className="slider-container">
+                                                            <div className="slider-track">
+                                                                {currentQuestion.options.map((option) => (
+                                                                    <div key={option.id} className="slide">
+                                                                        <div
+                                                                            className="d-block"
+                                                                            style={{
+                                                                                backgroundColor: questionResult.selectedAnswers.includes(option.id)
+                                                                                    ? '#28a745'
+                                                                                    : '#6c757d',
+                                                                                color: 'white',
+                                                                                opacity: 0.7,
+                                                                                cursor: 'default'
+                                                                            }}
+                                                                        >
+                                                                            {option.text}
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                            <div className="text-muted mt-2">
+                                                                Баллы: {questionResult.score}/{currentQuestion.maxScore}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {currentQuestion.questionPostscript && (
+                                                        <p className="text-muted mt-2">{currentQuestion.questionPostscript}</p>
+                                                    )}
                                                 </div>
-                                            </div>
-                                        )}
+                                            ) : null;
+                                        })}
 
-                                        {question.questionType === 'OPEN_ENDED_MULTI' && (
-                                            <div className="mb-3">
-                                                <strong>Ваш ответ:</strong>
-                                                <pre className="ms-2 bg-light p-2 rounded">
-                                    {question.selectedAnswers[0] || 'Нет ответа'}
-                                </pre>
-                                            </div>
-                                        )}
-
-                                        {question.questionType.startsWith('IMAGE_SELECTION') && (
-                                            <div className="row">
-                                                {question.options
-                                                    .filter(opt => question.selectedAnswers.includes(opt.id))
-                                                    .map(opt => (
-                                                        <div key={opt.id}
-                                                                className="col-4 text-center mb-3 position-relative">
-                                                            <img
-                                                                src={opt.url}
-                                                                alt={opt.text}
-                                                                className="img-thumbnail"
-                                                                style={{
-                                                                    border: '2px solid #28a745',
-                                                                    opacity: 0.9
-                                                                }}
-                                                            />
-                                                            <div
-                                                                className="position-absolute top-0 end-0 m-1 bg-success text-white rounded-circle p-1">
-                                                                ✓
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                            </div>
-                                        )}
-
-                                        {question.questionType.includes('BUTTON_SELECT') && (
-                                            <div className="slider-container">
-                                                <div className="slider-track">
-                                                    {question.options.map((option) => (
-                                                        <div key={option.id} className="slide">
-                                                            <div
-                                                                className="d-block"
-                                                                style={{
-                                                                    backgroundColor: question.selectedAnswers.includes(option.id)
-                                                                        ? '#28a745'
-                                                                        : '#6c757d',
-                                                                    color: 'white',
-                                                                    opacity: 0.7,
-                                                                    cursor: 'default'
-                                                                }}
-                                                            >
-                                                                {option.text}
-                                                            </div>
-                                                        </div>
-                                                    ))}
+                                        {/* Итоговая информация */}
+                                        {resultData && (
+                                            <div className="card mt-4 p-4 bg-light shadow-sm">
+                                                <h4 className="text-center mb-3">Итоги тестирования</h4>
+                                                <div className="row">
+                                                    <div className="col-md-6">
+                                                        <p className="h5">
+                                                            Общий балл: 
+                                                            <span className="ms-2 text-primary">
+                                                                {resultData.totalScore}
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-md-6">
+                                                        <p className="h5">
+                                                            Оценка: 
+                                                            <span className="ms-2 text-success">
+                                                                {resultData.mark}
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="text-center mt-3">
+                                                    <button 
+                                                        className="btn btn-primary"
+                                                        onClick={handleCloseTest}
+                                                    >
+                                                        Закрыть результаты
+                                                    </button>
                                                 </div>
                                             </div>
                                         )}
