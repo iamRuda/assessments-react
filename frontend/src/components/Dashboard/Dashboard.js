@@ -50,32 +50,63 @@ const Dashboard = () => {
 
     try {
       const token = localStorage.getItem("authToken");
+
+      // 1. Получаем ID группы по имени
+      const groupResponse = await fetch(
+          `http://localhost:8080/api/group/findByName/${encodeURIComponent(selectedGroup)}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: "application/json",
+            },
+          }
+      );
+
+      if (!groupResponse.ok) {
+        throw new Error("Группа не найдена или ошибка сервера");
+      }
+
+      const groupData = await groupResponse.json();
+
+      // 2. Формируем даты
+      const now = new Date();
+      const expires = new Date();
+      expires.setDate(now.getDate() + 7);
+
+      // 3. Формируем тело запроса
+      const requestBody = {
+        assigned: now.toISOString(),
+        begins: now.toISOString(),
+        expires: expires.toISOString(),
+        testId: currentTestId,
+        groupId: groupData.id // Используем полученный ID группы
+      };
+
+      // 4. Отправляем запрос на назначение
       const response = await fetch("http://localhost:8080/api/testAssignment/assign", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          testId: currentTestId,
-          groupName: selectedGroup,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
-      if (response.ok) {
-        alert("Тест успешно назначен!");
-        setShowAssignModal(false);
-      } else {
-        throw new Error("Ошибка назначения теста");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Ошибка назначения теста");
       }
+
+      alert("Тест успешно назначен!");
+      setShowAssignModal(false);
+      setSelectedGroup('');
+
     } catch (error) {
       console.error("Assignment error:", error);
-      alert(error.message);
+      alert(`Ошибка: ${error.message}`);
     }
-  };
-
-
-  useEffect(() => {
+  };  useEffect(() => {
     const token = localStorage.getItem("authToken");
 
     const initProfileData = async () => {
