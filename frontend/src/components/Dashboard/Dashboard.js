@@ -300,120 +300,157 @@ const Dashboard = () => {
 
 
 
-  {assignedTests ? (
-    <div className="row">
-      {assignedTests.length > 0 && assignedTests.map((assignedTest) => {
-        const isCompleted = assignedTest.result?.completed;
-        const totalScore = assignedTest.result?.totalScore || 0;
-        const maxScore = assignedTest.test?.maxScore || 0;
-        const mark = assignedTest.result?.mark || 'Оценка не выставлена';
+      {assignedTests ? (
+        <div className="row">
+          {assignedTests.length > 0 && assignedTests.map((assignedTest) => {
+            const isCompleted = assignedTest.result?.completed;
+            const totalScore = assignedTest.result?.totalScore || 0;
+            const maxScore = assignedTest.test?.maxScore || 0;
+            const mark = assignedTest.result?.mark || 'Оценка не выставлена';
 
-        return (
-          <div key={assignedTest.id} className="col-md-4 mb-4">
-            <div className="card h-100 position-relative">
-              {isCompleted && (
-                <div className="position-absolute top-0 end-0 m-2">
-                  <span className="badge bg-success">
-                    <i className="bi bi-check2"></i> Выполнено
-                  </span>
-                </div>
-              )}
+            return (
+              <div key={assignedTest.id} className="col-md-4 mb-4">
+                <div className="card h-100 position-relative">
+                {userRole === "STUDENT" ? (
+                  <div className="card-body d-flex flex-column">
+                    {/* Заголовок и статус */}
+                    <div className="d-flex justify-content-between align-items-start">
+                      <h5 className="card-title">📚 {assignedTest.test.title}</h5>
+                      {isCompleted && (
+                        <span className="badge bg-success">
+                          <i className="bi bi-check2"></i> Выполнено
+                        </span>
+                      )}
+                    </div>
 
-              <div className="card-body d-flex flex-column">
-                <h5 className="card-title">📚 {assignedTest.test.title}</h5>
+                    {/* Описание теста */}
+                    <p className="card-text flex-grow-1">
+                      {assignedTest.test.description || "Описание отсутствует"}
+                    </p>
 
-                {isCompleted && (
-                  <div className="mb-2">
-                    <span className="text-success fw-bold">
-                      {totalScore}/{maxScore} баллов
-                    </span>
-                    <div className="text-muted small">Оценка: {mark}</div>
-                  </div>
-                )}
-
-                <p className="card-text flex-grow-1">
-                  {assignedTest.test.description || "Описание отсутствует"}
-                </p>
-
-                <div className="mt-auto pt-3">
-                  <div className="d-flex justify-content-between align-items-center">
-                    {(userRole === "TEACHER" || userRole === "ADMIN") && (
-                      <div className="position-absolute start-0 bottom-0 ms-3 mb-3">
-                        <button
-                          className="btn btn-success"
-                          onClick={() => navigate(`/analytics/${assignedTest.test.id}`)}
-                        >
-                          <FontAwesomeIcon icon={faChartLine} className="me-2" />
-                          Аналитика
-                        </button>
-                      </div>
-                    )}
-
-                    <div className="ms-auto">
-                      <div className="d-flex flex-column gap-2">
-                        {(userRole === "TEACHER" || userRole === "ADMIN") && (
-                          <button
-                            className="btn btn-secondary"
-                            onClick={() => {
-                              setCurrentTestId(assignedTest.test.id);
-                              setShowAssignModal(true);
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faShare} className="me-2" />
-                            Назначить тест
-                          </button>
-                        )}
-                        <button
-                          className="btn btn-primary"
-                          onClick={() => handleTestClick(assignedTest.test.id)}
-                        >
-                          {(userRole === "TEACHER" || userRole === "ADMIN") 
-                            ? "Редактировать тест" 
-                            : (isCompleted ? 'Результаты' : 'Начать тест')}
-                        </button>
-                      </div>
+                    {/* Блок с результатами и кнопкой */}
+                    <div className="d-flex justify-content-between align-items-center mt-auto">
+                      {isCompleted ? (
+                        <div className="d-flex align-items-baseline gap-2">
+                          <span className="text-primary fw-semibold fs-3">{mark}</span>
+                          <span className="text-muted align-self-center">
+                            ({totalScore}/{maxScore} баллов)
+                          </span>
+                        </div>
+                      ) : (
+                        <div></div>
+                      )}
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => handleTestClick(assignedTest.test.id)}
+                      >
+                        {isCompleted ? 'Результаты' : 'Начать тест'}
+                      </button>
                     </div>
                   </div>
+                ) : (
+                    /* Вёрстка для преподавателя/админа */
+                    <>
+                      {isCompleted && (
+                        <div className="position-absolute top-0 end-0 m-2">
+                          <span className="badge bg-success">
+                            <i className="bi bi-check2"></i> Выполнено
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="card-body d-flex flex-column">
+                        <h5 className="card-title">📚 {assignedTest.test.title}</h5>
+
+                        {isCompleted && (
+                          <div className="mb-2">
+                            <span className="text-success fw-bold">
+                              {totalScore}/{maxScore} баллов
+                            </span>
+                            <div className="text-muted small">Оценка: {mark}</div>
+                          </div>
+                        )}
+
+                        <p className="card-text flex-grow-1">
+                          {assignedTest.test.description || "Описание отсутствует"}
+                        </p>
+
+                        <div className="mt-auto pt-3">
+                          <div className="d-flex justify-content-between align-items-center">
+                            <div className="position-absolute start-0 bottom-0 ms-3 mb-3">
+                              <button
+                                className="btn btn-success"
+                                onClick={() => navigate(`/analytics/${assignedTest.test.id}`)}
+                              >
+                                <FontAwesomeIcon icon={faChartLine} className="me-2" />
+                                Аналитика
+                              </button>
+                            </div>
+
+                            <div className="ms-auto">
+                              <div className="d-flex flex-column gap-2">
+                                <button
+                                  className="btn btn-secondary"
+                                  onClick={() => {
+                                    setCurrentTestId(assignedTest.test.id);
+                                    setShowAssignModal(true);
+                                  }}
+                                >
+                                  <FontAwesomeIcon icon={faShare} className="me-2" />
+                                  Назначить тест
+                                </button>
+                                <button
+                                  className="btn btn-primary"
+                                  onClick={() => handleTestClick(assignedTest.test.id)}
+                                >
+                                  Редактировать тест
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Кнопки создания (остаются без изменений) */}
+          {(profileData?.roles?.[0]?.role === 'ADMIN' || profileData?.roles?.[0]?.role === 'TEACHER') && (
+            <div className="col-md-4 mb-4 d-flex align-items-stretch">
+              <div
+                className="card h-100 w-100 d-flex align-items-center justify-content-center"
+                style={{ cursor: 'pointer', minHeight: '200px' }}
+                onClick={() => setShowCreateTestModal(true)}
+              >
+                <div className="card-body text-center d-flex flex-column justify-content-center">
+                  <h5 className="card-title">➕ Создать новое тестирование</h5>
+                  <p className="card-text text-muted">Нажмите, чтобы создать новый тест.</p>
                 </div>
               </div>
             </div>
-          </div>
-        );
-      })}
-
-      {(profileData?.roles?.[0]?.role === 'ADMIN' || profileData?.roles?.[0]?.role === 'TEACHER') && (
-        <div className="col-md-4 mb-4 d-flex align-items-stretch">
-          <div
-            className="card h-100 w-100 d-flex align-items-center justify-content-center"
-            style={{ cursor: 'pointer', minHeight: '200px' }}
-            onClick={() => setShowCreateTestModal(true)}
-          >
-            <div className="card-body text-center d-flex flex-column justify-content-center">
-              <h5 className="card-title">➕ Создать новое тестирование</h5>
-              <p className="card-text text-muted">Нажмите, чтобы создать новый тест.</p>
+          )}
+          
+          {(profileData?.roles?.[0]?.role === 'ADMIN') && (
+            <div className="col-md-4 mb-4 d-flex align-items-stretch">
+              <div
+                className="card h-100 w-100 d-flex align-items-center justify-content-center"
+                style={{ cursor: 'pointer', minHeight: '200px' }}
+                onClick={() => navigate('/create-user')}
+              >
+                <div className="card-body text-center d-flex flex-column justify-content-center">
+                  <h5 className="card-title">➕ Создать нового пользователя</h5>
+                  <p className="card-text text-muted">Нажмите, чтобы создать нового ученика или преподавателя.</p>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
+      ) : (
+        <p>Loading...</p>
       )}
-      
-      {(profileData?.roles?.[0]?.role === 'ADMIN') && (
-        <div className="col-md-4 mb-4 d-flex align-items-stretch">
-          <div
-            className="card h-100 w-100 d-flex align-items-center justify-content-center"
-            style={{ cursor: 'pointer', minHeight: '200px' }}
-            onClick={() => navigate('/create-user')}
-          >
-            <div className="card-body text-center d-flex flex-column justify-content-center">
-              <h5 className="card-title">➕ Создать нового пользователя</h5>
-              <p className="card-text text-muted">Нажмите, чтобы создать нового ученика или преподавателя.</p>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  ) : (
-    <p>Loading...</p>
-  )}
       
       {showCreateTestModal && (
           <div className="modal-overlay" onClick={() => setShowCreateTestModal(false)}>
