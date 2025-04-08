@@ -2,16 +2,19 @@ import React, {useState, useEffect} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './forms.css';
 import './slider.css';
+import './colorpicker.css';
 import {Link, useParams, useNavigate} from 'react-router-dom';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faArrowUp,
     faArrowDown,
     faPencilAlt,
-    faChartBar
+    faChartBar,
+    faPalette,
+    faTimes
 } from '@fortawesome/free-solid-svg-icons';
 
 const Forms = () => {
-    
+
     const navigate = useNavigate();
 
     const {id} = useParams();
@@ -27,6 +30,20 @@ const Forms = () => {
     const [isGradingModalOpen, setIsGradingModalOpen] = useState(false);
     const [localThresholds, setLocalThresholds] = useState([]);
     const [isStrictValidation, setIsStrictValidation] = useState(true);  // Флаг строгой проверки
+    const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
+    const [localDescription, setLocalDescription] = useState('');
+    const [localColor, setLocalColor] = useState('');
+    const [localTheme, setLocalTheme] = useState('');
+
+    useEffect(() => {
+        const originalBackground = document.body.style.backgroundColor;
+        document.body.style.backgroundColor = jsonData.test?.color || '#f8f9fa';
+        document.body.style.transition = 'background-color 0.3s ease';
+      
+        return () => {
+          document.body.style.backgroundColor = originalBackground;
+        };
+      }, [jsonData.test?.color]);
 
     useEffect(() => {
         const checkTestCompletion = async () => {
@@ -793,6 +810,19 @@ const Forms = () => {
         });
     };
 
+    const handleSaveTheme = () => {
+        setJsonData(prev => ({
+          ...prev,
+          test: {
+            ...prev.test,
+            description: localDescription,
+            color: localColor || null,
+            theme: localTheme
+          }
+        }));
+        setIsThemeModalOpen(false);
+      };
+
     const handleOpenGradingModal = () => {
         const thresholds = jsonData.test?.gradingThresholds
             ? Object.entries(jsonData.test.gradingThresholds)
@@ -902,7 +932,15 @@ const Forms = () => {
     }
 
     return (
-        <div className="container my-4">
+        <>
+        <div className="container my-4" style={{
+            position: 'relative',
+            zIndex: 1,
+            backgroundColor: 'white',
+            boxShadow: '0 0 30px rgba(0,0,0,0.05)',
+            borderRadius: '8px',
+            padding: '2rem'
+          }}>
             <div className="mb-3">
                 <Link to="/dashboard" className="">{"<<"} Вернуться на главную</Link>
             </div>
@@ -950,26 +988,174 @@ const Forms = () => {
                     )}
                 </div>
                 {(userRole === 'TEACHER' || userRole === 'ADMIN') && (
-                    <div>
-                        <button
-                            className="btn btn-secondary me-2"
-                            onClick={handleOpenGradingModal}
-                        >
-                            <FontAwesomeIcon icon={faChartBar} className="me-2"/>
-                            Изменить оценивание
-                        </button>
-                        <button className="btn btn-primary" onClick={handleAddQuestion}>
-                            Добавить вопрос
-                        </button>
-                        {isModalOpen && (
-                            <QuestionTemplateModal
-                                onClose={handleCloseModal}
-                                onSelectTemplate={handleSelectTemplate}
-                            />
-                        )}
-                    </div>
+                <div>
+                    <button
+                    className="btn btn-secondary me-2"
+                    onClick={() => {
+                        setLocalDescription(jsonData.test?.description || '');
+                        setLocalColor(jsonData.test?.color || '');
+                        setLocalTheme(jsonData.test?.theme || '');
+                        setIsThemeModalOpen(true);
+                    }}
+                    >
+                    <FontAwesomeIcon icon={faPalette} className="me-2"/>
+                    Настроить тему
+                    </button>
+                    <button
+                    className="btn btn-secondary me-2"
+                    onClick={handleOpenGradingModal}
+                    >
+                    <FontAwesomeIcon icon={faChartBar} className="me-2"/>
+                    Изменить оценивание
+                    </button>
+                    <button className="btn btn-primary" onClick={handleAddQuestion}>
+                    Добавить вопрос
+                    </button>
+                    {isModalOpen && (
+                    <QuestionTemplateModal
+                        onClose={handleCloseModal}
+                        onSelectTemplate={handleSelectTemplate}
+                    />
+                    )}
+                </div>
                 )}
             </div>
+            
+            {isThemeModalOpen && (
+                <div className="modal-overlay" onClick={() => setIsThemeModalOpen(false)}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{maxWidth: '600px'}}>
+                    <h3 className="mb-4">Настройки оформления</h3>
+                    
+                    <div className="mb-4">
+                        <label className="form-label fw-medium mb-2">Описание теста</label>
+                        <textarea
+                        className="form-control"
+                        rows="2"
+                        value={localDescription}
+                        onChange={(e) => setLocalDescription(e.target.value)}
+                        placeholder="Добавьте краткое описание теста..."
+                        />
+                    </div>
+
+                    <div className="mb-4">
+                        <label className="form-label fw-medium mb-2">Выбор цвета темы</label>
+                        <div className="color-picker-container bg-light p-3 rounded-3">
+                        <div className="d-flex align-items-center gap-3 mb-3">
+                            {/* Превью цвета */}
+                            <div className="position-relative">
+                            <div 
+                                className="color-preview rounded-2"
+                                style={{ 
+                                width: '80px',
+                                height: '80px',
+                                backgroundColor: localColor || 'transparent',
+                                backgroundImage: !localColor 
+                                    ? `repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%)`
+                                    : undefined,
+                                backgroundSize: '10px 10px',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                                }}
+                            >
+                                {localColor && (
+                                <button
+                                    className="btn btn-link p-0 text-danger position-absolute"
+                                    style={{
+                                    top: '-10px',
+                                    right: '-10px',
+                                    fontSize: '1.5rem'
+                                    }}
+                                    onClick={() => setLocalColor('')}
+                                    title="Сбросить цвет"
+                                >
+                                    <FontAwesomeIcon icon={faTimes} />
+                                </button>
+                                )}
+                            </div>
+                            </div>
+
+                            {/* Палитра и готовые цвета */}
+                            <div className="flex-grow-1">
+                            <div className="">
+                                <label className="form-label small mb-2">Свой выбор цвета:</label>
+                                <input
+                                type="color"
+                                className="form-control form-control-color w-100"
+                                value={localColor || '#ffffff'}
+                                onChange={(e) => setLocalColor(e.target.value)}
+                                id="colorInput"
+                                style={{
+                                    height: '40px',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer'
+                                }}
+                                />
+                            </div>
+                            
+                            <div className="">
+                                <label className="form-label small mb-2">Готовые варианты:</label>
+                                <div className="d-flex gap-2 flex-wrap">
+                                {['#6c757d', '#0d6efd', '#198754', '#dc3545', '#ffc107', '#686ec2', '#20c997', '#fd7e14'].map((color) => (
+                                    <button
+                                    key={color}
+                                    className="color-preset rounded-circle border-0"
+                                    style={{
+                                        width: '40px',
+                                        height: '40px',
+                                        backgroundColor: color,
+                                        transition: 'transform 0.2s'
+                                    }}
+                                    onClick={() => setLocalColor(color)}
+                                    title={`Цвет ${color}`}
+                                    />
+                                ))}
+                                <button
+                                    className="color-preset rounded-circle border-0"
+                                    style={{
+                                    width: '40px',
+                                    height: '40px',
+                                    background: 'repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%)',
+                                    backgroundSize: '10px 10px'
+                                    }}
+                                    onClick={() => setLocalColor('')}
+                                    title="Прозрачный"
+                                />
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    <div className="mb-4">
+                        <label className="form-label fw-medium mb-2">Тема оформления</label>
+                        <input
+                        type="text"
+                        className="form-control"
+                        value={localTheme}
+                        onChange={(e) => setLocalTheme(e.target.value)}
+                        placeholder="Например: Программирование, Математика..."
+                        />
+                    </div>
+
+                    <div className="d-flex justify-content-end gap-2">
+                        <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={() => setIsThemeModalOpen(false)}
+                        >
+                        Отмена
+                        </button>
+                        <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={handleSaveTheme}
+                        >
+                        Сохранить изменения
+                        </button>
+                    </div>
+                    </div>
+                </div>
+                )}
 
             {/* Модальное окно критериев оценивания */}
             {isGradingModalOpen && (
@@ -1514,6 +1700,7 @@ const Forms = () => {
                 </button>
             )}
         </div>
+    </>
     );
 };
 
