@@ -6,8 +6,6 @@ import Registration from "./components/Registration/Registration";
 import Dashboard from "./components/Dashboard/Dashboard";
 import Forms from "./components/Forms/Forms";
 import Settings from "./components/Settings/Settings";
-import Upload from "./components/Upload/Upload";
-import FileViewer from "./components/Upload/FileViewer";
 import PrivateRoute from "./routes/PrivateRoute";
 import "./App.css";
 import "./dark.css";
@@ -64,8 +62,6 @@ const App = () => {
           <Route path="/dashboard" element={<PrivateRoute element={Dashboard} />} />
           <Route path="/forms/:id" element={<PrivateRoute element={Forms} />} />
           <Route path="/settings" element={<PrivateRoute element={Settings} />} />
-          <Route path="/upload" element={<PrivateRoute element={Upload} />} />
-          {/* <Route path="/public/file/:filename" element={<FileViewer />} /> */}
         </Routes>
       </Router>
     </div>
