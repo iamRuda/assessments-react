@@ -58,7 +58,7 @@ const Login = () => {
         )}
 
         <form onSubmit={handleLogin}>
-          <h1 className="h3 mb-3 fw-normal text-center">Please sign in</h1>
+          <h1 className="h3 mb-3 fw-normal text-center">Войти в систему</h1>
 
           <div className="form-floating mb-3">
             <input
@@ -81,11 +81,11 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <label htmlFor="floatingPassword">Password</label>
+            <label htmlFor="floatingPassword">Пароль</label>
           </div>
 
           <button className="w-100 btn btn-lg btn-primary" type="submit">
-            Sign in
+            Войти
           </button>
         </form>
       </div>
