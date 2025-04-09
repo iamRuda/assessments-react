@@ -48,7 +48,7 @@ const Analytics = () => {
     const fetchGroupData = async (groupName) => {
         try {
             const response = await fetch(
-                `http://localhost:8080/api/testAssignment/findByGroupName/${encodeURIComponent(groupName)}`,
+                `http://localhost:8080/api/analytic/findByGroupName/${encodeURIComponent(groupName)}`,
                 {
                     method: "GET",
                     headers: {

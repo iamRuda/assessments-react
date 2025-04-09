@@ -60,7 +60,7 @@ const Forms = () => {
                         const result = await response.json();
                         setIsTestCompleted(result.completed);
                         // Исправлено здесь: берем данные из result.result
-                        setResultData(result.result); 
+                        setResultData(result);
                     }
                 } catch (error) {
                     console.error("Error checking test completion", error);
