@@ -13,13 +13,13 @@ const Login = () => {
     e.preventDefault();
   
     try {
-      const response = await fetch("http://localhost:8080/api/auth/signin", {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/signin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-        credentials: "include", // To include cookies in the request
+        credentials: "include",
       });
   
       console.log(response);  // Проверка ответа
