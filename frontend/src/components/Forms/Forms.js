@@ -96,7 +96,18 @@ const Forms = () => {
             
             // Сначала загружаем основные данные теста
             setJsonData(testData);
-      
+            
+            if (userRole === 'TEACHER' || userRole === 'ADMIN') {
+                setJsonData(prev => ({
+                  ...testData,
+                  questions: testData.questions.map(q => ({
+                    ...q,
+                    // Автозаполнение selectedAnswers из correctAnswers
+                    selectedAnswers: q.correctAnswers 
+                  }))
+                }));
+              }
+
             // Затем проверяем результаты
             const checkResults = async () => {
               if (userRole === 'STUDENT' && profileData?.id) {
@@ -235,28 +246,6 @@ const Forms = () => {
             )
         }));
     };
-
-    // Проверка статуса теста
-    useEffect(() => {
-        const checkTestStatus = async () => {
-            if (userRole === 'STUDENT') {
-                try {
-                    const response = await fetch(
-                        `http://localhost:8080/api/result/findByUserIdAndTestId/${profileData.id}/${id}`,
-                        {headers: {Authorization: `Bearer ${getToken()}`}}
-                    );
-                    if (response.ok) {
-                        const result = await response.json();
-                        setIsTestCompleted(result.completed);
-                    }
-                } catch (error) {
-                    console.error("Error checking test status:", error);
-                }
-            }
-        };
-        checkTestStatus();
-    }, [id, userRole, profileData]);
-
 
     const handleMultipleImageSelect = (e, questionId) => {
         const selectedValue = e.target.value;
