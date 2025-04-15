@@ -221,14 +221,54 @@ const Dashboard = () => {
 
   return (
     <div className="container">
-      <header className="d-flex align-items-center justify-content-between my-4">
+      <>
+      {/* Мобильная версия (до 768px) */}
+      <header className="d-md-none d-flex align-items-center justify-content-between my-3 gap-2">
+        <div className="d-flex align-items-center flex-grow-1">
+          <img
+            src={getAvatarUrl()}
+            alt="Avatar"
+            className="rounded-circle me-3"
+            style={{
+              width: '60px',
+              height: '60px',
+              objectFit: 'cover'
+            }}
+          />
+          <div className="d-flex flex-column">
+            <h2 className="mb-0 fs-5 text-break">
+              {profileData ? `${profileData.lastName} ${profileData.firstName}` : "Unknown User"}
+            </h2>
+            <div className="d-flex flex-wrap align-items-center gap-1">
+              <span className="text-muted fs-7">
+                {profileData?.roles?.[0]?.role || "Not assigned"}
+              </span>
+              <span className="text-muted">/</span>
+              <span className="text-muted fs-7 text-break">
+                {profileData?.email || "No email"}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="d-flex align-items-center ms-auto">
+          <button className="btn btn-link p-1" title="Notifications" onClick={() => setShowNotifications(!showNotifications)}>
+            <FontAwesomeIcon icon={faBell} fixedWidth size="lg" />
+          </button>
+          <button className="btn btn-link p-1" title="Settings" onClick={handleSettingsClick}>
+            <FontAwesomeIcon icon={faCog} fixedWidth size="lg" />
+          </button>
+        </div>
+      </header>
+
+      {/* Десктопная версия (от 768px) */}
+      <header className="d-none d-md-flex align-items-center justify-content-between my-4">
         <div className="d-flex align-items-center">
           <img
-              src={getAvatarUrl()}
-              alt="Avatar"
-              className="rounded-circle me-3"
-              width="100"
-              height="100"
+            src={getAvatarUrl()}
+            alt="Avatar"
+            className="rounded-circle me-3"
+            width="100"
+            height="100"
           />
           <div>
             <h2 className="mb-1">
@@ -241,24 +281,16 @@ const Dashboard = () => {
             </p>
           </div>
         </div>
-
         <div className="d-flex align-items-center">
-          <button
-              className="btn btn-link"
-              title="Notifications"
-              onClick={() => setShowNotifications(!showNotifications)}
-          >
+          <button className="btn btn-link" title="Notifications" onClick={() => setShowNotifications(!showNotifications)}>
             <FontAwesomeIcon icon={faBell} size="lg"/>
           </button>
-          <button
-              className="btn btn-link"
-              title="Settings"
-              onClick={handleSettingsClick}
-          >
+          <button className="btn btn-link" title="Settings" onClick={handleSettingsClick}>
             <FontAwesomeIcon icon={faCog} size="lg"/>
           </button>
         </div>
       </header>
+    </>
 
       {showAssignModal && (
           <div className="modal-overlay" onClick={() => setShowAssignModal(false)}>
