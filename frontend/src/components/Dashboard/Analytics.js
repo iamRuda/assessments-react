@@ -8,8 +8,10 @@ const Analytics = () => {
     const navigate = useNavigate();
     const [groups, setGroups] = useState([]);
     const [selectedGroup, setSelectedGroup] = useState("");
+    const [selectedGroupId, setSelectedGroupId] = useState("");
     const [analyticsData, setAnalyticsData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [sortConfig, setSortConfig] = useState({ key: "firstName", direction: "asc" });
 
     const token = localStorage.getItem("authToken");
 
@@ -27,7 +29,7 @@ const Analytics = () => {
                 if (!response.ok) throw new Error("Failed to fetch groups");
                 const groupsData = await response.json();
                 const filteredGroups = groupsData.filter(g => g.name !== "Teachers");
-                setGroups([{id: "all", name: "Все"}, ...filteredGroups]);
+                setGroups([{ id: "all", name: "Все" }, ...filteredGroups]);
             } catch (error) {
                 console.error("Error fetching groups:", error);
             }
@@ -44,11 +46,18 @@ const Analytics = () => {
         );
     };
 
+    const handleGroupChange = (e) => {
+        const selectedGroupName = e.target.value;
+        const selectedGroup = groups.find(group => group.name === selectedGroupName);
+        setSelectedGroup(selectedGroupName);
+        setSelectedGroupId(selectedGroup?.id || ""); // Обновляем ID группы
+    };
+
     // Загрузка данных аналитики
-    const fetchGroupData = async (groupName) => {
+    const fetchGroupData = async (groupId, testId) => {
         try {
             const response = await fetch(
-                `http://localhost:8080/api/analytic/findByGroupName/${encodeURIComponent(groupName)}`,
+                `http://localhost:8080/api/analytic/findByGroupIdAndTestId/${groupId}/${testId}`,
                 {
                     method: "GET",
                     headers: {
@@ -62,7 +71,6 @@ const Analytics = () => {
             const data = await response.json();
 
             return data
-                .filter(item => item.test.id === testId)
                 .map(item => ({
                     user: item.user,
                     result: item.result,
@@ -83,15 +91,15 @@ const Analytics = () => {
             try {
                 let data = [];
 
-                if (selectedGroup === "all") {
+                if (selectedGroupId === "all") {
                     // Загрузка данных для всех групп
                     const validGroups = groups.filter(g => g.name !== "Все" && g.name !== "Teachers");
                     for (const group of validGroups) {
-                        const groupData = await fetchGroupData(group.name);
+                        const groupData = await fetchGroupData(group.id, testId); // Используем ID
                         data = [...data, ...groupData];
                     }
                 } else {
-                    data = await fetchGroupData(selectedGroup);
+                    data = await fetchGroupData(selectedGroupId, testId); // Используем ID
                 }
 
                 // Фильтрация по ролям
@@ -106,6 +114,29 @@ const Analytics = () => {
         };
         loadData();
     }, [selectedGroup, testId, token]);
+
+    // Сортировка
+    const sortData = (key) => {
+        let direction = sortConfig.direction === "asc" ? "desc" : "asc";
+
+        const sorted = [...analyticsData].sort((a, b) => {
+            const valueA = a[key] ? a[key].toString().toLowerCase() : "";
+            const valueB = b[key] ? b[key].toString().toLowerCase() : "";
+
+            if (valueA < valueB) return direction === "asc" ? -1 : 1;
+            if (valueA > valueB) return direction === "asc" ? 1 : -1;
+            return 0;
+        });
+
+        setSortConfig({ key, direction });
+        setAnalyticsData(sorted);
+    };
+
+    // Получение стрелки сортировки
+    const getSortArrow = (key) => {
+        if (sortConfig.key !== key) return "⇅";
+        return sortConfig.direction === "asc" ? "▲" : "▼";
+    };
 
     return (
         <div className="container my-4">
@@ -123,7 +154,7 @@ const Analytics = () => {
                 <select
                     className="form-select"
                     value={selectedGroup}
-                    onChange={(e) => setSelectedGroup(e.target.value)}
+                    onChange={handleGroupChange}
                     disabled={isLoading}
                 >
                     <option value="">Выберите группу</option>
@@ -146,12 +177,66 @@ const Analytics = () => {
                     <table className="table table-striped table-hover">
                         <thead className="table-dark">
                         <tr>
-                            <th>Имя</th>
-                            <th>Фамилия</th>
-                            <th>Почта</th>
-                            <th>Группа</th>
-                            <th>Оценка</th>
-                            <th>Баллы</th>
+                            <th>
+                                Имя{" "}
+                                <span
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => sortData("user.firstName")}
+                                    title="Сортировать"
+                                >
+                                        {getSortArrow("user.firstName")}
+                                    </span>
+                            </th>
+                            <th>
+                                Фамилия{" "}
+                                <span
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => sortData("user.lastName")}
+                                    title="Сортировать"
+                                >
+                                        {getSortArrow("user.lastName")}
+                                    </span>
+                            </th>
+                            <th>
+                                Почта{" "}
+                                <span
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => sortData("user.email")}
+                                    title="Сортировать"
+                                >
+                                        {getSortArrow("user.email")}
+                                    </span>
+                            </th>
+                            <th>
+                                Группа{" "}
+                                <span
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => sortData("user.group.name")}
+                                    title="Сортировать"
+                                >
+                                        {getSortArrow("user.group.name")}
+                                    </span>
+                            </th>
+                            <th>
+                                Оценка{" "}
+                                <span
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => sortData("result.mark")}
+                                    title="Сортировать"
+                                >
+                                        {getSortArrow("result.mark")}
+                                    </span>
+                            </th>
+                            <th>
+                                Баллы{" "}
+                                <span
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => sortData("result.totalScore")}
+                                    title="Сортировать"
+                                >
+                                        {getSortArrow("result.totalScore")}
+                                    </span>
+                            </th>
                         </tr>
                         </thead>
                         <tbody>

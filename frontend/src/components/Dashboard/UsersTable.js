@@ -144,8 +144,8 @@ const UsersTable = () => {
 
     return (<div className="mt-4">
         <h3>Пользователи:</h3>
-        <table className="table table-striped">
-            <thead>
+        <table className="table table-striped table-hover">
+            <thead className="table-dark">
             <tr>
                 <th>
                     UID{" "}
