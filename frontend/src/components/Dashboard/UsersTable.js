@@ -143,157 +143,157 @@ const UsersTable = () => {
     }, [allUsers]);
 
     return (<div className="mt-4">
-            <h3>Пользователи:</h3>
-            <table className="table table-striped">
-                <thead>
-                <tr>
-                    <th>
-                        UID{" "}
-                        <span
-                            style={{cursor: "pointer"}}
-                            onClick={() => sortData("uid")}
-                            title="Сортировать"
-                        >
+        <h3>Пользователи:</h3>
+        <table className="table table-striped">
+            <thead>
+            <tr>
+                <th>
+                    UID{" "}
+                    <span
+                        style={{cursor: "pointer"}}
+                        onClick={() => sortData("uid")}
+                        title="Сортировать"
+                    >
                                 {getSortArrow("uid")}
                             </span>
-                    </th>
-                    <th>
-                        Имя{" "}
-                        <span
-                            style={{cursor: "pointer"}}
-                            onClick={() => sortData("firstName")}
-                            title="Сортировать"
-                        >
+                </th>
+                <th>
+                    Имя{" "}
+                    <span
+                        style={{cursor: "pointer"}}
+                        onClick={() => sortData("firstName")}
+                        title="Сортировать"
+                    >
                                 {getSortArrow("firstName")}
                             </span>
-                    </th>
-                    <th>
-                        Фамилия{" "}
-                        <span
-                            style={{cursor: "pointer"}}
-                            onClick={() => sortData("lastName")}
-                            title="Сортировать"
-                        >
+                </th>
+                <th>
+                    Фамилия{" "}
+                    <span
+                        style={{cursor: "pointer"}}
+                        onClick={() => sortData("lastName")}
+                        title="Сортировать"
+                    >
                                 {getSortArrow("lastName")}
                             </span>
-                    </th>
-                    <th>
-                        Электронная почта{" "}
-                        <span
-                            style={{cursor: "pointer"}}
-                            onClick={() => sortData("email")}
-                            title="Сортировать"
-                        >
+                </th>
+                <th>
+                    Электронная почта{" "}
+                    <span
+                        style={{cursor: "pointer"}}
+                        onClick={() => sortData("email")}
+                        title="Сортировать"
+                    >
                                 {getSortArrow("email")}
                             </span>
-                    </th>
-                    <th>
-                        <span
-                            style={{cursor: "pointer"}}
-                            onClick={() => setShowGroupDropdown(!showGroupDropdown)}
-                            title="Фильтровать"
+                </th>
+                <th>
+                    <span
+                        style={{cursor: "pointer"}}
+                        onClick={() => setShowGroupDropdown(!showGroupDropdown)}
+                        title="Фильтровать"
+                    >
+                        Группа
+                    </span>
+                    <span
+                        style={{cursor: "pointer", marginLeft: "5px"}}
+                        onClick={() => sortData("group")}  // Ваша функция сортировки
+                        title="Сортировать"
+                    >
+                        {getSortArrow("group")}
+                    </span>
+                    {showGroupDropdown && (<ul
+                        className="list-group position-absolute"
+                        style={{zIndex: 1000, width: "150px"}}
+                    >
+                        {groups.map((group) => (<li
+                            key={group.id}
+                            className="list-group-item list-group-item-action"
+                            onClick={() => filterByGroup(group.name)}
                         >
-                            Группа
-                        </span>
-                                            <span
-                                                style={{cursor: "pointer", marginLeft: "5px"}}
-                                                onClick={() => sortData("group")}  // Ваша функция сортировки
-                                                title="Сортировать"
-                                            >
-                            {getSortArrow("group")}
-                        </span>
-                                            {showGroupDropdown && (<ul
-                                className="list-group position-absolute"
-                                style={{zIndex: 1000, width: "150px"}}
-                            >
-                                {groups.map((group) => (<li
-                                        key={group.id}
-                                        className="list-group-item list-group-item-action"
-                                        onClick={() => filterByGroup(group.name)}
-                                    >
-                                        {group.name}
-                                    </li>))}
-                                <li
-                                    className="list-group-item list-group-item-action"
-                                    onClick={resetFilter}
-                                >
-                                    Сбросить фильтр
-                                </li>
-                            </ul>)}
-                    </th>
-                    <th>
-    <span
-        style={{ cursor: "pointer" }}
-        onClick={() => setShowRoleDropdown(!showRoleDropdown)}
-        title="Фильтровать"
-    >
-        Роль
-    </span>
-                        <span
-                            style={{ cursor: "pointer", marginLeft: "5px" }}
-                            onClick={() => sortData("role")}  // Ваша функция сортировки
-                            title="Сортировать"
+                            {group.name}
+                        </li>))}
+                        <li
+                            className="list-group-item list-group-item-action"
+                            onClick={resetFilter}
                         >
-        {getSortArrow("role")}
-    </span>
-                        {showRoleDropdown && (
-                            <ul
-                                className="list-group position-absolute"
-                                style={{ zIndex: 1000, width: "150px" }}
-                            >
-                                {roles.map((role) => (
-                                    <li
-                                        key={role}
-                                        className="list-group-item list-group-item-action"
-                                        onClick={() => filterByRole(role)}
-                                    >
-                                        {role}
-                                    </li>
-                                ))}
+                            Сбросить фильтр
+                        </li>
+                    </ul>)}
+                </th>
+                <th>
+                    <span
+                        style={{cursor: "pointer"}}
+                        onClick={() => setShowRoleDropdown(!showRoleDropdown)}
+                        title="Фильтровать"
+                    >
+                        Роль
+                    </span>
+                    <span
+                        style={{cursor: "pointer", marginLeft: "5px"}}
+                        onClick={() => sortData("role")}  // Ваша функция сортировки
+                        title="Сортировать"
+                    >
+                        {getSortArrow("role")}
+                    </span>
+                    {showRoleDropdown && (
+                        <ul
+                            className="list-group position-absolute"
+                            style={{zIndex: 1000, width: "150px"}}
+                        >
+                            {roles.map((role) => (
                                 <li
+                                    key={role}
                                     className="list-group-item list-group-item-action"
-                                    onClick={resetFilter}
+                                    onClick={() => filterByRole(role)}
                                 >
-                                    Сбросить фильтр
+                                    {role}
                                 </li>
-                            </ul>
-                        )}
-                    </th>
-                    <th>Взаимодействие</th>
-                </tr>
-                </thead>
-                <tbody>
-                {users.map((user) => {
-                    const uid = user.id.split("-")[4];
-                    const roleLetter = user.roles && user.roles.length > 0 ? user.roles[0].role.charAt(0) : "";
-                    return (<tr key={user.id}>
-                        <td>{uid}</td>
-                        <td>{user.firstName}</td>
-                        <td>{user.lastName}</td>
-                        <td>{user.email}</td>
-                        <td>{user.group ? user.group.name : ""}</td>
-                        <td>{roleLetter}</td>
-                        <td>
-                            <div className="d-flex justify-content-center align-items-center">
-                                <button
-                                    className="btn btn-sm btn-outline-success mx-2"
-                                    onClick={() => navigate("/admin-login")}
-                                    >
-                                        ➡️
-                                    </button>
-                                    <button
-                                        className="btn btn-sm btn-outline-danger mx-2"
-                                        onClick={() => navigate("/admin-delete")}
-                                    >
-                                        ❌
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>);
-                })}
-                </tbody>
-            </table>
-        </div>);
+                            ))}
+                            <li
+                                className="list-group-item list-group-item-action"
+                                onClick={resetFilter}
+                            >
+                                Сбросить фильтр
+                            </li>
+                        </ul>
+                    )}
+                </th>
+                <th>Взаимодействие</th>
+            </tr>
+            </thead>
+            <tbody>
+            {users.map((user) => {
+                const uid = user.id.split("-")[4];
+                const roleLetter = user.roles && user.roles.length > 0 ? user.roles[0].role.charAt(0) : "";
+                return (<tr key={user.id}>
+                    <td>{uid}</td>
+                    <td>{user.firstName}</td>
+                    <td>{user.lastName}</td>
+                    <td>{user.email}</td>
+                    <td>{user.group ? user.group.name : ""}</td>
+                    <td>{roleLetter}</td>
+                    <td>
+                        <div className="d-flex justify-content-center align-items-center">
+                            <button
+                                className="btn btn-sm btn-outline-success mx-2"
+                                onClick={() => navigate("/admin-login")}
+                            >
+                                ➡️
+                            </button>
+                            <button
+                                className="btn btn-sm btn-outline-danger mx-2"
+                                onClick={() => navigate("/admin-delete")}
+                            >
+                                ❌
+                            </button>
+                        </div>
+                    </td>
+                </tr>);
+            })}
+            </tbody>
+        </table>
+    </div>);
 };
 
 export default UsersTable;
