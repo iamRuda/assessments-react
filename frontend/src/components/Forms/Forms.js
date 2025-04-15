@@ -10,7 +10,10 @@ import {faArrowUp,
     faPencilAlt,
     faChartBar,
     faPalette,
-    faTimes
+    faTimes,
+    faPlus,
+    faCode,
+    faTrashAlt
 } from '@fortawesome/free-solid-svg-icons';
 
 const Forms = () => {
@@ -30,7 +33,7 @@ const Forms = () => {
     const [newTitle, setNewTitle] = useState('');
     const [isGradingModalOpen, setIsGradingModalOpen] = useState(false);
     const [localThresholds, setLocalThresholds] = useState([]);
-    const [isStrictValidation, setIsStrictValidation] = useState(true);  // Флаг строгой проверки
+    const [isStrictValidation, setIsStrictValidation] = useState(true);
     const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
     const [localDescription, setLocalDescription] = useState('');
     const [localColor, setLocalColor] = useState('');
@@ -157,14 +160,23 @@ const Forms = () => {
         const scrollY = window.scrollY;
         const windowHeight = window.innerHeight;
         const documentHeight = document.documentElement.scrollHeight;
-
-        const shouldShow = documentHeight > windowHeight;
-        setIsScrollButtonVisible(shouldShow);
-
+    
+        // Конвертируем 12rem в пиксели
+        const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+        const offsetThreshold = 12 * rootFontSize;
+    
+        const halfViewport = windowHeight * 0.5; // 50vh
+        const shouldShowInitial = documentHeight > windowHeight + halfViewport;
+    
         const scrollBottom = documentHeight - (scrollY + windowHeight);
-        const isNearBottom = scrollBottom < 100;
-        const isNearTop = scrollY < 100;
-
+        const isNearBottom = scrollBottom < offsetThreshold;
+        const isNearTop = scrollY < offsetThreshold;
+    
+        // Скрываем кнопку у границ
+        const shouldShow = shouldShowInitial && !isNearTop && !isNearBottom;
+        setIsScrollButtonVisible(shouldShow);
+    
+        // Определяем направление
         if (isNearBottom) {
             setScrollDirection('up');
         } else if (isNearTop) {
@@ -941,7 +953,7 @@ const Forms = () => {
             <div className="mb-3">
                 <Link to="/dashboard" className="">{"<<"} Вернуться на главную</Link>
             </div>
-            <div className="d-flex justify-content-between align-items-center mb-4">
+            <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-2 gap-md-0">
                 <div className="d-flex align-items-center gap-3">
                     {isEditingTitle ? (
                         <input
@@ -968,7 +980,7 @@ const Forms = () => {
                             autoFocus
                         />
                     ) : (
-                        <h2 className="mb-0">
+                        <h2 className="mb-0 fs-3 fs-md-2">
                             {jsonData.test?.title || "Получение данных..."}
                         </h2>
                     )}
@@ -985,9 +997,9 @@ const Forms = () => {
                     )}
                 </div>
                 {(userRole === 'TEACHER' || userRole === 'ADMIN') && (
-                <div>
+                <div className="d-flex flex-wrap gap-2 justify-content-end">
                     <button
-                    className="btn btn-secondary me-2"
+                    className="btn btn-secondary"
                     onClick={() => {
                         setLocalDescription(jsonData.test?.description || '');
                         setLocalColor(jsonData.test?.color || '');
@@ -995,18 +1007,19 @@ const Forms = () => {
                         setIsThemeModalOpen(true);
                     }}
                     >
-                    <FontAwesomeIcon icon={faPalette} className="me-2"/>
-                    Настроить тему
+                    <FontAwesomeIcon icon={faPalette} className="me-md-2"/>
+                    <span className="d-none d-md-inline">Настройка</span>
                     </button>
                     <button
-                    className="btn btn-secondary me-2"
+                    className="btn btn-secondary"
                     onClick={handleOpenGradingModal}
                     >
-                    <FontAwesomeIcon icon={faChartBar} className="me-2"/>
-                    Изменить оценивание
+                    <FontAwesomeIcon icon={faChartBar} className="me-md-2"/>
+                    <span className="d-none d-md-inline">Изменить оценивание</span>
                     </button>
                     <button className="btn btn-primary" onClick={handleAddQuestion}>
-                    Добавить вопрос
+                    <FontAwesomeIcon icon={faPlus} className="me-md-2"/>
+                    <span className="d-none d-md-inline">Добавить вопрос</span>
                     </button>
                     {isModalOpen && (
                     <QuestionTemplateModal
@@ -1551,29 +1564,32 @@ const Forms = () => {
                                     </div>
                                 )}
                                 {(userRole === 'TEACHER' || userRole === 'ADMIN') && (
-                                    <div className="mt-3">
-                                        <button
-                                            type="button"
-                                            className="btn btn-secondary me-2"
-                                            onClick={() => handleEditJson(question.id)}
-                                        >
-                                            Редактировать JSON
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="btn btn-info me-2"
-                                            onClick={() => handleStartFieldEditing(question.id)}
-                                        >
-                                            Редактировать вопрос
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="btn btn-danger"
-                                            onClick={() => handleDeleteQuestion(question.id)}
-                                        >
-                                            Удалить вопрос
-                                        </button>
-                                    </div>)}
+                                    <div className="mt-3 d-flex gap-2">
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        onClick={() => handleEditJson(question.id)}
+                                    >
+                                        <FontAwesomeIcon icon={faCode} className="me-md-2 me-0"/>
+                                        <span className="d-none d-md-inline">Редактировать JSON</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-info"
+                                        onClick={() => handleStartFieldEditing(question.id)}
+                                    >
+                                        <FontAwesomeIcon icon={faPencilAlt} className="me-md-2 me-0"/>
+                                        <span className="d-none d-md-inline">Редактировать вопрос</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-danger"
+                                        onClick={() => handleDeleteQuestion(question.id)}
+                                    >
+                                        <FontAwesomeIcon icon={faTrashAlt} className="me-md-2 me-0"/>
+                                        <span className="d-none d-md-inline">Удалить вопрос</span>
+                                    </button>
+                                </div>)}
                             </div>
                         )}
                     </div>
