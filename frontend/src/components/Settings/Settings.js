@@ -1,174 +1,229 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBars, faTimes, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 const Settings = () => {
   const [activeSection, setActiveSection] = useState("general");
-  // isDarkTheme = true, если установлена тёмная тема, иначе false (светлая)
   const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Инициализация темы (однократно при загрузке)
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      const dark = savedTheme === "dark";
-      setIsDarkTheme(dark);
-      // Обновляем класс body в зависимости от сохранённой темы
-      document.body.classList.remove("dark-theme", "light-theme");
-      document.body.classList.add(dark ? "dark-theme" : "light-theme");
-    } else {
-      // Если тема не сохранена, по умолчанию светлая тема
-      setIsDarkTheme(false);
-      document.body.classList.remove("dark-theme", "light-theme");
-      document.body.classList.add("light-theme");
-    }
+    const savedTheme = localStorage.getItem("theme") || "light";
+    setIsDarkTheme(savedTheme === "dark");
+    document.body.className = `${savedTheme}-theme`;
   }, []);
 
-  const handleBackToDashboard = () => {
-    navigate("/dashboard");
-  };
-
   const toggleTheme = () => {
-    const newTheme = !isDarkTheme ? "dark" : "light";
+    const newTheme = isDarkTheme ? "light" : "dark";
     setIsDarkTheme(!isDarkTheme);
-    // Явное управление классами на body:
-    document.body.classList.remove("dark-theme", "light-theme");
-    document.body.classList.add(newTheme === "dark" ? "dark-theme" : "light-theme");
+    document.body.className = `${newTheme}-theme`;
     localStorage.setItem("theme", newTheme);
   };
 
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const closeMenu = () => setIsMenuOpen(false);
 
-  const handleLogout = () => {
-    // Удаляем authToken из localStorage и выполняем логику logout
-    localStorage.removeItem("authToken");
-    console.log("Выполнен выход из учётной записи");
-    // Можно добавить очистку других данных и редирект на страницу логина
-    navigate("/login");
+  const handleSectionChange = (section) => {
+    setActiveSection(section);
+    closeMenu();
+  };
+
+  const sections = {
+    general: {
+      title: "Общие настройки",
+      content: (
+        <>
+          <div className="mb-3 d-flex align-items-center justify-content-between">
+            <span>Тёмная тема</span>
+            <div className="form-check form-switch">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                role="switch"
+                checked={isDarkTheme}
+                onChange={toggleTheme}
+                style={{ width: '3em', height: '1.5em' }}
+              />
+            </div>
+          </div>
+          <div className="mb-3 d-flex align-items-center justify-content-between">
+            <span>Email уведомления</span>
+            <div className="form-check form-switch">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                role="switch"
+                style={{ width: '3em', height: '1.5em' }}
+              />
+            </div>
+          </div>
+        </>
+      )
+    },
+    account: {
+      title: "Учётная запись",
+      content: (
+        <>
+          <div className="mb-4">
+            <button className="btn btn-warning w-100 py-2">
+              Сменить пароль
+            </button>
+          </div>
+          <div className="mb-4">
+            <button className="btn btn-danger w-100 py-2">
+              Удалить аккаунт
+            </button>
+          </div>
+          <select className="form-select py-2">
+            <option>Русский</option>
+            <option>English</option>
+          </select>
+        </>
+      )
+    },
+    logout: {
+      title: "Выход из системы",
+      content: (
+        <div className="text-center">
+          <p className="mb-4">Вы уверены, что хотите выйти?</p>
+          <button 
+            className="btn btn-danger px-5 py-2"
+            onClick={() => {
+              localStorage.removeItem("authToken");
+              navigate("/login");
+            }}
+          >
+            Выйти
+          </button>
+        </div>
+      )
+    }
   };
 
   return (
     <div className={`container-fluid ${isDarkTheme ? "dark-theme" : "light-theme"}`}>
-      <div className="row">
-        <div
-          className="col-md-3 bg-light p-4"
-          style={{ position: "absolute", top: 0, bottom: 0, left: 0 }}
+      {/* Мобильное меню */}
+      <div className="d-md-none fixed-top bg-light p-2 shadow-sm">
+        <button 
+          className="btn btn-link" 
+          onClick={toggleMenu}
+          aria-label="Toggle menu"
         >
+          <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} size="lg" />
+        </button>
+      </div>
+
+      <div className="row">
+        {/* Боковое меню для десктопа */}
+        <div className="col-md-3 d-none d-md-block bg-light p-4" 
+             style={{ position: "sticky", top: 0, height: "100vh" }}>
           <h3>Настройки</h3>
           <ul className="list-group">
             <li
               className={`list-group-item ${activeSection === "general" ? "active" : ""}`}
-              onClick={() => setActiveSection("general")}
+              onClick={() => handleSectionChange("general")}
               style={{ cursor: "pointer" }}
             >
               Общие
             </li>
             <li
               className={`list-group-item ${activeSection === "account" ? "active" : ""}`}
-              onClick={() => setActiveSection("account")}
+              onClick={() => handleSectionChange("account")}
               style={{ cursor: "pointer" }}
             >
               Учётная запись
             </li>
             <li
               className={`list-group-item ${activeSection === "logout" ? "active" : ""}`}
-              onClick={() => setActiveSection("logout")}
+              onClick={() => handleSectionChange("logout")}
               style={{ cursor: "pointer" }}
             >
-              Выход из учётки
+              Выход
             </li>
           </ul>
         </div>
 
-        <div className="col-md-9 offset-md-3 p-4" style={{ marginLeft: "25%" }}>
+        {/* Мобильное меню */}
+        <div 
+          className={`col-md-3 bg-light p-4 mobile-menu ${isMenuOpen ? 'open' : ''}`}
+          style={{
+            position: 'fixed',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            zIndex: 1000,
+            width: '75%',
+            transform: isMenuOpen ? 'translateX(0)' : 'translateX(-100%)',
+            transition: 'transform 0.3s ease'
+          }}
+        >
+          <h3>Настройки</h3>
+          <ul className="list-group">
+            <li
+              className={`list-group-item ${activeSection === "general" ? "active" : ""}`}
+              onClick={() => handleSectionChange("general")}
+            >
+              Общие
+            </li>
+            <li
+              className={`list-group-item ${activeSection === "account" ? "active" : ""}`}
+              onClick={() => handleSectionChange("account")}
+            >
+              Учётная запись
+            </li>
+            <li
+              className={`list-group-item ${activeSection === "logout" ? "active" : ""}`}
+              onClick={() => handleSectionChange("logout")}
+            >
+              Выход
+            </li>
+          </ul>
+        </div>
+
+        {/* Основной контент */}
+        <div className="col-md-9 p-4" style={{ marginLeft: "auto" }}>
           <div className="d-flex justify-content-between mb-4">
-            <h4>
-              {activeSection === "general"
-                ? "Общие настройки"
-                : activeSection === "account"
-                ? "Настройки учётной записи"
-                : "Выход из учётки"}
-            </h4>
-            <button className="btn btn-secondary" onClick={handleBackToDashboard}>
-              Назад
+            <h5 className="d-md-none">
+              {sections[activeSection].title}
+            </h5>
+            <h3 className="d-none d-md-block">{sections[activeSection].title}</h3>
+            <button className="btn btn-secondary" onClick={() => navigate("/dashboard")}>
+              <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
+              <span className="d-none d-md-inline">На главную</span>
+              <span className="d-md-none">Назад</span>
             </button>
           </div>
 
-          {activeSection === "general" && (
-            <div>
-              <h5 className="mb-3">Общие настройки</h5>
-              <p className="mb-4">Настройки для общих параметров вашего профиля.</p>
-              <div className="mb-3">
-                <label htmlFor="themeToggle" className="form-label">
-                  Тёмная тема
-                </label>
-                <input
-                  type="checkbox"
-                  className="form-check-input mx-3"
-                  id="themeToggle"
-                  checked={isDarkTheme}
-                  onChange={toggleTheme}
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="emailNotifications" className="form-label">
-                  Уведомления по электронной почте
-                </label>
-                <input
-                  type="checkbox"
-                  className="form-check-input mx-3"
-                  id="emailNotifications"
-                  onChange={(e) =>
-                    console.log("Email notifications toggled:", e.target.checked)
-                  }
-                />
-              </div>
-            </div>
-          )}
-
-          {activeSection === "account" && (
-            <div>
-              <h5 className="mb-3">Учётная запись</h5>
-              <p className="mb-4">Настройки для изменения данных учётной записи.</p>
-              <div className="mb-3">
-                <label htmlFor="changePassword" className="form-label">
-                  Сменить пароль
-                </label>
-                <button className="btn btn-warning mx-3" id="changePassword">
-                  Изменить
-                </button>
-              </div>
-              <div className="mb-3">
-                <label htmlFor="deleteAccount" className="form-label">
-                  Удалить учётную запись
-                </label>
-                <button className="btn btn-danger mx-3" id="deleteAccount">
-                  Удалить
-                </button>
-              </div>
-              <div className="mb-3">
-                <label htmlFor="language" className="form-label">
-                  Язык интерфейса
-                </label>
-                <select className="form-select" id="language">
-                  <option>Русский</option>
-                  <option>English</option>
-                </select>
-              </div>
-            </div>
-          )}
-
-          {activeSection === "logout" && (
-            <div>
-              <h5 className="mb-3">Выход из учётной записи</h5>
-              <p className="mb-4">Настройки для выхода из учётной записи.</p>
-              <button className="btn btn-danger" onClick={handleLogout}>
-                Выйти
-              </button>
-            </div>
-          )}
+          <div className="card p-4 shadow-sm">
+            {sections[activeSection].content}
+          </div>
         </div>
       </div>
+
+      {/* Стили для мобильной версии */}
+      <style>{`
+        @media (max-width: 767px) {
+          .mobile-menu {
+            overflow-y: auto;
+            background: white;
+            top: 60px !important; /* Добавляем отступ сверху */
+          }
+          .col-md-9 {
+            margin-left: 0 !important;
+            padding-top: 6rem !important; /* Увеличиваем отступ */
+          }
+          .list-group-item {
+            padding: 1rem;
+            font-size: 1rem;
+          }
+          .fixed-top {
+            height: 60px;
+          }
+        }
+      `}</style>
     </div>
   );
 };
