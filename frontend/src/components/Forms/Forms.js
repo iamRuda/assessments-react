@@ -46,30 +46,6 @@ const Forms = () => {
         };
       }, [jsonData.test?.color]);
 
-      useEffect(() => {
-        const checkTestCompletion = async () => {
-            if (userRole === 'STUDENT' && profileData?.id) {
-                try {
-                    const token = getToken();
-                    const response = await fetch(
-                        `http://localhost:8080/api/result/findByUserIdAndTestId/${profileData.id}/${id}`,
-                        {headers: {Authorization: `Bearer ${token}`}}
-                    );
-    
-                    if (response.ok) {
-                        const result = await response.json();
-                        setIsTestCompleted(result.completed);
-                        // Исправлено здесь: берем данные из result.result
-                        setResultData(result);
-                    }
-                } catch (error) {
-                    console.error("Error checking test completion", error);
-                }
-            }
-        };
-        checkTestCompletion();
-    }, [id, userRole, profileData]);
-
     const getToken = () => {
         return localStorage.getItem("authToken");
     };
@@ -101,37 +77,67 @@ const Forms = () => {
 
     useEffect(() => {
         const fetchTestData = async () => {
-            setIsLoading(true);
-            try {
-                const token = getToken();
-                const response = await fetch(`http://localhost:8080/api/test/findById/${id}`, {
-                    method: "GET",
-                    headers: {Authorization: `Bearer ${token}`},
-                });
-
-                if ((response.status === 403) || (response.status === 404)) {
-                    setIsNotFound(true);
-                    return;
-                }
-
-                if (!response.ok) {
-                    throw new Error('Ошибка загрузки теста');
-                }
-
-                const result = await response.json();
-                setJsonData(result);
-            } catch (error) {
-                console.error("Error fetching test data", error);
-                if (error.message.includes('404')) {
-                    setIsNotFound(true);
-                }
-            } finally {
-                setIsLoading(false);
+          setIsLoading(true);
+          try {
+            const token = getToken();
+            const response = await fetch(`http://localhost:8080/api/test/findById/${id}`, {
+              method: "GET",
+              headers: { Authorization: `Bearer ${token}` },
+            });
+      
+            if (response.status === 403 || response.status === 404) {
+              setIsNotFound(true);
+              return;
             }
+      
+            if (!response.ok) throw new Error('Ошибка загрузки теста');
+      
+            const testData = await response.json();
+            
+            // Сначала загружаем основные данные теста
+            setJsonData(testData);
+      
+            // Затем проверяем результаты
+            const checkResults = async () => {
+              if (userRole === 'STUDENT' && profileData?.id) {
+                try {
+                  const resultResponse = await fetch(
+                    `http://localhost:8080/api/result/findByUserIdAndTestId/${profileData.id}/${id}`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                  );
+      
+                  if (resultResponse.ok) {
+                    const result = await resultResponse.json();
+                    setIsTestCompleted(result.completed);
+                    setResultData(result);
+      
+                    // Обновляем selectedAnswers после установки основных данных
+                    setJsonData(prev => ({
+                      ...prev,
+                      questions: prev.questions.map(q => ({
+                        ...q,
+                        selectedAnswers: result.questionsWithScoreAndSelectedAnswers[q.id]?.selectedAnswers || []
+                      }))
+                    }));
+                  }
+                } catch (error) {
+                  console.error("Error checking test completion", error);
+                }
+              }
+            };
+      
+            await checkResults();
+      
+          } catch (error) {
+            console.error("Error fetching test data", error);
+            if (error.message.includes('404')) setIsNotFound(true);
+          } finally {
+            setIsLoading(false);
+          }
         };
-
+      
         fetchTestData();
-    }, [id]);
+      }, [id, userRole, profileData]); 
 
     const [scrollDirection, setScrollDirection] = useState('down');
     const [isScrollButtonVisible, setIsScrollButtonVisible] = useState(false);
@@ -1389,152 +1395,6 @@ const Forms = () => {
                         ) : (
                             <div>
                                 <p className="text-dark">{question.questionText}</p>
-
-                                {isTestCompleted && userRole === 'STUDENT' ? (
-                                    <div className="completed-answers">
-                                        {resultData?.questionsWithScoreAndSelectedAnswers && 
-                                        Object.entries(resultData.questionsWithScoreAndSelectedAnswers).map(([questionId, questionResult]) => {
-                                            const currentQuestion = jsonData.questions.find(q => q.id === questionId);
-                                            
-                                            return currentQuestion ? (
-                                                <div key={questionId} className="card mb-4 p-3 shadow-sm">
-                                                    {/* Заголовок вопроса */}
-                                                    <h5>{currentQuestion.questionHeader}</h5>
-                                                    
-                                                    {/* Для вопросов с вариантами ответов */}
-                                                    {['MULTIPLE_CHOICE_SINGLE', 'MULTIPLE_CHOICE_MULTIPLE'].includes(currentQuestion.questionType) && (
-                                                        <div className="mb-3">
-                                                            <strong>
-                                                                {currentQuestion.questionType === 'MULTIPLE_CHOICE_SINGLE'
-                                                                    ? "Выбранный ответ:"
-                                                                    : "Выбранные ответы:"}
-                                                            </strong>
-                                                            {currentQuestion.options
-                                                                .filter(opt => 
-                                                                    questionResult.selectedAnswers.includes(opt.id) ||
-                                                                    questionResult.selectedAnswers.includes(opt.id.toString())
-                                                                )
-                                                                .map(opt => (
-                                                                    <div key={opt.id} className="ms-2 text-success">
-                                                                        ✔ {opt.text} 
-                                                                        <span className="text-muted ms-2">
-                                                                            (Баллы: {questionResult.score}/{currentQuestion.maxScore})
-                                                                        </span>
-                                                                    </div>
-                                                                ))}
-                                                        </div>
-                                                    )}
-
-                                                    {/* Open Ended */}
-                                                    {currentQuestion.questionType.startsWith('OPEN_ENDED') && (
-                                                        <div className="mb-3">
-                                                            <strong>Ваш ответ:</strong>
-                                                            <div className="ms-2 bg-light p-2 rounded">
-                                                                {questionResult.selectedAnswers[0] || 'Нет ответа'}
-                                                                <div className="text-muted mt-2">
-                                                                    Баллы: {questionResult.score}/{currentQuestion.maxScore}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {/* Image Selection */}
-                                                    {currentQuestion.questionType.startsWith('IMAGE_SELECTION') && (
-                                                        <div className="row">
-                                                            {currentQuestion.options
-                                                                .filter(opt => questionResult.selectedAnswers.includes(opt.id))
-                                                                .map(opt => (
-                                                                    <div key={opt.id} className="col-4 text-center mb-3 position-relative">
-                                                                        <img
-                                                                            src={opt.url}
-                                                                            alt={opt.text}
-                                                                            className="img-thumbnail"
-                                                                            style={{
-                                                                                border: '2px solid #28a745',
-                                                                                opacity: 0.9
-                                                                            }}
-                                                                        />
-                                                                        <div className="position-absolute top-0 end-0 m-1 bg-success text-white rounded-circle p-1">
-                                                                            ✓
-                                                                        </div>
-                                                                        <div className="text-muted mt-1">
-                                                                            Баллы: {questionResult.score}/{currentQuestion.maxScore}
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                        </div>
-                                                    )}
-
-                                                    {/* Button Select */}
-                                                    {currentQuestion.questionType.includes('BUTTON_SELECT') && (
-                                                        <div className="slider-container">
-                                                            <div className="slider-track">
-                                                                {currentQuestion.options.map((option) => (
-                                                                    <div key={option.id} className="slide">
-                                                                        <div
-                                                                            className="d-block"
-                                                                            style={{
-                                                                                backgroundColor: questionResult.selectedAnswers.includes(option.id)
-                                                                                    ? '#28a745'
-                                                                                    : '#6c757d',
-                                                                                color: 'white',
-                                                                                opacity: 0.7,
-                                                                                cursor: 'default'
-                                                                            }}
-                                                                        >
-                                                                            {option.text}
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                            <div className="text-muted mt-2">
-                                                                Баллы: {questionResult.score}/{currentQuestion.maxScore}
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {currentQuestion.questionPostscript && (
-                                                        <p className="text-muted mt-2">{currentQuestion.questionPostscript}</p>
-                                                    )}
-                                                </div>
-                                            ) : null;
-                                        })}
-
-                                        {/* Итоговая информация */}
-                                        {resultData && (
-                                            <div className="card mt-4 p-4 bg-light shadow-sm">
-                                                <h4 className="text-center mb-3">Итоги тестирования</h4>
-                                                <div className="row">
-                                                    <div className="col-md-6">
-                                                        <p className="h5">
-                                                            Общий балл: 
-                                                            <span className="ms-2 text-primary">
-                                                                {resultData.totalScore}
-                                                            </span>
-                                                        </p>
-                                                    </div>
-                                                    <div className="col-md-6">
-                                                        <p className="h5">
-                                                            Оценка: 
-                                                            <span className="ms-2 text-success">
-                                                                {resultData.mark}
-                                                            </span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <div className="text-center mt-3">
-                                                    <button 
-                                                        className="btn btn-primary"
-                                                        onClick={handleCloseTest}
-                                                    >
-                                                        Закрыть результаты
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    // Оригинальные интерактивные элементы
                                     <>
                                         {question.options && (question.questionType === 'MULTIPLE_CHOICE_SINGLE' || question.questionType === 'MULTIPLE_CHOICE_MULTIPLE') && (
                                             question.options.map((option) => (
@@ -1681,6 +1541,11 @@ const Forms = () => {
                                             </div>
                                         )}
                                     </>
+                                {/* После вариантов ответов в рендере вопроса */}
+                                {(userRole === 'STUDENT' && isTestCompleted && resultData) && (
+                                <div className="mt-3 p-2 bg-light rounded">
+                                    <strong>Набрано баллов:</strong> {resultData.questionsWithScoreAndSelectedAnswers[question.id]?.score || 0}
+                                </div>
                                 )}
                                 <p className="text-muted mt-2">{question.questionPostscript}</p>
                                 {(userRole === 'TEACHER' || userRole === 'ADMIN') && (
@@ -1724,18 +1589,26 @@ const Forms = () => {
                         )}
                     </div>
                 ))}
-                <div className="d-flex justify-content-end">
-                    <button
-                        type={isTestCompleted ? "button" : "submit"}
-                        className="btn btn-primary"
-                        onClick={isTestCompleted ? handleCloseTest : undefined}
-                    >
-                        {isTestCompleted && userRole === 'STUDENT' ? (
-                            'Закрыть'
-                        ) : (userRole === 'TEACHER' || userRole === 'ADMIN') ?
-                            'Сохранить тест' :
-                            'Отправить ответы'}
-                    </button>
+                <div className="d-flex justify-content-end align-items-center gap-4">
+                {(userRole === 'STUDENT' && isTestCompleted && resultData) && (
+                    <div className="me-auto">
+                    <h4 className="mb-0">
+                        Оценка: {resultData.mark} 
+                        <span className="text-muted fs-5 ms-2">
+                        (Баллы: {resultData.totalScore} из {jsonData.questions.reduce((sum, q) => sum + (q.maxScore || 0), 0)})
+                        </span>
+                    </h4>
+                    </div>
+                )}
+                
+                <button
+                    type={isTestCompleted ? "button" : "submit"}
+                    className="btn btn-primary"
+                    onClick={isTestCompleted ? handleCloseTest : undefined}
+                >
+                    {isTestCompleted && userRole === 'STUDENT' ? 'Закрыть' : 
+                    (userRole === 'TEACHER' || userRole === 'ADMIN') ? 'Сохранить тест' : 'Отправить ответы'}
+                </button>
                 </div>
             </form>
             {isScrollButtonVisible && (
