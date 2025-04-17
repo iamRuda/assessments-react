@@ -57,7 +57,7 @@ const Forms = () => {
         const initProfileData = async () => {
             try {
                 const token = getToken();
-                const response = await fetch("http://localhost:8080/api/user/profile", {
+                const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/profile`, {
                     method: "GET",
                     headers: {Authorization: `Bearer ${token}`},
                 });
@@ -83,7 +83,7 @@ const Forms = () => {
           setIsLoading(true);
           try {
             const token = getToken();
-            const response = await fetch(`http://localhost:8080/api/test/findById/${id}`, {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/test/findById/${id}`, {
               method: "GET",
               headers: { Authorization: `Bearer ${token}` },
             });
@@ -116,7 +116,7 @@ const Forms = () => {
               if (userRole === 'STUDENT' && profileData?.id) {
                 try {
                   const resultResponse = await fetch(
-                    `http://localhost:8080/api/result/findByUserIdAndTestId/${profileData.id}/${id}`,
+                    `${process.env.REACT_APP_API_BASE_URL}/api/result/findByUserIdAndTestId/${profileData.id}/${id}`,
                     { headers: { Authorization: `Bearer ${token}` } }
                   );
       
@@ -318,7 +318,7 @@ const Forms = () => {
         const token = getToken();
         if (userRole === 'TEACHER' || userRole === 'ADMIN') {
             try {
-                const response = await fetch(`http://localhost:8080/api/test/update`, {
+                const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/test/update`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -341,7 +341,7 @@ const Forms = () => {
             }
         } else if (userRole === 'STUDENT') {
             try {
-                const response = await fetch("http://localhost:8080/api/test/complete", {
+                const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/test/complete`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

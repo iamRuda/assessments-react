@@ -19,7 +19,7 @@ const Analytics = () => {
     useEffect(() => {
         const fetchGroups = async () => {
             try {
-                const response = await fetch("http://localhost:8080/api/group/findAll", {
+                const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/group/findAll`, {
                     method: "GET",
                     headers: {
                         Authorization: `Bearer ${token}`,

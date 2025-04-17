@@ -14,7 +14,7 @@ const Registration = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:8080/api/auth/signup", {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -18,7 +18,7 @@ const UsersTable = () => {
     // Загрузка всех пользователей
     const fetchUsers = async () => {
         try {
-            const response = await fetch("http://localhost:8080/api/user/findAll", {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/findAll`, {
                 method: "GET", headers: {
                     Authorization: `Bearer ${token}`, Accept: "application/json",
                 },
@@ -35,7 +35,7 @@ const UsersTable = () => {
     // Загрузка всех групп
     const fetchGroups = async () => {
         try {
-            const response = await fetch("http://localhost:8080/api/group/findAll", {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/group/findAll`, {
                 method: "GET", headers: {
                     Authorization: `Bearer ${token}`, Accept: "application/json",
                 },
@@ -51,7 +51,7 @@ const UsersTable = () => {
     // Фильтрация пользователей по группе
     const filterByGroup = async (groupName) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/user/findByGroup?groupName=${encodeURIComponent(groupName)}`, {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/findByGroup?groupName=${encodeURIComponent(groupName)}`, {
                 method: "GET", headers: {
                     Authorization: `Bearer ${token}`, Accept: "application/json",
                 },
@@ -68,7 +68,7 @@ const UsersTable = () => {
     // Фильтрация пользователей по роли
     const filterByRole = async (role) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/user/findByRole?role=${encodeURIComponent(role)}`, {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/findByRole?role=${encodeURIComponent(role)}`, {
                 method: "GET", headers: {
                     Authorization: `Bearer ${token}`, Accept: "application/json",
                 },

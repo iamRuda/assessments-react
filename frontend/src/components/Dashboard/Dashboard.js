@@ -23,7 +23,7 @@ const Dashboard = () => {
     const token = localStorage.getItem("authToken");
     const fetchGroups = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/group/findAll", {
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/group/findAll`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -53,7 +53,7 @@ const Dashboard = () => {
 
       // 1. Получаем ID группы по имени
       const groupResponse = await fetch(
-          `http://localhost:8080/api/group/findByName/${encodeURIComponent(selectedGroup)}`,
+          `${process.env.REACT_APP_API_BASE_URL}/api/group/findByName/${encodeURIComponent(selectedGroup)}`,
           {
             method: "GET",
             headers: {
@@ -84,7 +84,7 @@ const Dashboard = () => {
       };
 
       // 4. Отправляем запрос на назначение
-      const response = await fetch("http://localhost:8080/api/testAssignment/assign", {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/testAssignment/assign`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -111,7 +111,7 @@ const Dashboard = () => {
 
     const initProfileData = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/user/profile", {
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/profile`, {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -162,7 +162,7 @@ const Dashboard = () => {
 
       try {
         const response = await fetch(
-          `http://localhost:8080/api` + URL_MAPPING,
+          `${process.env.REACT_APP_API_BASE_URL}/api` + URL_MAPPING,
           {
             method: "GET",
             headers: { Authorization: `Bearer ${token}` },
@@ -193,7 +193,7 @@ const Dashboard = () => {
   const handleCreateTest = async (testTitle) => {
     const token = localStorage.getItem("authToken");
     try {
-      const response = await fetch("http://localhost:8080/api/test/create", {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/test/create`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
