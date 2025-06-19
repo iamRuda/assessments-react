@@ -1,0 +1,121 @@
+.checkbox-overlay {
+    position: absolute; /* Position absolutely within the parent container */
+    top: 0.5rem; /* Adjust this value to position it vertically */
+    right: 0.8rem; /* Adjust this value to position it horizontally */
+    width: 1.5rem;
+    height: 1.5rem;
+    cursor: pointer;
+    z-index: 1; /* Ensure it appears above the image */
+}
+
+.img-form {
+    display: inline-block; /* Keeps the label as a block to maintain layout */
+    width: 7rem; /* Set this to match the image width */
+    height: 7rem; /* Set this to match the image height */
+    position: relative; /* To position the checkbox correctly within it */
+}
+
+.img-form img {
+    width: 100%; /* Make image responsive to the label size */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 10px; /* Keep rounded corners */
+}
+
+
+
+/* Стили для модального окна */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Затемнение фона */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050; /* Поверх всех элементов */
+  }
+  
+  .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 50rem;
+    width: 100%;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Стили для кнопок с иконками */
+  .template-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd;
+    padding: 15px;
+    width: 9rem;
+    height: 10rem;
+    border-radius: 10px;
+    background-color: #f7f7f7;
+    cursor: pointer;
+    text-align: center;
+  }
+  
+  .template-btn .icon-container {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+  }
+  
+  .template-btn .icon {
+    max-width: 70%;
+    max-height: 70%;
+  }
+  
+  .template-btn span {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .template-btn:hover {
+    background-color: #eaeaea;
+  }
+  
+  /* Кнопка закрытия */
+  .close-modal {
+    margin-top: 20px;
+    width: 100%;
+  }
+
+  .max-score-container {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: white;
+    padding: 5px 10px;
+    /* border-radius: 5px; */
+    /* box-shadow: 0 2px 4px rgba(0,0,0,0.1); */
+}
+
+.score-input {
+    border: none !important;
+    border-bottom: 1px solid #dee2e6 !important;
+    width: 60px;
+    text-align: center;
+    padding: 0 5px;
+    margin-left: 10px;
+}
+
+.score-input:focus {
+    outline: none;
+    box-shadow: none;
+    border-bottom-color: #80bdff !important;
+}
